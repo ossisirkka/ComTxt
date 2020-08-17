@@ -104,6 +104,15 @@ funktio_3lk_plus <- function(muuttujat){
 }
 
 
+# Funktio attribuuttien poistoon
+strip_attr <- function(dataframe) {
+  out <- lapply(dataframe, function(x) {
+    attributes(x) <- NULL
+    x
+  })
+  out <- as.data.frame(out)
+  out
+}
 
 ```
 
@@ -196,12 +205,12 @@ tv_liikunta <- data1 %>%
   )) %>% # tämä voi olla hyvä tapa
   mutate(TV_Pesäpallo = case_when(
     k63a == 2 | k63b == 2 ~ "TV_Pesäpallo+",
-    k63c == 1 ~ "TV_Pesäpallo-",
+    k63c == 1 ~ "TV_Pesäpallo0",
     TRUE ~ "TV_Pesäpallo0"
   )) %>% 
   mutate(TV_Jääkiekko = case_when(
     k63a == 3 | k63b == 3 ~ "TV_Jääkiekko+",
-    k63c == 3 ~ "TV_Jääkiekko-",
+    k63c == 3 ~ "TV_Jääkiekko0",
     TRUE ~ "TV_Jääkiekko0"
   )) %>% 
   mutate(TV_Jalkapallo = case_when(
@@ -226,7 +235,7 @@ tv_liikunta <- data1 %>%
   )) %>% 
   mutate(TV_taitoluistelu = case_when(
     k63a == 6 | k63b == 6 ~ "TV_taitoluistelu+",
-    k63c == 6 ~ "TV_taitoluistelu-",
+    k63c == 6 ~ "TV_taitoluistelu0",
     TRUE ~ "TV_taitoluistelu0"
   )) %>% 
   as.data.frame(.) %>% 
@@ -244,11 +253,14 @@ ruoat <- data1 %>%
   select("Pizza" = k71a, "Chateaubriand"=k71b, "Karjalanpaisti"=k71c, "Kreiksalaat" = k71d, 
          "Wieninleike"   =k71e, "Kuha"=k71f, "Kiinalainenruoka" = k71g, "Sushi"= k71h, 
          "Hampurilainen"=k71i) %>% 
+  strip_attr(.) %>% 
   mutate_each(funs(replace(.,.==1,2))) %>%
   mutate_each(funs(replace(.,.==4,0))) %>%
   mutate_each(funs(replace(.,.==5,0))) %>%
   mutate_each(funs(replace(.,.==3,1))) %>%
   mutate_each(funs(replace(.,.==6,1))) %>% 
+  mutate(Pizza = replace(Pizza, Pizza == 0, 1)) %>% 
+  mutate(Chateaubriand = replace(Chateaubriand, Chateaubriand == 0, 1)) %>% 
   #mutate_each(funs(replace(., is.na(.),1))) %>% 
   funktio_3lk() 
 
@@ -269,7 +281,7 @@ excel 213-248 + 25-27 (elokuvat) + 303-304 (bingo)
 
 ```{r}
 osallistuminen <- data1 %>% 
-  select("Museot"= k57b, "Pubit" = k57c, "Karaoke"  = k57d, "Rockkeikat" = k57e, "Oopperakäynti" = k57f, "Bingo" = k57g, "Klassinenkons" = k57h, "Jazzkons" = k57i, "Musikaalit" = k57j, "Teatteri" = k57k, "Galleriat"  = k57l, "Yökerho" = k57m, "Ulkonasyönti" = k57n, "Elokuvat" = k57a) %>%
+  select("Museot"= k57b, "Pubit" = k57c, "Karaoke"  = k57d, "Rockkeikat" = k57e, "Oopperakäynti" = k57f, "Klassinenkons" = k57h, "Jazzkons" = k57i, "Musikaalit" = k57j, "Teatteri" = k57k, "Galleriat"  = k57l, "Yökerho" = k57m, "Ulkonasyönti" = k57n, "Elokuvat" = k57a) %>%
   mutate_each(funs(replace(.,.==1,2))) %>%
   mutate_each(funs(replace(.,.==2,2))) %>%
   mutate_each(funs(replace(.,.==3,2))) %>%
@@ -385,11 +397,6 @@ taidesuuntaukset <- data1 %>%
     k45a != 7 & k45b == 7 ~ "Performanssitaide-", 
     k45a != 7 & k45b != 7 ~ "Performanssitaide0"
   )) %>% 
-  mutate(EiMikäänTaide = case_when(
-    k45a == 8 & k45b != 8 ~ "EiMikäänTaide+",
-    k45a != 8 & k45b == 8 ~ "EiMikäänTaide-", 
-    k45a != 8 & k45b != 8 ~ "EiMikäänTaide0"
-  )) %>% 
   as.data.frame(.) %>% 
   select(-k45a, -k45b) %>% 
   mutate_all(.,funs(as.factor(.)))
@@ -459,7 +466,7 @@ excel 79-111
 
 ```{r}
 kirjagenret <- data1 %>% 
-  select("Dekkarit" = k39a, "Scifikirjat" = k39b, "Viihde/romant.kirjat" = k39c, "Elämäkerrat" = k39d, "Modernikirjal" = k39e, "Klassinenkirjal" = k39f, "Tietokirjat" = k39g, "Runot" = k39h, "Uskonn.kirjat" = k39i, "Itseapukirjat" = k39j, "Harrastekirjat" = k39k) %>% 
+  select("Dekkarit" = k39a, "Scifikirjat" = k39b, "Viihde/romant.kirjat" = k39c, "Modernikirjal" = k39e, "Klassinenkirjal" = k39f, "Tietokirjat" = k39g, "Runot" = k39h, "Uskonn.kirjat" = k39i, "Itseapukirjat" = k39j) %>% 
   mutate_each(funs(replace(.,.==1,2))) %>%
   mutate_each(funs(replace(.,.==2,2))) %>%
   mutate_each(funs(replace(.,.==3,1))) %>%
@@ -548,7 +555,7 @@ excel 9-24
 
 ```{r}
 tvsarjat <- data1 %>% 
-  select("Kotikatu" = k33_1, "BigBrother" = k33_2, "Sinkkuelämää" = k33_5, "Simpsonit" = k33_7, "A-studio" = k33_10, "Morse" = k33_12, "Miljonääriksi" = k33_15, "SalatutElämät" = k33_19) %>% 
+  select("Kotikatu" = k33_1, "Sinkkuelämää" = k33_5, "Simpsonit" = k33_7, "A-studio" = k33_10, "Morse" = k33_12, "Miljonääriksi" = k33_15, "SalatutElämät" = k33_19) %>% 
   mutate_each(funs(replace(.,is.na(.),0))) %>% 
   mutate_each(funs(replace(.,.>1,1))) %>% 
   funktio_2lk()
@@ -597,12 +604,12 @@ tv_ohjelmat <- data1 %>%
   select(k32a, k32b, k32c) %>% 
   mutate(Tv_uutiset = case_when(
     k32a == 1 | k32b == 1 ~ "Tv_uutiset+",
-    k32c == 1 ~ "Tv_uutiset-",
+    k32c == 1 ~ "Tv_uutiset0",
     TRUE ~ "Tv_uutiset0"
   )) %>% 
   mutate(Komediat = case_when(
     k32a == 2 | k32b == 2 ~ "Komediat+",
-    k32c == 2 ~ "Komediat-", 
+    k32c == 2 ~ "Komediat0", 
     TRUE ~ "Komediat0"
   )) %>% 
   mutate(Poliisisarjat = case_when(
@@ -612,7 +619,7 @@ tv_ohjelmat <- data1 %>%
   )) %>% 
   mutate(Ulkom.draamat = case_when(
     k32a == 11 | k32b == 11 ~ "Ulkom.draamasarja+",
-    k32c == 11 ~ "Ulkom.draamasarjat-",
+    k32c == 11 ~ "Ulkom.draamasarjat0",
     TRUE ~ "Ulkom.draamasarjat0"
   )) %>% 
   mutate(Urheiluohjelmat = case_when(
@@ -1066,12 +1073,12 @@ tv_liikunta <- data %>%
   )) %>% # tämä voi olla hyvä tapa
   mutate(TV_Pesäpallo = case_when(
     K58_a == 2 | K58_b == 2 ~ "TV_Pesäpallo+",
-    K58_c == 1 ~ "TV_Pesäpallo-",
+    K58_c == 1 ~ "TV_Pesäpallo0",
     TRUE ~ "TV_Pesäpallo0"
   )) %>% 
   mutate(TV_Jääkiekko = case_when(
     K58_a == 3 | K58_b == 3 ~ "TV_Jääkiekko+",
-    K58_c == 3 ~ "TV_Jääkiekko-",
+    K58_c == 3 ~ "TV_Jääkiekko0",
     TRUE ~ "TV_Jääkiekko0"
   )) %>% 
   mutate(TV_Jalkapallo = case_when(
@@ -1096,7 +1103,7 @@ tv_liikunta <- data %>%
   )) %>% 
   mutate(TV_taitoluistelu = case_when(
     K58_a == 6 | K58_b == 6 ~ "TV_taitoluistelu+",
-    K58_c == 6 ~ "TV_taitoluistelu-",
+    K58_c == 6 ~ "TV_taitoluistelu0",
     TRUE ~ "TV_taitoluistelu0"
   )) %>% 
   as.data.frame(.) %>% 
@@ -1115,12 +1122,15 @@ ruoat <- data %>%
   select("Pizza" = K70_a, "Chateaubriand"=K70_b, "Karjalanpaisti"=K70_c, "Kreiksalaat" = K70_d, 
          "Wieninleike"   =K70_e, "Kuha"=K70_f, "Kiinalainenruoka" = K70_g, "Sushi"= K70_h, 
          "Hampurilainen"=K70_i) %>% 
+  strip_attr(.) %>% 
   mutate_each(funs(replace(.,.==1,2))) %>%
   mutate_each(funs(replace(.,.==4,0))) %>%
   mutate_each(funs(replace(.,.==5,0))) %>%
   mutate_each(funs(replace(.,.==3,1))) %>%
   mutate_each(funs(replace(.,.==6,1))) %>% 
 #  mutate_each(funs(replace(., is.na(.),1))) %>% 
+  mutate(Pizza = replace(Pizza, Pizza == 0, 1)) %>% 
+  mutate(Chateaubriand = replace(Chateaubriand, Chateaubriand == 0, 1)) %>% 
   funktio_3lk() 
 
 summary(ruoat)
@@ -1134,7 +1144,7 @@ excel 213-248 + 25-27 (elokuvat) + 303-304 (bingo)
 
 ```{r}
 osallistuminen <- data %>% 
-  select("Museot"= K52_b, "Pubit" = K52_d, "Karaoke"  = K52_e, "Rockkeikat" = K52_f, "Oopperakäynti" = K52_g, "Bingo" = K52_h, "Klassinenkons" = K52_i, "Jazzkons" = K52_j, "Musikaalit" = K52_k, "Teatteri" = K52_l, "Galleriat"  = K52_m, "Yökerho" = K52_n, "Ulkonasyönti" = K52_o, "Elokuvat" = K52_a) %>%
+  select("Museot"= K52_b, "Pubit" = K52_d, "Karaoke"  = K52_e, "Rockkeikat" = K52_f, "Oopperakäynti" = K52_g, "Klassinenkons" = K52_i, "Jazzkons" = K52_j, "Musikaalit" = K52_k, "Teatteri" = K52_l, "Galleriat"  = K52_m, "Yökerho" = K52_n, "Ulkonasyönti" = K52_o, "Elokuvat" = K52_a) %>%
   mutate_each(funs(replace(.,.==1,2))) %>%
   mutate_each(funs(replace(.,.==2,2))) %>%
   mutate_each(funs(replace(.,.==3,2))) %>%
@@ -1240,11 +1250,6 @@ taidesuuntaukset <- data %>%
     K36_a != 7 & K36_b == 7 ~ "Performanssitaide-", 
     K36_a != 7 & K36_b != 7 ~ "Performanssitaide0"
   )) %>% 
-  mutate(EiMikäänTaide = case_when(
-    K36_a == 8 & K36_b != 8 ~ "EiMikäänTaide+",
-    K36_a != 8 & K36_b == 8 ~ "EiMikäänTaide-", 
-    K36_a != 8 & K36_b != 8 ~ "EiMikäänTaide0"
-  )) %>% 
   as.data.frame(.) %>% 
   select(-K36_a, -K36_b) %>% 
   mutate_all(.,funs(as.factor(.)))
@@ -1310,7 +1315,7 @@ excel 79-111
 
 ```{r}
 kirjagenret <- data %>% 
-  select("Dekkarit" = K31_a, "Scifikirjat" = K31_b, "Viihde/romant.kirjat" = K31_c, "Elämäkerrat" = K31_d, "Modernikirjal" = K31_e, "Klassinenkirjal" = K31_f, "Tietokirjat" = K31_g, "Runot" = K31_h, "Uskonn.kirjat" = K31_i, "Itseapukirjat" = K31_j, "Harrastekirjat" = K31_k) %>% 
+  select("Dekkarit" = K31_a, "Scifikirjat" = K31_b, "Viihde/romant.kirjat" = K31_c, "Modernikirjal" = K31_e, "Klassinenkirjal" = K31_f, "Tietokirjat" = K31_g, "Runot" = K31_h, "Uskonn.kirjat" = K31_i, "Itseapukirjat" = K31_j) %>% 
   mutate_each(funs(replace(.,.==1,2))) %>%
   mutate_each(funs(replace(.,.==2,2))) %>%
   mutate_each(funs(replace(.,.==3,1))) %>%
@@ -1390,7 +1395,7 @@ excel 9-24
 
 ```{r}
 tvsarjat <- data %>% 
-  select("Kotikatu" = K25_1, "BigBrother" = K25_2, "Sinkkuelämää" = K25_5, "Simpsonit" = K25_7, "A-studio" = K25_10, "Morse" = K25_12, "Miljonääriksi" = K25_15, "SalatutElämät" = K25_19) %>% 
+  select("Kotikatu" = K25_1, "Sinkkuelämää" = K25_5, "Simpsonit" = K25_7, "A-studio" = K25_10, "Morse" = K25_12, "Miljonääriksi" = K25_15, "SalatutElämät" = K25_19) %>% 
   mutate_each(funs(replace(.,is.na(.),0))) %>% 
   mutate_each(funs(replace(.,.>1,1))) %>% 
   funktio_2lk()
@@ -1436,12 +1441,12 @@ tv_ohjelmat <- data %>%
   select(K24_a, K24_b, K24_c) %>% 
   mutate(Tv_uutiset = case_when(
     K24_a == 1 | K24_b == 1 ~ "Tv_uutiset+",
-    K24_c == 1 ~ "Tv_uutiset-",
+    K24_c == 1 ~ "Tv_uutiset0",
     TRUE ~ "Tv_uutiset0"
   )) %>% 
   mutate(Komediat = case_when(
     K24_a == 2 | K24_b == 2 ~ "Komediat+",
-    K24_c == 2 ~ "Komediat-", 
+    K24_c == 2 ~ "Komediat0", 
     TRUE ~ "Komediat0"
   )) %>% 
   mutate(Poliisisarjat = case_when(
@@ -1451,7 +1456,7 @@ tv_ohjelmat <- data %>%
   )) %>% 
   mutate(Ulkom.draamat = case_when(
     K24_a == 11 | K24_b == 11 ~ "Ulkom.draamasarja+",
-    K24_c == 11 ~ "Ulkom.draamasarjat-",
+    K24_c == 11 ~ "Ulkom.draamasarjat0",
     TRUE ~ "Ulkom.draamasarjat0"
   )) %>% 
   mutate(Urheiluohjelmat = case_when(
@@ -1786,14 +1791,14 @@ Aloitetaan analyysi luomalla vanhan aineiston mca-kartta. Mukana 100 eniten kont
 ```{r, echo=TRUE, include=TRUE, cache=FALSE}
 library(FactoMineR)
 library(factoextra)
-analyysi_imputoitu <- MCA(molemmat,
-                          ncp=5,
-                          quali.sup = c((ncol(molemmat) - ncol(suplementary_variables) + 1) : ncol(molemmat)),
-                          ind.sup = c(1369:nrow(molemmat)),
-                          row.w = data1$kpaino[vanha_indeksöinti], # painot mukana analyysissä
-                          graph = FALSE)
-
-sum(vanha_indeksöinti)
+# analyysi_imputoitu <- MCA(molemmat,
+#                           ncp=5,
+#                           quali.sup = c((ncol(molemmat) - ncol(suplementary_variables) + 1) : ncol(molemmat)),
+#                           ind.sup = c(1369:nrow(molemmat)),
+#                           row.w = data1$kpaino[vanha_indeksöinti], # painot mukana analyysissä
+#                           graph = FALSE)
+# 
+# sum(vanha_indeksöinti)
 
 #tämä komento tekee kulttuurisen kartan
 #fviz_mca_var(analyysi_imputoitu,
@@ -1836,11 +1841,11 @@ Seuraavaksi esitetään yksilöiden pilvi vanhalla aineistolla. Haastatellut yks
 Uudella aineistolla tehty kulttuurinen kartta:
 
 ```{r echo = TRUE, include=TRUE, cache=FALSE}
-analyysi_imputoitu_uusi <- MCA(complete_uusi_aineisto$completeObs,
-                          ncp=5,
-                          quali.sup = c((ncol(complete_uusi_aineisto$completeObs) - ncol(suplementary_variables) + 1) : ncol(complete_uusi_aineisto$completeObs)),
-                          row.w = data$analyysipaino[uusi_indeksöinti], # painot mukana analyysissä
-                          graph = FALSE)
+# analyysi_imputoitu_uusi <- MCA(complete_uusi_aineisto$completeObs,
+#                           ncp=5,
+#                           quali.sup = c((ncol(complete_uusi_aineisto$completeObs) - ncol(suplementary_variables) + 1) : ncol(complete_uusi_aineisto$completeObs)),
+#                           row.w = data$analyysipaino[uusi_indeksöinti], # painot mukana analyysissä
+#                           graph = FALSE)
 
 
 #tämä komento tekee kulttuurisen kartan
@@ -2008,7 +2013,7 @@ pelaaminen <- data %>%
 ###
 ###
 
-lehdet <- data %>% 
+lehdet_uusi <- data %>% 
   select("Helsingin Sanomat" = K29_a, "Iltasanomat/Iltalehti" = K29_e, "Jokin_ilmainen_lehti" = K29_g, "Viini-lehti" = K30_k) %>% 
   mutate_each(funs(replace(., . == 3, 0))) %>% 
   mutate_each(funs(replace(., . == 1, 4))) %>% 
@@ -2065,7 +2070,7 @@ uudet_muuttujat <- data.frame(
   harrastukset,
   pelaaminen,
   #uudet muuttujat
-  lehdet, 
+  lehdet_uusi, 
   uudet_artistit,
   banksy,
   taidearvostelut,
@@ -2074,6 +2079,57 @@ uudet_muuttujat <- data.frame(
   sisutus
 )[uusi_indeksöinti,]
 
+```
+
+
+## Modaliteettien kentät
+
+```{r}
+reps <- function(df, str){
+#  df <- strip_attr(df)
+   if(all(sapply(df, is.factor))){
+    return(rep(str, mod_määrä(df)))
+  } else {
+    df <- df %>%  mutate_if(is.character, as.factor)
+    return(rep(str, mod_määrä(df)))
+}}
+
+  
+mod_luokitukset <- c(
+  reps(tv_liikunta, "Tv ja elokuvat"),
+  reps(liikunta, "Urheilu, pukeutuminen ja ruumiillisuus"),
+  reps(festarit, "Musiikki"),
+  reps(ruoat, "Ruoka ja syöminen"),
+
+  rep("Kuvataide", 3),
+  rep("Ruoka ja syöminen", 3),
+  rep("Musiikki", 3 * 6),
+  rep("Kirjallisuus ja lukeminen", 3),
+  rep("Kuvataide", 3),
+  rep("Ruoka ja syöminen", 3 * 2),
+  rep("Tv ja elokuvat", 3),
+  
+  reps(taitelijat, "Kuvataide"),
+  reps(taidesuuntaukset, "Kuvataide"),
+  reps(musiikkikappaleet, "Musiikki"),
+  reps(musiikkigenret, "Musiikki"),
+  reps(kirjailijat, "Kirjallisuus ja lukeminen"),
+  reps(kirjagenret, "Kirjallisuus ja lukeminen"),
+  reps(lehdet, "Kirjallisuus ja lukeminen"), 
+  reps(ohjaajat, "Tv ja elokuvat"),
+  reps(elokuvagenret, "Tv ja elokuvat"), 
+  reps(tvsarjat, "Tv ja elokuvat"),
+  reps(tv_ohjelmat, "Tv ja elokuvat"),
+  reps(liikunta_harrastus, "Urheilu, pukeutuminen ja ruumiillisuus"),
+  reps(kauneus, "Urheilu, pukeutuminen ja ruumiillisuus"),
+  reps(muodikkuus, "Urheilu, pukeutuminen ja ruumiillisuus"),
+  reps(ruokajuoma, "Ruoka ja syöminen"),
+  reps(levyt, "Musiikki"),
+  reps(dvd, "Tv ja elokuvat"),
+  reps(kirjojaKotona, "Kirjallisuus ja lukeminen"),
+  reps(TaulujaKotona, "Kuvataide"),
+  reps(television_katselu, "Tv ja elokuvat"),
+  reps(lukeminen, "Kirjallisuus ja lukeminen"))
 ```
 
 
@@ -2090,7 +2146,8 @@ save(
   uudet_muuttujat,
   vanha_indeksöinti,
   uusi_indeksöinti,
-  file = "C:/Users/Ossi/OneDrive/KOULU 2018-2019/Suomalaisen kulttuurin muutos/git_files/Suomalaisen-kulttuurin-muutos/data_for_mca.RData"
+  mod_luokitukset,
+  file = "C:/Users/Ossi/Desktop/r-projektit/mca-article/data_for_mca.RData"
 )
 
 ```
