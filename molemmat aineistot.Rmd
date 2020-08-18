@@ -2130,6 +2130,23 @@ mod_luokitukset <- c(
   reps(TaulujaKotona, "Kuvataide"),
   reps(television_katselu, "Tv ja elokuvat"),
   reps(lukeminen, "Kirjallisuus ja lukeminen"))
+
+
+mod_luokitukset_uudet_muuttujat <- c(
+  reps(peligenret, "Pelaaminen"),
+  reps(Nettikäyttö, "Online"),
+  reps(NettiTarkoitus, "Online"),
+  reps(nettiväittämät, "Online"),
+  reps(yhteisöpalvelut, "Online"),
+  reps(harrastukset, "Arkiset"),
+  reps(pelaaminen, "Pelaaminen"),
+  reps(lehdet_uusi, "Kirjallisuus ja lukeminen"),
+  reps(uudet_artistit, "Musiikki"),
+  reps(banksy, "Kuvataide"),
+  reps(taidearvostelut, "Kuvataide"),
+  reps(lomailu, "Lomailu"),
+  reps(uudet_liikunta, "Urheilu, pukeutuminen ja ruumiillisuus"),
+  reps(sisutus, "Urheilu, pukeutuminen ja ruumiillisuus"))
 ```
 
 
@@ -2147,6 +2164,7 @@ save(
   vanha_indeksöinti,
   uusi_indeksöinti,
   mod_luokitukset,
+  mod_luokitukset_uudet_muuttujat,
   file = "C:/Users/Ossi/Desktop/r-projektit/mca-article/data_for_mca.RData"
 )
 
