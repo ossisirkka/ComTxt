@@ -41,14 +41,7 @@ uusi <- complete_uusi_aineisto$completeObs
 # Extract the number of supplementary variables from the dataframe
 sup.vars <- c("ikä", "koulutus", "ammattiluokka", "sukupuoli", "alue", "tulotaso")
 ```
-```{r,stringtoredoucemodalities}
-index_str <- c("Scifielokuvat", "TV_Pesäpallo", "Urheiluohjelmat", "Mäkelä", "Harlin", "Morse", "Poliisisarjat", "Musikaalielokuvat", "TV_Yleisurheilu",
-"Kaustinen", "Suurajot", "Britney", "Ooppera", "Klassinen", "Rock", "Jazz", "X3nainen", "Tangomarkkinat",
-"Vuorinen", "Viihde.romant.kirjat",
-"Vesi", "Maito",
-"Asetelmat", "Muotokuvat", "Renesanssitaide",
-"Uinti", "Solarium", "Kävely", "Pyöräily")
-
+```{r,indexstring_to_reduce_modalities}
 load("index_for_removing_mod_classifiers.RData")
 mod_luokitukset <- mod_luokitukset[!index_for_removing_mod_classifiers]
 ```
@@ -80,7 +73,7 @@ analyysi_uusi <- MCA(uusi,
                       )
 ```
 
-```{r, third-analysis}
+```{r, thirdAnalysis}
 new_variables <- uudet_muuttujat[,names(uudet_muuttujat) %in% c("Helsingin.Sanomat","Taidearvostelut", "Jooga", "Marjastus.tai.sienestys",
                                                                 "Ammuskelupelit", "Toimintapelit", "pelaaminen_per_päivä", "Metsästys", "Kaupunkiloma",
                                                                 "Kaukomatka", "Puutarhanhoito", "Banksy", "pelaaminen_per_päivä",
@@ -625,7 +618,7 @@ calculate_sup_vars <- function(dat, sarake){
   dim1 <- dat$ind.sup$coord[,1] # coordinates of support individuals for first dimension 
   dim2 <- dat$ind.sup$coord[,2] # Coordinates of support individuals for second dimension
   weigth <- rep(1, length(dim1)) # Vector of ones
-  df <- data.frame(complete_uusi_aineisto$completeObs, dim1, dim2, weigth) # dataframe, where is imputated survey data and our coordinates
+  df <- data.frame(complete_uusi_aineisto$completeObs[,!names(complete_uusi_aineisto$completeObs) %in% index_str], dim1, dim2, weigth) # dataframe, where is imputated survey data and our coordinates
   
   temp <- split(df, df[,sarake]) # Split the data to as many sets as there are categories in the variable
   
@@ -905,7 +898,7 @@ clust_uusi <- HCPC(analyysi_uusi, nb.clust = -1, graph = FALSE)
 
 # create ggplot -----------------------------------------------------------
 plot_clusters <- function(clustdat){
-  to_plot <- clustdat$call$X[,c(1,2,6)]
+  to_plot <- clustdat$call$X[,c("Dim 1","Dim 2","clust")]
   names(to_plot) <- c("dim1", "dim2", "group")
   ggplot(to_plot, aes(dim1, dim2, color = group)) + 
     geom_point() +

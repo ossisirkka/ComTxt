@@ -1,0 +1,160 @@
+---
+title: "modaliteettien poistoa"
+author: "Ossi Sirkka"
+date: "15 9 2020"
+output: html_document
+---
+
+```{r}
+load("worksspace_for_removing_modalities.RData")
+
+find_mods_and_contributions <- function(str){
+  contributions%>% 
+  mutate(mod = (str_replace(row.names(contributions), "\\+", "") %>% 
+           str_replace(., "\\+", "") %>% 
+           str_replace(., "\\-", "") %>% 
+           str_replace(., "0", ""))) %>%
+  filter(mod_luokitukset == str) %>% 
+  group_by(mod) %>% 
+  mutate(kontr_yhteens = Dim.1 + Dim.2) %>% 
+  arrange(desc(kontr_yhteens)) %>% 
+  summarise(x = sum(kontr_yhteens)) %>% 
+  arrange(desc(x)) %>% 
+  print(.,n = 81)
+}
+
+
+```
+
+Documention for removing modalities from the analysis
+
+# tv ja elokuvat
+```{r}
+
+find_mods_and_contributions("Tv ja elokuvat")
+
+
+```
+
+Potential items to remowe are the last rows in the table, modalities that do not contribute in neither axis. Still, contents of the variable must be taken into account. Possible removed items include:
+
+  * scifimovies
+  * pesäpallo
+  * urheiluohjelma
+  * mäkelä / kaurismäki
+  * poliisisarjat
+  * morse
+  * musikaalielokuvat
+  * yleisurheilu
+  * dvd
+  
+This would yield total number of 
+
+```{r}
+mod_määrä(molemmat[,c("Scifielokuvat", "TV_Pesäpallo", "Urheiluohjelmat", "Mäkelä", "Harlin", "Morse", "Poliisisarjat", "Musikaalielokuvat", "TV_Yleisurheilu", "DVD")])
+
+```
+removed modalities.
+  
+# Musiikki
+
+```{r}
+find_mods_and_contributions("Musiikki")
+```
+
+Possible items:
+
+  * Kaustinen
+  * Suurajot?
+  * Britney
+  * Ooppera (oopperakäynti jää)
+  * klassinen (klassinen konsertti jää
+  * rock (rockkeikat jää)
+  * jazz (jazzkonsertit jää)
+  * 3nainen
+  * Tangomarkkinat
+  " levyt
+  
+this would yield total number of 
+
+```{r}
+mod_määrä(molemmat[,c("Kaustinen", "Suurajot", "Britney", "Ooppera", "Klassinen", "Rock", "Jazz", "X3nainen", "Tangomarkkinat", "Levyt")])
+```
+
+removed modalities.
+
+# Kirjallisuus ja lukeminen
+
+```{r}
+find_mods_and_contributions("Kirjallisuus ja lukeminen")
+```
+
+possible removable items:
+
+  * Vuorinen
+  * Viihde/romat.kirjat
+  * KirkojaKotona
+  
+this would yield
+
+```{r}
+mod_määrä(molemmat[,c("Vuorinen", "Viihde.romant.kirjat", "KirjojaKotona")])
+```
+
+#ruoja ja syöminen
+
+```{r}
+find_mods_and_contributions("Ruoka ja syöminen")
+```
+possible removable items
+
+  * vesi
+  * maito
+
+```{r}
+mod_määrä(molemmat[,c("Vesi", "Maito")])
+```
+
+# Kuvataide
+
+```{r}
+find_mods_and_contributions("Kuvataide")
+```
+
+```{r}
+mod_määrä(molemmat[,c("Asetelmat", "Muotokuvat", "Renesanssitaide", "TaulujaKotona")])
+```
+# Urheilu, pukeutuminen ja ruumiillisuus
+
+```{r}
+find_mods_and_contributions("Urheilu, pukeutuminen ja ruumiillisuus")
+```
+
+```{r}
+mod_määrä(molemmat[, c("Uinti", "Solarium", "Kävely", "Pyöräily")])
+```
+
+# save shit to use in master file 
+```{r}
+
+index_str <- c("Scifielokuvat", "TV_Pesäpallo", "Urheiluohjelmat", "Mäkelä", "Harlin", "Morse", "Poliisisarjat", "Musikaalielokuvat", "TV_Yleisurheilu", "DVD", "Levyt", "KirjojaKotona", "TaulujaKotona", 
+               "Kaustinen", "Suurajot", "Britney", "Ooppera", "Klassinen", "Rock", "Jazz", "X3nainen", "Tangomarkkinat",
+               "Vuorinen", "Viihde.romant.kirjat",
+               "Vesi", "Maito",
+               "Asetelmat", "Muotokuvat", "Renesanssitaide",
+               "Uinti", "Solarium", "Kävely", "Pyöräily")
+# modalitites of variables in index_str
+
+modalities_to_remove <- unname(unlist(sapply(index_str, function(x) levels(vanha[,x]))))
+
+# index vector to remove respective modality classifiers
+index_for_removing_mod_classifiers <- rownames(analyysi_vanha$var$contrib) %in% modalities_to_remove
+
+# Save this indexing, its not easy to implement in rmarkdown file
+
+save(index_for_removing_mod_classifiers, index_str, file = "index_for_removing_mod_classifiers.RData")
+
+
+
+```
+
