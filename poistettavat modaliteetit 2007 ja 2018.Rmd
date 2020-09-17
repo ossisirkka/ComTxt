@@ -112,7 +112,7 @@ possible removable items
   * maito
 
 ```{r}
-mod_määrä(molemmat[,c("Vesi", "Maito")])
+mod_määrä(molemmat[,c("Vesi", "Maito", "Kuha", "Wieninleike")])
 ```
 
 # Kuvataide
@@ -131,24 +131,40 @@ find_mods_and_contributions("Urheilu, pukeutuminen ja ruumiillisuus")
 ```
 
 ```{r}
-mod_määrä(molemmat[, c("Uinti", "Solarium", "Kävely", "Pyöräily")])
+mod_määrä(molemmat[, c("Uinti", "Kävely", "Pyöräily")])
 ```
 
 # save shit to use in master file 
 ```{r}
 
-index_str <- c("Scifielokuvat", "TV_Pesäpallo", "Urheiluohjelmat", "Mäkelä", "Harlin", "Morse", "Poliisisarjat", "Musikaalielokuvat", "TV_Yleisurheilu", "DVD", "Levyt", "KirjojaKotona", "TaulujaKotona", 
-               "Kaustinen", "Suurajot", "Britney", "Ooppera", "Klassinen", "Rock", "Jazz", "X3nainen", "Tangomarkkinat",
-               "Vuorinen", "Viihde.romant.kirjat",
-               "Vesi", "Maito",
-               "Asetelmat", "Muotokuvat", "Renesanssitaide",
-               "Uinti", "Solarium", "Kävely", "Pyöräily")
+index_str <- c("Scifielokuvat", "TV_Pesäpallo", "Urheiluohjelmat", "Mäkelä", "Harlin", "Morse", "Poliisisarjat", "Musikaalielokuvat", "TV_Yleisurheilu", "DVD",
+               "Levyt", "Kaustinen", "Suurajot", "Britney", "Ooppera", "Klassinen", "Rock", "Jazz", "X3nainen", "Tangomarkkinat",
+               
+               "Vuorinen", "Viihde.romant.kirjat","KirjojaKotona",
+               
+               "Vesi", "Maito", "Kuha", "Wieninleike",
+               
+               "Asetelmat", "Muotokuvat", "Renesanssitaide","TaulujaKotona", 
+               
+               "Uinti", "Kävely", "Pyöräily",
+               
+               "Nettimusiikki", "Nettilehdet", "Nettichattaily")
 # modalitites of variables in index_str
 
-modalities_to_remove <- unname(unlist(sapply(index_str, function(x) levels(vanha[,x]))))
+modalities_to_remove <- unname(unlist(sapply(index_str, function(x) levels(complete_vanha_aineisto$completeObs[,x]))))
 
+
+# mca for this purpose only
+
+analyysi_vanha_for_indexing <- MCA(complete_vanha_aineisto$completeObs, 
+                      ncp = 3,
+                      ind.sup = NULL,
+                      quali.sup = which(names(vanha) %in% sup.vars),
+                      graph = FALSE,
+                      row.w = NULL) # Uniform weights for observations
+                      
 # index vector to remove respective modality classifiers
-index_for_removing_mod_classifiers <- rownames(analyysi_vanha$var$contrib) %in% modalities_to_remove
+index_for_removing_mod_classifiers <- rownames(analyysi_vanha_for_indexing$var$contrib) %in% modalities_to_remove
 
 # Save this indexing, its not easy to implement in rmarkdown file
 

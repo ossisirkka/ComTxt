@@ -798,6 +798,35 @@ summary(lukeminen)
 
 ```
 
+##online
+
+```{r}
+
+netti_frq_luokittelu <- function(dat){
+    attributes(dat) <- NULL
+    dat <- as.data.frame(dat)
+    dat <- dat %>% 
+      mutate(vec = as.character(dat)) %>% 
+      transmute( out = case_when( 
+            vec %in% c(1,2) ~ "Netti+",
+            vec %in% c(3,4) ~ "Netti0",
+            vec %in% c(5,6) ~ "Netti-",
+            TRUE ~ NA_character_))
+    dat
+}
+
+netti_freq_2007 <- netti_frq_luokittelu(data1$k54)
+
+netti_tarkoitus_2007 <- data1 %>% 
+  select(starts_with("k56")) %>% 
+  select("Nettimusiikki" = k56_3,
+         "Nettilehdet" = k56_6,
+         "Nettitaide" = k56_7,
+         "Nettichattaily" = k56_9,
+         "Nettipelaaminen" = k56_11) %>% 
+  mutate_all(funs(ifelse(is.na(.), 0, 1))) %>%
+  funktio_2lk()
+```
 
 
 #Muokattujen muuttujien yhdistäminen
@@ -829,7 +858,9 @@ matriisi_mca1_missingit <- data.frame(
   kirjojaKotona,
   TaulujaKotona,
   television_katselu,
-  lukeminen)
+  lukeminen,
+  netti_freq_2007,
+  netti_tarkoitus_2007)
 ```
 
 
@@ -1630,6 +1661,25 @@ summary(lukeminen)
 
 ```
 
+##online
+
+```{r}
+netti_freq_2018 <- netti_frq_luokittelu(data$K46)
+
+
+netti_tarkoitus_2018 <- data %>% 
+  select(starts_with("K48")) %>% 
+  select("Nettimusiikki" = K48_3,
+         "Nettilehdet" = K48_6,
+         "Nettitaide" = K48_10,
+         "Nettichattaily" = K48_11,
+         "Nettipelaaminen" = K48_13)%>% 
+  mutate_all(funs(ifelse(is.na(.), 0, 1))) %>%
+  funktio_2lk()
+
+```
+
+
 #Muokattujen muuttujien ydistäminen
 
 ```{r}
@@ -1659,7 +1709,9 @@ matriisi_mca_missingit <- data.frame(
   kirjojaKotona,
   TaulujaKotona,
   television_katselu,
-  lukeminen)
+  lukeminen,
+  netti_freq_2018,
+  netti_tarkoitus_2018)
 ```
 
 
@@ -2129,7 +2181,9 @@ mod_luokitukset <- c(
   reps(kirjojaKotona, "Kirjallisuus ja lukeminen"),
   reps(TaulujaKotona, "Kuvataide"),
   reps(television_katselu, "Tv ja elokuvat"),
-  reps(lukeminen, "Kirjallisuus ja lukeminen"))
+  reps(lukeminen, "Kirjallisuus ja lukeminen"),
+  reps(netti_freq_2007, "Online"),
+  reps(netti_tarkoitus_2007, "Online"))
 
 
 mod_luokitukset_uudet_muuttujat <- c(

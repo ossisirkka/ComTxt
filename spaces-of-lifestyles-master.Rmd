@@ -41,13 +41,14 @@ uusi <- complete_uusi_aineisto$completeObs
 # Extract the number of supplementary variables from the dataframe
 sup.vars <- c("ikä", "koulutus", "ammattiluokka", "sukupuoli", "alue", "tulotaso")
 ```
+
 ```{r,indexstring_to_reduce_modalities}
 load("index_for_removing_mod_classifiers.RData")
 mod_luokitukset <- mod_luokitukset[!index_for_removing_mod_classifiers]
 ```
 
 ```{r firstAnalysis}
-
+mod_määrä(vanha)
 vanha <- vanha[,!names(vanha) %in% index_str]
 # Create mca-analysis
 
@@ -176,17 +177,18 @@ In this article, main analysis method is Multiple Correspondence Analysis (MCA).
 
 MCA is a technique which allow representing summary of the relations existing between set of categorical variables (Di Franco 2015, 1301). As a method, MCA has inductive and explanatory nature, and it allows graphical representation of relationships between (possible plentiful) set of categorical variables in multidimensional space (Purhonen et al. 2014 359; Le Roux & Rouanet 2010). Analogously to principal component analysis, the data is assumed to be described by latent dimensions, which are expected to redefine most of the information in the data (Kahma & Toikka 2012, 117). For interpretation, final solution is found using between 2 to 4 dimensions, which explain majority of the variance in the data. The object of applying MCA is therefore to reveal and analyze hidden structures and their dynamics in our datasets.
 
-Due to high dimensionality of MCA-solution, variances explained by the dimensions are usually quite low. *Modified rates of explained variance,* proposed by Benzécri (1992, 412; Le Roux & Rouanet 2010, 39) are usually used to emphazise importance of first axes. Modified rates are found using following procedure:
-
-  1.    Get all axes where $$\lambda_i > 1/Q$$ where $Q =$ Number of active variables and $\lambda_i$ is eigenvalue of $i$th axis.
-  2.    Calculate modified eigenvalue $\hat{\lambda}$ with $$\hat{\lambda_{i}} = (\lambda_i- \frac{1}{Q})^2$$
-  3.    Calculate modified explained variance of $i$th axis with $$\frac{\hat{\lambda_{i}}}{\sum_{i = 1}^{Q}\hat{\lambda_{i}}}$$
-
 We apply MCA to datasets from two different time points with identical set of variables. To examine change that has happened during eleven year period in space of lifestyles in Finland, method proposed by Le Roux & Rouanet (1998, 204), and originally Benzecri (1992, 410), is employed. We combine the data from both years, and conduct the analysis using observations from 2007 as active individuals and observations from 2018 as supplementary individuals. From this analysis, we use the coordinates of supplementary individuals in first and second axis. The Location ${p}$ of modality $i$ on axis $j$ in 2018 on space constructed from observations in 2007 can be found with $$p_{i,j} = {{1\over k}{\sum_{n = 1}^{k}{c_{i,j,n}}}\over\sqrt{\lambda{j}}}$$ where $k$ = number of respondents that chose modality ${i}$ and $\lambda{j}$ = eigenvalue of axis ${j}$.
 
 After calculating the coordinates of modalities of 2018 in space of lifestyles of 2007, we measure distance of modalities obtained using 2007 and 2018 data. For calculation, we use Euclidean distance $d(p_{ij},q_{ij})$: $$d(p_{ij},q_{ij}) = \sqrt{(q_{i1} - p_{i1})^2 + (q_{i2} - p_{i2})^2}$$ where $p_{ij} = (p_{i1}, p_{i2})$, the coordinates of modality $i$ in first and second axis using 2007 data, and $q_{ij} = (q_{i1}, q_{i2})$, the coordinates of modality $i$ in first and second axis $j$ using 2018 data. 
 
+Relative contribution $rctr_{l,k}$, where $l$ is class of modalities and  $j$ is the axis, is calculated in following manner:
 
+$$rctr_{l,j} = ctr_{l,j}({1\over{\sum_{k = i}^{K}k_{l}}}{\sum_{i = 1}^{K} k_{i}\over{\sum_{i = 1}^{I}l}})$$, 
+
+where $ctr_{l,j}$ is absolute contribution of class $l$ in axis $j$,
+      ${1\over{\sum_{k = i}^{K}k_{l}}}$ is repiprocal of sum of modalities $k$ belonging to class $l$,
+      ${\sum_{i = 1}^{K} k_{i}}$ is total number of modalities and
+      ${\sum_{i = 1}^{I}l}$ is total number of classes $l$ in the data. 
 
 # Analysis
 
@@ -236,19 +238,28 @@ The modified rates of explained variance for two first dimensions are `r round(k
 
 calc_contributions <- function(df, year){
   
-  ordervec  <- coords %>% 
-  group_by(mod_luokitukset) %>% 
-  tally() %>% 
-  arrange(desc(n)) %>% 
-  select("Kenttä" = mod_luokitukset)
+    modaliteettien_summa <- length(df$mod_luokitukset)
+    n_luokat <- length(unique(df$mod_luokitukset))
+
+  ordervec  <- df %>% 
+    group_by(mod_luokitukset) %>% 
+    tally() %>% 
+    arrange(desc(n)) %>% 
+    select("Kenttä" = mod_luokitukset, "Modaliteetien määrä" = n)
   
   
   df %>% 
     dplyr::group_by(mod_luokitukset) %>% 
-    dplyr::summarize("Kontribuutio ensimmäiselle akselille" = round(sum(Dim.1) / 100, 2),
+    dplyr::summarize(
+                     "Kontribuutio ensimmäiselle akselille" = round(sum(Dim.1) / 100, 2),
                      "Kontribuutio toiselle akselille" = round(sum(Dim.2) / 100, 2),
                      "Kontribuutio molemmille akseleille yhteensä" = round(sum(c(Dim.1, Dim.2)) / 2 / 100 ,2)) %>% 
     arrange(match(mod_luokitukset, ordervec$Kenttä)) %>% 
+    add_column(.,ordervec[,2], .after = "mod_luokitukset") %>% 
+    mutate(luokan_kontribuution_kerroin = (modaliteettien_summa / n_luokat) /.[,2],
+      "Luokan suhteellinen kontribuutio ensimmäiselle akselille" = round(.[,3] * luokan_kontribuution_kerroin, 2),
+      "Luokan suhteellinen kontribuutio toiselle akselille" = round(.[,4] * luokan_kontribuution_kerroin, 2)) %>% 
+    select(-luokan_kontribuution_kerroin) %>% 
     create_kable(., otsikko = paste("Eri kenttien osuus kontribuutiosta 1. ja 2. akseliin", year))
 }
 
@@ -600,7 +611,7 @@ combine_sup_var_ellipses(analyysi_uusi)
 
 Using these distances, we can determine which modalities have experienced greatest changes in their location in space of lifestyles during eleven years. 20 modalities with highest and smallest difference in their location is presented in figure 7.
 
-```{r figure7, fig.cap="Items with highest and smallest difference in their location in space of lifestyles during 2007-2018 in Finland.", out.width="100%"}
+```{r figure7, fig.cap="Items with highest difference in their location in space of lifestyles during 2007-2018 in Finland.", out.width="100%"}
 
 molemmat <- molemmat[,!names(molemmat) %in% index_str]
 
@@ -742,7 +753,7 @@ plot_change <- function(suunta = 1, nvar = 15, sign = "+"){
     geom_hline(yintercept = 0, colour = "gray70") +
     geom_vline(xintercept = 0, colour = "gray70") +
     geom_point(size = 1) +
-    geom_line(aes(group = pari),color = "black", size = 0.01, linetype = "dashed", alpha = 0.6) +
+    geom_line(aes(group = pari),color = "black", size = 0.01, linetype = "dashed", alpha = 0.8) +
     geom_text_repel(size = 4) +
     scale_x_continuous(breaks = bre, limits = limx) +
     scale_y_continuous(breaks = bre, limits = limy) +
@@ -752,15 +763,13 @@ plot_change <- function(suunta = 1, nvar = 15, sign = "+"){
     theme(legend.position="none", plot.title = element_text(hjust = 0.5))
 }
 
-p1 <- plot_change(1, 25, sign = "+")
-p2 <- plot_change(-1, 25, sign = "-")
+plot_change(1, 25, sign = "+")
 
-gridExtra::grid.arrange(p1, p2, nrow = 2)
 
 
 ```
 
-In figure 5, some major changes in the space of lifestyles in Finland are present. Bigger trend seems to be that many of the modalities calculated using 2018 individuals are located in more legitimate and modern location in the space of lifestyles of 2007. Never watching news from tv used to be marker of low legitimacy in 2007, but in 2018 it has became non-separating item in illegitimate-legitimate dimensions. Liking comedy movies has become more modern cultural practice, whereas disliking action movies has shifted from being traditional to being less separating in traditional-modem dimensions. During 11 years, reading two-nine books per year has became sign of legitimacy, compared to 2007, when reading was perfectly non-separating in both dimensions.
+In figure 5, some major changes in the space of lifestyles in Finland are present. Bigger trend seems to be that many of the modalities calculated using 2018 individuals are located in more legitimate and modern location in the space of lifestyles of 2007. Never watching news from tv used to be marker of low legitimacy in 2007, but in 2018 it has became non-separating item in illegitimate-legitimate dimensions. Liking comedy movies has become more modern cultural practice, whereas disliking action movies has shifted from being traditional to being less separating in traditional-modem dimensions. During 11 years, reading moderate amount (from two to nine) books per year has became sign of legitimacy, compared to 2007, when reading was perfectly non-separating in both dimensions.
 
 On the other hand, reading more than nine book per year has stable location in the space of lifestyles. Most of the most stable modalities locate on the modern side of the space. Only traditional stable practice among 15 most stable modalities is watching more than three hours of tv per day. Reality tv kept it's location on the modern, slightly illegitimate location. Disliking classical music was stable marker of low legitimacy and modernity, whereas liking impressionism was stable marker of high legitimacy and modernity.  
 
@@ -972,7 +981,6 @@ create_kable(data.frame(Axis = 1:4,
 ```{r, table9}
 coords <- data.frame(newdat_mca$var$contrib[,1:2], mod_luokitukset = c(mod_luokitukset, newmods))
 calc_contributions(coords, "kattavalla muuttujavalikoimalla")
-
 
 ```
 
