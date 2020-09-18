@@ -48,7 +48,6 @@ mod_luokitukset <- mod_luokitukset[!index_for_removing_mod_classifiers]
 ```
 
 ```{r firstAnalysis}
-mod_määrä(vanha)
 vanha <- vanha[,!names(vanha) %in% index_str]
 # Create mca-analysis
 
@@ -841,7 +840,53 @@ rownames(table3) <- c("mean (1. dimension)",
 create_kable(table3, otsikko = "Keskiarvot ja keskihajonnat 1. ja 2. ulottuvuudella eri vuosien havainnoilla")
 ```
 
-In the first dimension, shift of individuals is towards legitimate side in space of lifestyles compared to 2007 (p = `r table3[1,4]`). In second dimension, 2018 individuals were more modern than individuals in 2007 (p < `r table3[2,4]`). Variance in both dimensions were higher among 2007 than 2018 individuals.
+In the first dimension, shift of individuals is towards legitimate side in space of lifestyles compared to 2007 (p = `r table3[1,4]`). In second dimension, 2018 individuals were more modern than individuals in 2007 (p < `r table3[2,4]`). Variance in both dimensions were higher among 2007 than 2018 individuals. Shift towards modern side of the space can be partly explained with cohort effect; the most traditional group in 2007 was not present in 2018 data, and oldest cohort in 2018 data was did not prefer as traditional cultural indicators as previous cohort. It is also notable that even individuals in 2018 were more modern than invidivuals in 2007, there are no individuals in 2018 that are more modern than most modern indivuals in 2007. This might be explained by identical set of indicators, picked before first survey in 2007. Items that were considered most modern in 2007 are still most modern in 2018, selitä paremmin.
+
+Next, we examine the change in terms of movement in two main axis between 2007 and 2018 individuals in distinct sociodemographic groups. This shift is analyzed by comparing mean points of individuals that chose particular sociodemographic modality in 2007 and 2018. This analysis is presented in table x.
+
+```{r}
+get_mean_and_test_table2 <- function(muuttuja, dimensio = 1){
+  coords_and_sup_vars <- data.frame(rbind(analyysi_molemmat$ind$coord[,1:2], analyysi_molemmat$ind.sup$coord[,1:2]),
+                                  rbind(analyysi_molemmat$call$X[,names(analyysi_molemmat$call$X) %in% sup.vars]),
+                                  aineisto = c(rep("2007", nrow(analyysi_molemmat$ind$coord)),
+                                               rep("2018", nrow(analyysi_molemmat$ind.sup$coord))))
+
+  if(dimensio == 1){
+    df <- data.frame(sapply(levels(coords_and_sup_vars[[muuttuja]]), function(x) t.test(Dim.1 ~ aineisto, coords_and_sup_vars[coords_and_sup_vars[[muuttuja]] == x,])))
+  }  else if(dimensio == 2){
+    df <- data.frame(sapply(levels(coords_and_sup_vars[[muuttuja]]), function(x) t.test(Dim.2 ~ aineisto, coords_and_sup_vars[coords_and_sup_vars[[muuttuja]] == x,])))
+  }
+  df <- data.frame(t(df))
+  
+  tmp_df <- data.frame(
+             mean_2007 = sapply(df$estimate, function(x) x[1]),
+             mean_2018 =sapply(df$estimate, function(x) x[2]),
+             t.test = unlist(df$statistic),
+             p.value = unlist(df$p.value))
+  rownames(tmp_df) <- rownames(df)           
+  tmp_df <- tmp_df %>%
+    rownames_to_column("tmp") %>% 
+    mutate_if(is.numeric, round, 3) %>% 
+    column_to_rownames("tmp")
+  names(tmp_df)[1:2] <- paste0("mean_dim", dimensio, c("_2007", "_2018"))
+  tmp_df
+}
+
+
+tb <- data.frame(
+  do.call(rbind, lapply(sup.vars, function(x) get_mean_and_test_table2(x, 1))),
+  do.call(rbind, lapply(sup.vars, function(x) get_mean_and_test_table2(x, 2))))
+
+library(kableExtra)
+otsikko <- "Sosiodemografisten modaliteettien keskiarvon muutos kahdella ensimmäisellä ulottuvuudella 2007 ja 2018 vastauksien mukaan. Vuoden 2007 havainnot ovat aktiivisia havaintoja ja vuoden 2018 havainnot ovat analyysissä supplementaarihavaintoja. Boldattujen rivine kohdalla muutos ainakin toisella akselilla on ollu tilastollisesti merkitsevä."
+knitr::kable(tb, caption = otsikko) %>%
+             kable_styling(bootstrap_options = c("striped", "hover"), font_size = 12, latex_options = c("scale_down","hold_position")) %>% 
+             row_spec(which(tb$p.value < 0.05 | tb$p.value.1 < 0.05), bold = T) %>% 
+             column_spec(column = ncol(tb), width = "4cm")
+
+
+```
+
 
 ### Supplementary variables
 
@@ -1139,8 +1184,8 @@ plot_sup_vars(mca_temp, "2018")
 ## Appendix 1
 
 ```{r, appendix1}
-tables_2007 <- lapply(complete_vanha_aineisto$completeObs, table, exclude = TRUE)
-tables_2018 <- lapply(complete_uusi_aineisto$completeObs, table, exclude = TRUE)
+tables_2007 <- lapply(vanha, table, exclude = TRUE)
+tables_2018 <- lapply(uusi, table, exclude = TRUE)
 
 
 
@@ -1155,6 +1200,9 @@ tables_list <- lapply(seq_len(length(tables_2007)), function(i){
 })
 
 tables_df <- do.call(rbind, tables_list)
+tables_df <- add_column(tables_df,
+           Class = c(mod_luokitukset, rep(" ", mod_määrä(uusi[,names(uusi) %in% sup.vars]))),
+           .before = "Frequency_2007")
 create_kable(tables_df, otsikko = "Full list of indicators used to constuct identical spaces of lifestyles in 2007 and 2018 ")
 ```
 

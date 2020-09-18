@@ -6,7 +6,19 @@ output: html_document
 ---
 
 ```{r}
-load("worksspace_for_removing_modalities.RData")
+#load("worksspace_for_removing_modalities.RData")
+
+
+analyysi_vanha_for_indexing <- MCA(complete_vanha_aineisto$completeObs, 
+                      ncp = 3,
+                      ind.sup = NULL,
+                      quali.sup = which(names(vanha) %in% sup.vars),
+                      graph = FALSE,
+                      row.w = NULL) # Uniform weights for observations
+
+contributions <- data.frame(analyysi_vanha_for_indexing$var$contrib[,1:2], mod_luokitukset)
+
+
 
 find_mods_and_contributions <- function(str){
   contributions%>% 
@@ -156,12 +168,7 @@ modalities_to_remove <- unname(unlist(sapply(index_str, function(x) levels(compl
 
 # mca for this purpose only
 
-analyysi_vanha_for_indexing <- MCA(complete_vanha_aineisto$completeObs, 
-                      ncp = 3,
-                      ind.sup = NULL,
-                      quali.sup = which(names(vanha) %in% sup.vars),
-                      graph = FALSE,
-                      row.w = NULL) # Uniform weights for observations
+
                       
 # index vector to remove respective modality classifiers
 index_for_removing_mod_classifiers <- rownames(analyysi_vanha_for_indexing$var$contrib) %in% modalities_to_remove
