@@ -807,7 +807,7 @@ netti_frq_luokittelu <- function(dat){
     dat <- as.data.frame(dat)
     dat <- dat %>% 
       mutate(vec = as.character(dat)) %>% 
-      transmute( out = case_when( 
+      transmute( Netti = case_when( 
             vec %in% c(1,2) ~ "Netti+",
             vec %in% c(3,4) ~ "Netti0",
             vec %in% c(5,6) ~ "Netti-",
