@@ -47,14 +47,66 @@ load("index_for_removing_mod_classifiers.RData")
 mod_luokitukset <- mod_luokitukset[!index_for_removing_mod_classifiers]
 ```
 
+```{r}
+# Here is function to create our dataset for spesific mca. We use data matrix where NA values are present, instead of multiple imputation.
+
+get_data_for_spesific_mca <- function(active_df, sup_df, karsittavat_str = index_str){
+  
+  # Get data set that includes supplementary and active variables. Exclude variables that have been determined to not be in the analysis (karsittavat_str)
+  dat_with_na_levels <- data.frame(active_df[,!names(active_df) %in% karsittavat_str], sup_df) %>% 
+    mutate_if(is.character, as.factor) %>% 
+    mutate_each(funs(addNA(., ifany = TRUE)))
+  
+  # Get indices of null categories. This is important for MCA-function to conduct spesific mca. 
+  index_for_null_categories <- active_df[,!names(active_df) %in% karsittavat_str] %>%
+    mutate_if(is.character, as.factor) %>% 
+    mutate_each(funs(addNA(., ifany = TRUE))) %>%  
+    sapply(., function(x) levels(x)) %>% 
+    unlist(.) %>% 
+    is.na(.) %>% 
+    which(. == TRUE) %>% 
+    'names<-' (NULL)
+  
+  # Get all the factor levels in the analysis
+  levels_in_analysis <- dat_with_na_levels %>%   
+    sapply(., function(x) levels(x)) %>% 
+    unlist(.) %>% unname(.)
+  
+  # Create vector of "NA1, NA2, ..., NAx", to give every NA-level unique identifier. Otherwise MCA-function includes variable name to 
+  # every category which makes the map messy.
+  na_levels_with_identifier <- paste0((levels_in_analysis[index_for_null_categories]), seq_len(length(index_for_null_categories)))
+  
+  # Loop over every NA level and replace that with NAx.
+  i <- 1
+  for(col in 1:ncol(dat_with_na_levels)){
+    if(NA %in% levels(dat_with_na_levels[,col])){
+      levels(dat_with_na_levels[,col]) <- c(levels(dat_with_na_levels[,col])[-length(levels(dat_with_na_levels[,col]))],
+                                                na_levels_with_identifier[i])
+      i <- i + 1
+      
+    }
+  }
+  
+  # Return data and index for null categories
+  list(data = dat_with_na_levels, null_categories = index_for_null_categories)
+} 
+
+```
+
+
+
 ```{r firstAnalysis}
-vanha <- vanha[,!names(vanha) %in% index_str]
+# get data for 2007 analysis
+
+vanha <- get_data_for_spesific_mca(matriisi_mca1_missingit, suplementary_variables1)
+
 # Create mca-analysis
 
-analyysi_vanha <- MCA(vanha, 
+analyysi_vanha <- MCA(vanha$data, 
                       ncp = 3,
                       ind.sup = NULL,
-                      quali.sup = which(names(vanha) %in% sup.vars),
+                      excl = vanha$null_categories,
+                      quali.sup = which(names(vanha$data) %in% sup.vars),
                       graph = FALSE,
                       row.w = NULL # Uniform weights for observations
                       )
@@ -62,12 +114,13 @@ analyysi_vanha <- MCA(vanha,
 ```
 
 ```{r secondAnalysis}
-uusi <- uusi[,!names(uusi) %in% index_str]
+uusi <- get_data_for_spesific_mca(matriisi_mca_missingit, suplementary_variables)
 
-analyysi_uusi <- MCA(uusi, 
+analyysi_uusi <- MCA(uusi$data, 
                       ncp = 5,
                       ind.sup = NULL,
-                      quali.sup = which(names(uusi) %in% sup.vars),
+                      excl = uusi$null_categories,
+                      quali.sup = which(names(uusi$data) %in% sup.vars),
                       graph = FALSE,
                       row.w = NULL # Uniform weights for observations
                       )
@@ -81,12 +134,11 @@ new_variables <- uudet_muuttujat[,names(uudet_muuttujat) %in% c("Helsingin.Sanom
                                                                 "NettiUutiset", "Instagram", "MV.lehti", "Urheilupelit",
                                                                 "Dieetti", "Kehonrakennus", "Edullinen_pukeutuminen", "Kauppalehti.Taloussanomat",
                                                                 "Risteily", "Cheeck", "Lautapelien.pelaaminen", "Kalastus", "Mökkeily", "Leipominen")]
- newdat <- data.frame(complete_uusi_aineisto$completeObs[,!names(complete_uusi_aineisto$completeObs) %in% index_str], new_variables)
+ newdat <-get_data_for_spesific_mca(cbind(matriisi_mca_missingit, new_variables), suplementary_variables)
 
- newdat_imp <- missMDA::imputeMCA(newdat, ncp = 5)
-
- newdat_mca <- MCA(newdat_imp$completeObs,
-                  quali.sup = which(names(newdat_imp$completeObs) %in% sup.vars),
+ newdat_mca <- MCA(newdat$data,
+                  quali.sup = which(names(newdat$data) %in% sup.vars),
+                  excl = newdat$null_categories,
                   ncp = 5, 
                   graph = FALSE)
 ```
@@ -116,16 +168,17 @@ In this section we will introduce our research questions, data and methods.
 
 In the analysis, two nationally representative postal surveys from Finland are used. These surveys are collected by Statistics Finland in 2007 and 2018. These datasets are "Culture and Leisure in Finland, 2007" (n = 1388, response rate 46.3 %; sample size 3000) and "Culture and Leisure in Finland, 2018" (N = 1425, response rate 40.8 %, sample size 3500). Both of these survey consist of 17-74 year old mainland population in Finland. Surveys are cross-sectional in but they are designed to allow comparison, and there is correspondence in terms of topics covered and exact formulations of questions and items mentioned in the questions. In survey of 2018, there are also additional indicators of more contemporary cultural items, indicators for online and offline activities. Both datasets are included with a weigth variable calculated by Statistics Finland to correct non-response bias in terms of respondent's age, gender, education and residential area. In this analysis, we do not use these weights as there is only minor difference between weighted and unweighted results.
 
-The space of lifestyles in constructed using set of indicators that cover wide range of cultural practices and tastes. In two first steps of the analysis, fields covered in the space of lifestyles are music, literature, art, tv and movies, sports, dressing and ruumiillisuus?, and food and drinking. To construct the map, `r ncol(vanha) - length(sup.vars)` active variables are used, and the number of active modalities is `r mod_määrä(vanha[,!(names(vanha) %in% sup.vars)])`. In addition to active variables in the analysis, we use also `r length(sup.vars)` supplementary, socio-economic variables, with total number of `r do.call(sum, lapply(vanha[,names(vanha) %in% sup.vars], function(x) nlevels(x)))` modalities.  Fields and the number of modalities covering them are presented in table 1. Fields with most indicators are music and literature, which both cover 20 % of all modalities in analysis. This choice of cultural indicators is used to construct two spaces of lifestyles in different time points, 2007 and 2018, with sets of identical cultural items. Full list of variables included and their distributions can be found in the appendix 1. **One guideline to discard categories with low frequency is to discard all modalities with frequency lower than 2 % (Di Franco 2015, 1305), and another is lower than 5 % frequency (Le Roux & Rouanet 2010, 39). We proceed to choose our threshold to be 3 % (i.e. categories with more than 41 observations), which leads to retaining contextually interesting categories and deletion of infrequent categories, which possibly contribute disproportionally strongly to the MCA solution. ei vielä poistettu**
+The space of lifestyles in constructed using set of indicators that cover wide range of cultural practices and tastes. In two first steps of the analysis, fields covered in the space of lifestyles are music, literature, art, tv and movies, sports, dressing and ruumiillisuus?, and food and drinking. To construct the map, `r ncol(vanha$data) - length(sup.vars)` active variables are used, and the number of active modalities is `r mod_määrä(vanha$data[,!(names(vanha$data) %in% sup.vars)])`. In addition to active variables in the analysis, we use also `r length(sup.vars)` supplementary, socio-economic variables, with total number of `r do.call(sum, lapply(vanha$data[,names(vanha$data) %in% sup.vars], function(x) nlevels(x)))` modalities.  Fields and the number of modalities covering them are presented in table 1. Fields with most indicators are music and literature, which both cover 20 % of all modalities in analysis. This choice of cultural indicators is used to construct two spaces of lifestyles in different time points, 2007 and 2018, with sets of identical cultural items. Full list of variables included and their distributions can be found in the appendix 1. **One guideline to discard categories with low frequency is to discard all modalities with frequency lower than 2 % (Di Franco 2015, 1305), and another is lower than 5 % frequency (Le Roux & Rouanet 2010, 39). We proceed to choose our threshold to be 3 % (i.e. categories with more than 41 observations), which leads to retaining contextually interesting categories and deletion of infrequent categories, which possibly contribute disproportionally strongly to the MCA solution. ei vielä poistettu**
 
-The total number of observations in 2007 data is `r nrow(vanha)`. `r 1388 - nrow(vanha)` observations were dropped from the sample due to high fraction of missing data. In 2018 data, there are `r nrow(uusi)` observations, and `r 1425 - nrow(uusi)` observations were deleted. For the remaining observations, Multiple imputation method suggested by Josse & Husson (2016) were employed. In the first two steps of analysis, there are `r round(nrow(vanha) / (ncol(vanha)-length(sup.vars)),2)` and `r round(nrow(uusi) / (ncol(uusi)-length(sup.vars)),2)`  individuals for active category. In the literature, one suggested guideline to minimum number of observations per active category is 20 (Di Franco 2015, 1305). However, author do not present any mathematical justification or citations for this precept. Despite of low number of observations per active category, we proceed to conduct our analysis with high total number of active categories.   
+The total number of observations in 2007 data is `r nrow(vanha$data)`. `r 1388 - nrow(vanha$data)` observations were dropped from the sample due to high fraction of missing data. In 2018 data, there are `r nrow(uusi$data)` observations, and `r 1425 - nrow(uusi$data)` observations were deleted. For the remaining observations, Multiple imputation method suggested by Josse & Husson (2016) were employed. In the first two steps of analysis, there are `r round(nrow(vanha$data) / (ncol(vanha$data)-length(sup.vars)),2)` and `r round(nrow(uusi$data) / (ncol(uusi$data)-length(sup.vars)),2)`  individuals for active category. In the literature, one suggested guideline to minimum number of observations per active category is 20 (Di Franco 2015, 1305). However, author do not present any mathematical justification or citations for this precept. Despite of low number of observations per active category, we proceed to conduct our analysis with high total number of active categories.   
 
 ```{r}
 # MCA for table
-mca_for_table <- MCA(vanha, 
+mca_for_table <- MCA(vanha$data, 
                       ncp = 5,
                       ind.sup = NULL,
-                      quali.sup = which(names(vanha) %in% sup.vars),
+                      excl = vanha$null_categories,
+                      quali.sup = which(names(vanha$data) %in% sup.vars),
                       graph = FALSE,
                       row.w = NULL # Uniform weights for observations
                       )
@@ -895,14 +948,10 @@ In both of our analyses, we used socio-economic indicators as supplementary vari
 ```{r figure9, fig.cap="Supplemenatry variables in 2007 and 2018 projected on space of lifestyle in respective year", out.width="100%"}
 
 plot_sup_vars <- function(anal, vuosi){
-  df <- data.frame(anal$quali.sup$coord[,1:2], colr = factor(c(
-    rep(1, 6),
-    rep(2, 4),
-    rep(3, 9),
-    rep(4, 2),
-    rep(5, 2),
-    rep(6, 4)
-  )))
+  df <- data.frame(anal$quali.sup$coord[,1:2],
+                   colr = factor(rep(1:length(sup.vars), sapply(anal$call$X[,names(anal$call$X) %in% sup.vars], function(x){
+                     if(sum(is.na(x)) == 0) {length(levels(x))}
+                     else {length(levels(x)) + 1}}))))
   names(df) <- c("dim1", "dim2", "colr")
   
   size = 5
@@ -1040,7 +1089,7 @@ gridExtra::grid.arrange (p1, p2, nrow = 1)
 
 
 ```{r, figure13, fig.cap="Space of lifestyles in 2018 using comprehensive set of cultural indicators.", out.width="100%"}
-plottaa_uudet_muuttujat <- function(uudet_muuttujat, kriteeri = 0.2){
+plottaa_uudet_muuttujat <- function(analyysi_data, uudet_muuttujat, support_vars, kriteeri = 0.2){
   # Datan muokkaus ----------------------------------------------------------
   mod_määrä <- function(dat){
     määrä <- sum(sapply(dat, function(x) nlevels(x)))
@@ -1051,21 +1100,21 @@ plottaa_uudet_muuttujat <- function(uudet_muuttujat, kriteeri = 0.2){
   
   uudet_muuttujat <- uudet_muuttujat %>% mutate_if(is.character, as.factor)
   
-  df_temp <- data.frame(complete_uusi_aineisto$completeObs[uusi_indeksöinti,!names(complete_uusi_aineisto$completeObs) %in% sup.vars],
-                        data.frame(uudet_muuttujat)[uusi_indeksöinti,])
-  #                     data.frame(sup.vars)[uusi_indeksöinti,])
-  nrdat <- nrow(complete_uusi_aineisto$completeObs)
-  ncdat <- ncol(complete_uusi_aineisto$completeObs[, !names(complete_uusi_aineisto$completeObs) %in% sup.vars])
+  df_temp <- data.frame(analyysi_data[,!names(analyysi_data) %in% sup.vars],
+                        data.frame(uudet_muuttujat))
+  
+  nrdat <- nrow(analyysi_data)
+  ncdat <- ncol(analyysi_data[, !names(analyysi_data) %in% sup.vars])
   nrx <- nrow(uudet_muuttujat)
   ncx <- ncol(uudet_muuttujat)
   nlevel_uudet_muuttujat <- mod_määrä(uudet_muuttujat)
   # imputointi
-  df_temp_comp <- missMDA::imputeMCA(df_temp,ncp=5)
-  # mca
-  mca_temp <- MCA(df_temp_comp$completeObs,
+  df_temp_comp <- get_data_for_spesific_mca(df_temp, support_vars) 
+  
+  mca_temp <- MCA(df_temp_comp$data,
                   ncp=5,
-                  #                quali.sup = (ncdat + ncx + 1):(ncol(df_temp)),
-                  #row.w = data$analyysipaino[uusi_indeksöinti], # painot mukana analyysissä
+                  excl = df_temp_comp$null_categories,
+                  quali.sup = which(names(df_temp_comp$data) %in% sup.vars),
                   graph = FALSE)
   # lasketaan selitysasteet
   korjatut_selitysasteet <- function(data){
@@ -1133,7 +1182,7 @@ plottaa_uudet_muuttujat <- function(uudet_muuttujat, kriteeri = 0.2){
   return(plot)
 }
 
-plottaa_uudet_muuttujat(new_variables, 0.2)
+plottaa_uudet_muuttujat(matriisi_mca_missingit, new_variables, suplementary_variables, 0.2)
 ```
 
 As can be seen from figure 13, the first and second dimension remained the same as in previous spaces, despite adding new cultural indicators. Introducing our new set of variables to our analysis yielded higher proportion of explained variance (24 % -> 27.5 %) in traditional-modern -axis, but lowered this proportion in first, illegitimate-legitimate -axis (52 % -> 48.4). In total, these two dimensions explain 76 % percent of the variance in our data. The increased explanation power of second axis is somewhat expected: some of the new cultural indicators, such as gaming and social media indicators, were known to be favored by younger population. As previously, we do not interpret third dimensions.  
@@ -1183,9 +1232,9 @@ plot_sup_vars(mca_temp, "2018")
 
 ## Appendix 1
 
-```{r, appendix1}
-tables_2007 <- lapply(vanha, table, exclude = TRUE)
-tables_2018 <- lapply(uusi, table, exclude = TRUE)
+```{r, appendix1, eval = FALSE}
+tables_2007 <- lapply(vanha$data, table, exclude = TRUE)
+tables_2018 <- lapply(uusi$data, table, exclude = TRUE)
 
 
 
@@ -1208,8 +1257,8 @@ create_kable(tables_df, otsikko = "Full list of indicators used to constuct iden
 
 ## Appendix 2
 
-```{r, appendix2}
-new_vars_tables <- lapply(newdat_imp$completeObs[, which(names(newdat_imp$completeObs) == "Toimintapelit"):ncol(newdat_imp$completeObs)], table)
+```{r, appendix2, eval = FALSE}
+new_vars_tables <- lapply(newdat$data[, which(names(newdat$data) == "Toimintapelit"):ncol(newdat$data)], table)
 tables_new_list <- lapply(seq_len(length(new_vars_tables)), function(i){
   data.frame(
     Variable = c(str_sub(names(new_vars_tables[[i]][1]), start = 1, end = nchar(names(new_vars_tables[[i]][1]))-1 ),

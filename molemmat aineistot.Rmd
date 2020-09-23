@@ -2129,7 +2129,7 @@ uudet_muuttujat <- data.frame(
   lomailu,
   uudet_liikunta,
   sisutus
-)[uusi_indeksöinti,]
+)
 
 ```
 
@@ -2137,6 +2137,13 @@ uudet_muuttujat <- data.frame(
 ## Modaliteettien kentät
 
 ```{r}
+
+# Function to get number of modalities in data.frame
+  mod_määrä <- function(dat){
+    määrä <- sum(sapply(dat, function(x) nlevels(x)))
+    määrä
+  }
+
 reps <- function(df, str){
 #  df <- strip_attr(df)
    if(all(sapply(df, is.factor))){
@@ -2219,6 +2226,12 @@ save(
   uusi_indeksöinti,
   mod_luokitukset,
   mod_luokitukset_uudet_muuttujat,
+  
+  matriisi_mca1_missingit,
+  suplementary_variables1,
+  
+  matriisi_mca_missingit,
+  suplementary_variables,
   file = "C:/Users/Ossi/Desktop/r-projektit/mca-article/data_for_mca.RData"
 )
 
