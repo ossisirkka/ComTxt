@@ -161,6 +161,7 @@ In this section we will introduce our research questions, data and methods.
 
   * Are lifestyles, measured with large set of identical indicators of cultural practices in 2007 and 2018 in Finland, stable?
     * Have the main distinctive latent dimensions, illegitimate-legitimate and traditional-modern, remained the same or changed? Can we quantify major changes in these dimensions or in positions of individual cultural items in space of lifestyles? 
+    * Onko elämäntyylien kartalla epälegitiimiin laitaan sijouttuvat yksilöt oikeasti passivisia, vai onko kyseessä metodologinen artefakti joka on seurausta siitä, ettei kyselyaineisto ole tavoittanut heidän kulttuurisia mieltymyksiään?
   * Have the ways in which cultural practices are socially structured changed in Finland during last the last 10 years, a period marked by rapid digitalization of cultural consumption and production and increased socio-political polarization? 
 
 
@@ -564,35 +565,45 @@ Clouds of individuals, marked with socio-economic variables and concentration el
 ```{r, Figure3, fig.cap="Clouds of individuals in 2007 according to socio-ecominc variables", out.width="100%"}
 combine_sup_var_ellipses <- function(dat){
   plot_inds_sup_vars <- function(dat, taustamuuttuja){
-    d <- data.frame(dat$ind$coord, taustamuuttuja = analyysi_uusi$call$X[taustamuuttuja])
-    var <- rlang::enquo(taustamuuttuja)
-    
-    limx <- c(-0.7, 1)
-    limy <- c(-0.7, 1)
-    bre <- round(seq(-1.6, 2, 0.2),2)
-    
-    ggplot(d, aes(x = Dim.1, y = Dim.2, color = d[,6])) +
-      geom_point(size = 1) + 
-      stat_ellipse(level = 0.90) +
-      geom_hline(yintercept = 0, colour = "gray70") +
-      geom_vline(xintercept = 0, colour = "gray70") +
-      scale_x_continuous(breaks = bre, limits = limx) +
-      scale_y_continuous(breaks = bre, limits = limy) +
-      scale_color_discrete(name = "") +
-      ggtitle(var) +
-      labs(x = "1. dimensio", y = "2. dimensio") +
-      theme_minimal() +
-      theme(plot.title = element_text(hjust = 0.5), legend.position = "bottom")
+  df <- data.frame(taustamuuttuja = dat$call$X[taustamuuttuja], dat$ind$coord)
+  df <- df[str_detect(df[[taustamuuttuja]], "NA", negate = TRUE), , drop = TRUE]
+  
+  #  df_ellipses <- data.frame(dat$call$X[[taustamuuttuja]], dat$ind$coord)
+  ellipses <- coord.ellipse(df, npoint = 100, level.conf = 0.90)$res
+  ellipses <- ellipses[!is.na(ellipses$Dim.1),]
+  #  return(ellipses)  
+  names(ellipses) <- c("muuttuja", "dim1", "dim2")
+  var <- rlang::enquo(taustamuuttuja)
+  
+  limx <- c(-0.7, 1)
+  limy <- c(-0.7, 1)
+  bre <- round(seq(-1.6, 2, 0.2),2)
+  
+  #return(list(head(df), head(ellipses), dim(df), dim(ellipses)))
+  
+  ggplot(df, aes(x = Dim.1, y = Dim.2, color = df[,1])) +
+    geom_point(size = 1) + 
+  #    stat_ellipse(level = 0.90) +
+    geom_hline(yintercept = 0, colour = "gray70") +
+    geom_vline(xintercept = 0, colour = "gray70") +
+    scale_x_continuous(breaks = bre, limits = limx) +
+    scale_y_continuous(breaks = bre, limits = limy) +
+    scale_color_discrete(name = "") +
+    geom_path(data = ellipses, aes(x = dim1, y = dim2, color = muuttuja), size = 1.0) +
+    ggtitle(var) +
+    labs(x = "1. dimensio", y = "2. dimensio") +
+    theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5), legend.position = "bottom")
   }
   
   
-  p1 <- plot_inds_sup_vars(newdat_mca,"ikä")
-  p2 <- plot_inds_sup_vars(newdat_mca,"koulutus")
-  #p3 <- plot_inds_sup_vars("ammattiluokka")
-  p4 <- plot_inds_sup_vars(newdat_mca,"alue")
-  p5 <- plot_inds_sup_vars(newdat_mca,"tulotaso")
-  p6 <- plot_inds_sup_vars(newdat_mca,"sukupuoli")
-
+  p1 <- plot_inds_sup_vars(dat, "ikä")
+  p2 <- plot_inds_sup_vars(dat, "koulutus")
+#  p3 <- plot_inds_sup_vars(dat, "ammattiluokka") # lets not include this...
+  p4 <- plot_inds_sup_vars(dat, "alue")
+  p5 <- plot_inds_sup_vars(dat, "tulotaso")
+  p6 <- plot_inds_sup_vars(dat, "sukupuoli")
+  
   gridExtra::grid.arrange(p1, p2, p4, p5, p6, ncol = 3)
 }
 
@@ -650,7 +661,7 @@ Majority of modern cultural items have shifted towards legitimate culture. This 
 
 Similar items are near the origo of the space of lifestyles in 2018 as they were in 2007. Cultural items such as liking pizza or reading Pirkka-magazine, which is the most popular magazine in Finland. Next, investigate cloud of individuals in 2018 according to socio-economic supplementary variables. This investigation is presented in figure 6. Interprepation of these clouds of individuals in very similiar as it was for 2007 analysis in chapter 3.1 for figure 3.3.
 
-```{r, Figure6, fig.cap="Clouds of individuals in 2007 according to socio-ecominc variables", out.width="100%"}
+```{r, Figure6, fig.cap="Clouds of individuals in 2018 according to socio-ecominc variables", out.width="100%"}
 combine_sup_var_ellipses(analyysi_uusi)
 
 ```
@@ -954,6 +965,9 @@ plot_sup_vars <- function(anal, vuosi){
                      else {length(levels(x)) + 1}}))))
   names(df) <- c("dim1", "dim2", "colr")
   
+  df <- df[str_detect(rownames(df), "NA", negate = TRUE),] # exclude na-levels
+
+  
   size = 5
   
   limx <- c(-1.2, 1.4)
@@ -1232,14 +1246,19 @@ plot_sup_vars(mca_temp, "2018")
 
 ## Appendix 1
 
-```{r, appendix1, eval = FALSE}
+```{r, appendix1, eval = TRUE}
 tables_2007 <- lapply(vanha$data, table, exclude = TRUE)
 tables_2018 <- lapply(uusi$data, table, exclude = TRUE)
 
-
-
-
 tables_list <- lapply(seq_len(length(tables_2007)), function(i){
+  
+  if (all(which(c(length(tables_2007[[i]]), length(tables_2018[[i]])) == min(c(length(tables_2007[[i]]), length(tables_2018[[i]])))) == 1)){
+    tables_2007[[i]][length(tables_2007[[i]]) + 1] <- NA
+  } else if (all(which(c(length(tables_2007[[i]]), length(tables_2018[[i]])) == min(c(length(tables_2007[[i]]), length(tables_2018[[i]])))) == 2)){
+  tables_2018[[i]][length(tables_2018[[i]]) + 1] <- NA
+}
+    
+  
   data.frame(
     Variable = c(str_sub(names(tables_2007[[i]][1]), start = 1, end = nchar(names(tables_2007[[i]][1]))-1 ),
                  rep(" ", length(names(tables_2007[[i]]))-1)),
@@ -1249,16 +1268,19 @@ tables_list <- lapply(seq_len(length(tables_2007)), function(i){
 })
 
 tables_df <- do.call(rbind, tables_list)
+tables_df <- tables_df[!str_detect(tables_df$Label, "NA") & !is.na(tables_df$Label),]
 tables_df <- add_column(tables_df,
-           Class = c(mod_luokitukset, rep(" ", mod_määrä(uusi[,names(uusi) %in% sup.vars]))),
-           .before = "Frequency_2007")
+                        Class = c(mod_luokitukset, rep(" ", nrow(tables_df) - length(mod_luokitukset))),
+                        .before = "Frequency_2007")
+
+
 create_kable(tables_df, otsikko = "Full list of indicators used to constuct identical spaces of lifestyles in 2007 and 2018 ")
 ```
 
 ## Appendix 2
 
-```{r, appendix2, eval = FALSE}
-new_vars_tables <- lapply(newdat$data[, which(names(newdat$data) == "Toimintapelit"):ncol(newdat$data)], table)
+```{r, appendix2, eval = TRUE}
+new_vars_tables <- lapply(newdat$data[, which(names(newdat$data) == "Toimintapelit"):ncol(newdat$data[,!names(newdat$data) %in% sup.vars])], table, exclude = TRUE)
 tables_new_list <- lapply(seq_len(length(new_vars_tables)), function(i){
   data.frame(
     Variable = c(str_sub(names(new_vars_tables[[i]][1]), start = 1, end = nchar(names(new_vars_tables[[i]][1]))-1 ),
@@ -1268,6 +1290,10 @@ tables_new_list <- lapply(seq_len(length(new_vars_tables)), function(i){
 })
 
 new_tables_df <- do.call(rbind, tables_new_list)
+new_tables_df <- add_column(new_tables_df[str_detect(new_tables_df$Label, "NA", negate = TRUE),], Class = newmods, .after = "Label")
+
+
 create_kable(new_tables_df, otsikko = "List of additional indicators used to constuct comprehensive space of lifestyles with 2018 data")
+
 ```
 
