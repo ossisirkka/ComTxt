@@ -12,7 +12,7 @@ output: html_document
 analyysi_vanha_for_indexing <- MCA(complete_vanha_aineisto$completeObs, 
                       ncp = 3,
                       ind.sup = NULL,
-                      quali.sup = which(names(vanha) %in% sup.vars),
+                      quali.sup = which(names(vanha$data) %in% sup.vars),
                       graph = FALSE,
                       row.w = NULL) # Uniform weights for observations
 
@@ -160,7 +160,7 @@ index_str <- c("Scifielokuvat", "TV_Pesäpallo", "Urheiluohjelmat", "Mäkelä", 
                
                "Uinti", "Kävely", "Pyöräily",
                
-               "Nettimusiikki", "Nettilehdet", "Nettichattaily")
+               "Nettimusiikki", "Nettilehdet", "Nettichattaily", "Nettitaide", "Nettipelaaminen")
 # modalitites of variables in index_str
 
 modalities_to_remove <- unname(unlist(sapply(index_str, function(x) levels(complete_vanha_aineisto$completeObs[,x]))))

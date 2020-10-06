@@ -42,9 +42,9 @@ uusi <- complete_uusi_aineisto$completeObs
 sup.vars <- c("ikä", "koulutus", "ammattiluokka", "sukupuoli", "alue", "tulotaso")
 ```
 
-```{r,indexstring_to_reduce_modalities}
+```{r,indexstring_to_reduce_modalities, eval = TRUE}
 load("index_for_removing_mod_classifiers.RData")
-mod_luokitukset <- mod_luokitukset[!index_for_removing_mod_classifiers]
+#mod_luokitukset <- mod_luokitukset[!index_for_removing_mod_classifiers, "mod_luokitukset"]
 ```
 
 ```{r}
@@ -151,6 +151,15 @@ new_variables <- uudet_muuttujat[,names(uudet_muuttujat) %in% c("Helsingin.Sanom
   }
 ```
 
+```{r, get-right-modality-classes}
+tmp <- unname(unlist(sapply(analyysi_vanha$call$X[,!names(analyysi_vanha$call$X) %in% sup.vars], function(x) levels(x))))
+tmp <- tmp[str_detect(tmp, "NA", negate = TRUE)]
+
+mod_luokitukset <- mod_luokitukset[mod_luokitukset$mod %in% tmp, 2]       
+
+```
+
+
 # Introduction / Theory
 # Research design
 
@@ -198,6 +207,7 @@ contributions %>%
   tally() %>% 
   arrange(desc(n)) %>% 
   mutate(Osuus = round(n/sum(n),2)) %>% 
+  rbind(c("Yhteensä", sum(.$n), sum(.$Osuus))) %>% 
   select("Kenttä" = mod_luokitukset, "Modaliteettien määrä" = n, Osuus) %>% 
   create_kable(.,otsikko = "Kenttien koot molemmissa aineistoissa")
 
@@ -217,6 +227,7 @@ coords %>%
   tally %>% 
   mutate(Osuus = round(n / sum(n),2)) %>% 
   arrange(desc(n)) %>% 
+  rbind(c("Yhteensä", sum(.$n), sum(.$Osuus))) %>% 
   select("Kenttä" = mods, "Modaliteettien määrä" = n, Osuus) %>% 
   create_kable(., otsikko = "Kenttien koot täydennetyllä listalla muuttujia")
 
@@ -1193,10 +1204,13 @@ plottaa_uudet_muuttujat <- function(analyysi_data, uudet_muuttujat, support_vars
     theme_minimal() +
     theme(legend.position="none", plot.title = element_text(hjust = 0.5)) +
     annotate("text", x = 1.4, y = -1, label = paste("Akselit yhteensä:", sum(c(xlab, ylab))))
-  return(plot)
+  return(list(plot, analyysi_uudet_muuttujat = mca_temp))
 }
 
-plottaa_uudet_muuttujat(matriisi_mca_missingit, new_variables, suplementary_variables, 0.2)
+analyysi_uudet_muuttujat <- plottaa_uudet_muuttujat(matriisi_mca_missingit, new_variables, suplementary_variables)[[2]]
+plottaa_uudet_muuttujat(matriisi_mca_missingit, new_variables, suplementary_variables, 0.2)[[1]]
+
+
 ```
 
 As can be seen from figure 13, the first and second dimension remained the same as in previous spaces, despite adding new cultural indicators. Introducing our new set of variables to our analysis yielded higher proportion of explained variance (24 % -> 27.5 %) in traditional-modern -axis, but lowered this proportion in first, illegitimate-legitimate -axis (52 % -> 48.4). In total, these two dimensions explain 76 % percent of the variance in our data. The increased explanation power of second axis is somewhat expected: some of the new cultural indicators, such as gaming and social media indicators, were known to be favored by younger population. As previously, we do not interpret third dimensions.  
@@ -1214,19 +1228,9 @@ In addition to interesting indicators that locate on the edges of the space of l
 In figure 14, supplementary variables for analysis with complete set of indicators are presented.
 
 ```{r,  figure14, fig.cap="Supplementary variables in 2018 analysis using comprehensive set of cultural indicators.", out.width="100%"}
-df_temp <- data.frame(complete_uusi_aineisto$completeObs[uusi_indeksöinti,!names(complete_uusi_aineisto$completeObs) %in% sup.vars],
-                      data.frame(new_variables)[uusi_indeksöinti,],
-                      complete_uusi_aineisto$completeObs[uusi_indeksöinti, names(complete_uusi_aineisto$completeObs) %in% sup.vars]
-                      )
+plot_sup_vars(analyysi_uudet_muuttujat, "2018")
 
 
-df_temp_comp <- missMDA::imputeMCA(df_temp,ncp=3)
-mca_temp <- MCA(df_temp_comp$completeObs,
-                quali.sup = which(names(df_temp_comp$completeObs) %in% sup.vars),
-                graph = FALSE
-)
-
-plot_sup_vars(mca_temp, "2018")
 ```
 
 

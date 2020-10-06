@@ -924,6 +924,11 @@ tarkka_ammattiluokitus_vanha <- case_when(
 
 
 ```{r}
+attributes(data1$koulutusaste_4luok) <- NULL
+attributes(data1$k1) <- NULL
+attributes(data1$k7) <- NULL
+attributes(data1$k26a) <- NULL
+
 
 data1$IKA <- 107 - data1$k2
 suplementary_variables1 <- data.frame(
@@ -1788,7 +1793,11 @@ data$Alue <- case_when(data$Alue == 1 ~ 4,
                        data$Alue == 3 ~ 2,
                        data$Alue == 4 ~ 1)
 
-table(data$ammattiluokitus_2010)
+
+attributes(data$koulutus4luokkainen) <- NULL
+attributes(data$K2) <- NULL
+attributes(data$Alue) <- NULL
+attributes(data$tulotaso) <- NULL
 
 suplementary_variables <- data.frame(
   ikä = as.factor(cut(data$IKA, 
@@ -2137,13 +2146,11 @@ uudet_muuttujat <- data.frame(
 ## Modaliteettien kentät
 
 ```{r}
-
 # Function to get number of modalities in data.frame
   mod_määrä <- function(dat){
     määrä <- sum(sapply(dat, function(x) nlevels(x)))
     määrä
   }
-
 reps <- function(df, str){
 #  df <- strip_attr(df)
    if(all(sapply(df, is.factor))){
@@ -2152,14 +2159,12 @@ reps <- function(df, str){
     df <- df %>%  mutate_if(is.character, as.factor)
     return(rep(str, mod_määrä(df)))
 }}
-
   
 mod_luokitukset <- c(
   reps(tv_liikunta, "Tv ja elokuvat"),
   reps(liikunta, "Urheilu, pukeutuminen ja ruumiillisuus"),
   reps(festarit, "Musiikki"),
   reps(ruoat, "Ruoka ja syöminen"),
-
   rep("Kuvataide", 3),
   rep("Ruoka ja syöminen", 3),
   rep("Musiikki", 3 * 6),
@@ -2192,7 +2197,6 @@ mod_luokitukset <- c(
   reps(netti_freq_2007, "Online"),
   reps(netti_tarkoitus_2007, "Online"))
 
-
 mod_luokitukset_uudet_muuttujat <- c(
   reps(peligenret, "Pelaaminen"),
   reps(Nettikäyttö, "Online"),
@@ -2208,6 +2212,18 @@ mod_luokitukset_uudet_muuttujat <- c(
   reps(lomailu, "Lomailu"),
   reps(uudet_liikunta, "Urheilu, pukeutuminen ja ruumiillisuus"),
   reps(sisutus, "Urheilu, pukeutuminen ja ruumiillisuus"))
+
+sup.vars <- c("ikä", "koulutus", "ammattiluokka", "sukupuoli", "alue", "tulotaso")
+
+mod_luokitukset <- data.frame(
+  mod = unname(unlist(sapply(matriisi_mca_missingit[, !names(matriisi_mca_missingit) %in% sup.vars], function(x) {x <- as.factor(x); levels(x)}))),
+  mod_luokitukset
+)
+
+mod_luokitukset_uudet_muuttujat <- data.frame(
+  mod = unname(unlist(sapply(uudet_muuttujat, function(x) {x <- as.factor(x); levels(x)}))),
+  mod_luokitukset_uudet_muuttujat
+)
 ```
 
 
