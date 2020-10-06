@@ -127,16 +127,30 @@ analyysi_uusi <- MCA(uusi$data,
 ```
 
 ```{r, thirdAnalysis}
-new_variables <- uudet_muuttujat[,names(uudet_muuttujat) %in% c("Helsingin.Sanomat","Taidearvostelut", "Jooga", "Marjastus.tai.sienestys",
-                                                                "Ammuskelupelit", "Toimintapelit", "pelaaminen_per_päivä", "Metsästys", "Kaupunkiloma",
-                                                                "Kaukomatka", "Puutarhanhoito", "Banksy", "pelaaminen_per_päivä",
-                                                                "Facebook", "Youtube", "Twitter", "Suomi24", "IS.tai.IL.keskustelupalsta", "NettiBlogit",
-                                                                "NettiUutiset", "Instagram", "MV.lehti", "Urheilupelit",
-                                                                "Dieetti", "Kehonrakennus", "Edullinen_pukeutuminen", "Kauppalehti.Taloussanomat",
-                                                                "Risteily", "Cheeck", "Lautapelien.pelaaminen", "Kalastus", "Mökkeily", "Leipominen")]
- newdat <-get_data_for_spesific_mca(cbind(matriisi_mca_missingit, new_variables), suplementary_variables)
+new <- c(
+  # vanhojen päivitys
+  "Cheeck", "Jooga", "Banksy",
+  
+  # online
+  "Ammuskelupelit", "Toimintapelit", "Urheilupelit", "pelaaminen_per_päivä",
+  "Facebook", "Youtube", "Twitter", "Suomi24", "IS.tai.IL.keskustelupalsta", "NettiBlogit",
+  "NettiUutiset", "Instagram", "MV.lehti",
+  
+  # arkiset
+  "Puutarhanhoito", "Leipominen", "Käsityöt", "Tekniset.työt", "Kalastus", "Metsästys", "Marjastus.tai.sienestys", "Ristikot..sudokut.tai.palapelit",
+  "Pelikorteilla.pelaaminen", "Lautapelien.pelaaminen", "Pihapelin.pelaaminen"
+)
 
- newdat_mca <- MCA(newdat$data,
+# Try these, modify modality classes respectfully
+
+new_vars <- uudet_muuttujat[,names(uudet_muuttujat) %in% new]
+newdat <-get_data_for_spesific_mca(cbind(matriisi_mca_missingit, new_vars), suplementary_variables)
+newmods <- unname(unlist(sapply(newdat$data[,names(newdat$data) %in% new], function(x) levels(x))))
+newmods <- newmods[str_detect(newmods, "NA", negate = TRUE)]
+
+mod_luokitukset_uudet_muuttujat <- mod_luokitukset_uudet_muuttujat[mod_luokitukset_uudet_muuttujat$mod %in% newmods, 2]
+
+newdat_mca <- MCA(newdat$data,
                   quali.sup = which(names(newdat$data) %in% sup.vars),
                   excl = newdat$null_categories,
                   ncp = 5, 
@@ -217,10 +231,7 @@ contributions %>%
 In third step of the analysis, additional indicators of lifestyle are included in the analysis. Updated table of fields and the number of modalities covering them are presented in table 2. 
 
 ```{r, Table2}
-newmods <- c(rep("Pelaaminen", 6), rep("Online", 32 - 7), rep("Arkiset", 50 - 32), rep("Pelaaminen", 3), rep("Kirjallisuus ja lukeminen", 3), rep("Musiikki", 2),
-  rep("Kuvataide", 4), rep("Lomailu", 8), rep("Urheilu, pukeutuminen ja ruumiillisuus", 2))
-
-coords <- data.frame(newdat_mca$var$contrib[,1:2], mods = c(mod_luokitukset, newmods))
+coords <- data.frame(newdat_mca$var$contrib[,1:2], mods = c(mod_luokitukset, mod_luokitukset_uudet_muuttujat))
 
 coords %>% 
   group_by(mods) %>% 
@@ -1086,7 +1097,7 @@ Third cluster seem to be classic highbrow cluster. Items that reflect high cultu
 ## Space of lifestyles in 2018 with additional online and offline indicators
 
 
-Previous analyses were conducted using set of cultural indicators, that were available in both 2007 and 2018 data. Next, we will conduct MCA to 2018 data using set of cultural indicators that yields the most comprehensive space of lifestyles using our data. (note: Proportion of variance explained could be increased to ~78 % by dismissing "central"/not-separating cultural indicators (mökki, risteily, cheek). Maybe not worth it, when interprepting these variables is interesting?) New variables include both online and offline indicators, such as reading Helsingin Sanomat newspaper, body building, liking art of Banksy, using social media service Twitter, reading blogs online or watching videos from Youtube. Total number of new variables included is `r ncol(new_variables)`. Using these variables as active variables, the eigenvalues, proportions of explained variance and Benzecris modified rates of explained variance for first four axes are presented in table x. Contributions to the first and second axis of fields included in the analysis are presented in table X. The first and second axis of our more comprehensive space of lifestyles is presented in figure 10. These axes are presented in two-dimensional plane in figure 13, with newly included variables highlighted.
+Previous analyses were conducted using set of cultural indicators, that were available in both 2007 and 2018 data. Next, we will conduct MCA to 2018 data using set of cultural indicators that yields the most comprehensive space of lifestyles using our data. (note: Proportion of variance explained could be increased to ~78 % by dismissing "central"/not-separating cultural indicators (mökki, risteily, cheek). Maybe not worth it, when interprepting these variables is interesting?) New variables include both online and offline indicators, such as reading Helsingin Sanomat newspaper, body building, liking art of Banksy, using social media service Twitter, reading blogs online or watching videos from Youtube. Total number of new variables included is `r ncol(new_vars)`. Using these variables as active variables, the eigenvalues, proportions of explained variance and Benzecris modified rates of explained variance for first four axes are presented in table x. Contributions to the first and second axis of fields included in the analysis are presented in table X. The first and second axis of our more comprehensive space of lifestyles is presented in figure 10. These axes are presented in two-dimensional plane in figure 13, with newly included variables highlighted.
 
 ```{r, table8}
 create_kable(data.frame(Axis = 1:4, 
@@ -1098,7 +1109,7 @@ create_kable(data.frame(Axis = 1:4,
 
 
 ```{r, table9}
-coords <- data.frame(newdat_mca$var$contrib[,1:2], mod_luokitukset = c(mod_luokitukset, newmods))
+coords <- data.frame(newdat_mca$var$contrib[,1:2], mod_luokitukset = c(mod_luokitukset, mod_luokitukset_uudet_muuttujat))
 calc_contributions(coords, "kattavalla muuttujavalikoimalla")
 
 ```
@@ -1207,8 +1218,8 @@ plottaa_uudet_muuttujat <- function(analyysi_data, uudet_muuttujat, support_vars
   return(list(plot, analyysi_uudet_muuttujat = mca_temp))
 }
 
-analyysi_uudet_muuttujat <- plottaa_uudet_muuttujat(matriisi_mca_missingit, new_variables, suplementary_variables)[[2]]
-plottaa_uudet_muuttujat(matriisi_mca_missingit, new_variables, suplementary_variables, 0.2)[[1]]
+analyysi_uudet_muuttujat <- plottaa_uudet_muuttujat(matriisi_mca_missingit, new_vars, suplementary_variables)[[2]]
+plottaa_uudet_muuttujat(matriisi_mca_missingit, new_vars, suplementary_variables, 0.2)[[1]]
 
 
 ```
@@ -1294,7 +1305,7 @@ tables_new_list <- lapply(seq_len(length(new_vars_tables)), function(i){
 })
 
 new_tables_df <- do.call(rbind, tables_new_list)
-new_tables_df <- add_column(new_tables_df[str_detect(new_tables_df$Label, "NA", negate = TRUE),], Class = newmods, .after = "Label")
+new_tables_df <- add_column(new_tables_df[str_detect(new_tables_df$Label, "NA", negate = TRUE),], Class = mod_luokitukset_uudet_muuttujat, .after = "Label")
 
 
 create_kable(new_tables_df, otsikko = "List of additional indicators used to constuct comprehensive space of lifestyles with 2018 data")

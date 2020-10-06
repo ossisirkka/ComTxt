@@ -2198,13 +2198,13 @@ mod_luokitukset <- c(
   reps(netti_tarkoitus_2007, "Online"))
 
 mod_luokitukset_uudet_muuttujat <- c(
-  reps(peligenret, "Pelaaminen"),
+  reps(peligenret, "Online"),
   reps(Nettikäyttö, "Online"),
   reps(NettiTarkoitus, "Online"),
   reps(nettiväittämät, "Online"),
   reps(yhteisöpalvelut, "Online"),
   reps(harrastukset, "Arkiset"),
-  reps(pelaaminen, "Pelaaminen"),
+  reps(pelaaminen, "Online"),
   reps(lehdet_uusi, "Kirjallisuus ja lukeminen"),
   reps(uudet_artistit, "Musiikki"),
   reps(banksy, "Kuvataide"),
