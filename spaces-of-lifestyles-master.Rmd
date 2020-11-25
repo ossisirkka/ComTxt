@@ -1061,29 +1061,30 @@ Based on visual inspection, clusters seem to me formed consistently, and separat
 
 ```{r Figure11, fig.cap="Most important items for cluster in 2007 and 2018", out.width="100%"}
 find_most_important_categories_for_clusters <- function(dat, sign = "+", vuosi){
+  
+  options(scipen = 1)
+  
   for (i in 1:3){
     df <- data.frame(dat$desc.var$category[[i]])
     df$category <- rownames(df)
-    names(df)
+
     p <- df %>% 
-      select(v.test, category) %>% 
-#      filter(str_sub(category, -1) == sign) %>%  this line can be used to filter results by last sign (+, -, 0)
-      top_n(15, v.test) %>% 
-      ggplot() + 
-      geom_bar(aes( reorder(category, v.test), v.test), stat = "identity") +
-      coord_flip() +
-      ggtitle(paste("Most important categories for cluster", i))
+      select(category, v.test, p.value) %>% 
+      filter(str_sub(category, -1) == sign) %>% # this line can be used to filter results by last sign (+, -, 0) %>% 
+      top_n(15, v.test)
+    
+    rownames(p) <- NULL
+      
     assign(paste0("p",i),p)
   }
-  p1 <- p1 + labs(subtitle = vuosi)
   list(p1, p2, p3)
 }
 
 olds <- find_most_important_categories_for_clusters(clust_vanha, sign = "+", vuosi = "2007")
 news <- find_most_important_categories_for_clusters(clust_uusi, sign = "+", vuosi = "2018")
 
-gridExtra::grid.arrange(olds[[1]], olds[[2]], olds[[3]],
-                        news[[1]], news[[2]], news[[3]], as.table = FALSE)
+olds
+news
 
 ```
 
@@ -1244,7 +1245,37 @@ plot_sup_vars(analyysi_uudet_muuttujat, "2018")
 
 ```
 
+Clustring in 2018 with additional indicators 
 
+```{r Figure15, fig.cap="Clusters in spaces of lifestyles in 2018.", out.width="100%"}
+clust_2018_whole <- HCPC(newdat_mca, nb.clust = -1, graph = FALSE)
+
+
+# create ggplot -----------------------------------------------------------
+plot_clusters <- function(clustdat){
+  to_plot <- clustdat$call$X[,c("Dim 1","Dim 2","clust")]
+  names(to_plot) <- c("dim1", "dim2", "group")
+  ggplot(to_plot, aes(dim1, dim2, color = group)) + 
+    geom_point() +
+    stat_ellipse(level = 0.95) +
+    geom_hline(yintercept = 0, colour = "gray70") +
+    geom_vline(xintercept = 0, colour = "gray70") +
+    scale_x_continuous(breaks = bre, limits = limx) +
+    scale_y_continuous(breaks = bre, limits = limy) +
+    ggtitle(substitute(clustdat)) +
+    theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5))
+}
+p3 <- plot_clusters(clust_2018_whole)
+plot(p3)
+
+
+```
+
+```{r}
+new_whole <- find_most_important_categories_for_clusters(clust_2018_whole, sign = "+", vuosi = "2007")
+new_whole
+```
 
 
 # Conclusions
