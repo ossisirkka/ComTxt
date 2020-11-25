@@ -99,7 +99,11 @@ get_data_for_spesific_mca <- function(active_df, sup_df, karsittavat_str = index
 # get data for 2007 analysis
 
 vanha <- get_data_for_spesific_mca(matriisi_mca1_missingit, suplementary_variables1)
+index_vanha_data_missingit <- apply(vanha$data[,!(names(vanha$data) %in% sup.vars)],
+                                    1,
+                                    function(x) sum(str_detect(x, "NA")) < 0.2 * ncol(vanha$data[,!(names(vanha$data) %in% sup.vars)]))
 
+vanha$data <- vanha$data[index_vanha_data_missingit,]
 # Create mca-analysis
 
 analyysi_vanha <- MCA(vanha$data, 
@@ -115,6 +119,11 @@ analyysi_vanha <- MCA(vanha$data,
 
 ```{r secondAnalysis}
 uusi <- get_data_for_spesific_mca(matriisi_mca_missingit, suplementary_variables)
+index_uusi_data_missingit <- apply(uusi$data[,!(names(uusi$data) %in% sup.vars)],
+                                   1,
+                                   function(x) sum(str_detect(x, "NA")) < 0.2 * ncol(uusi$data[,!(names(uusi$data) %in% sup.vars)]))
+
+uusi$data <- uusi$data[index_uusi_data_missingit,]
 
 analyysi_uusi <- MCA(uusi$data, 
                       ncp = 5,
@@ -149,6 +158,10 @@ newmods <- unname(unlist(sapply(newdat$data[,names(newdat$data) %in% new], funct
 newmods <- newmods[str_detect(newmods, "NA", negate = TRUE)]
 
 mod_luokitukset_uudet_muuttujat <- mod_luokitukset_uudet_muuttujat[mod_luokitukset_uudet_muuttujat$mod %in% newmods, 2]
+
+index_newdat_missingit <- apply(newdat$data[,!(names(newdat$data) %in% sup.vars)], 1, function(x) sum(str_detect(x, "NA")) < 0.2 * ncol(newdat$data[,!(names(newdat$data) %in% sup.vars)]))
+
+newdat$data <- newdat$data[index_newdat_missingit,]
 
 newdat_mca <- MCA(newdat$data,
                   quali.sup = which(names(newdat$data) %in% sup.vars),
@@ -190,11 +203,33 @@ In this section we will introduce our research questions, data and methods.
 
 ## Data
 
-In the analysis, two nationally representative postal surveys from Finland are used. These surveys are collected by Statistics Finland in 2007 and 2018. These datasets are "Culture and Leisure in Finland, 2007" (n = 1388, response rate 46.3 %; sample size 3000) and "Culture and Leisure in Finland, 2018" (N = 1425, response rate 40.8 %, sample size 3500). Both of these survey consist of 17-74 year old mainland population in Finland. Surveys are cross-sectional in but they are designed to allow comparison, and there is correspondence in terms of topics covered and exact formulations of questions and items mentioned in the questions. In survey of 2018, there are also additional indicators of more contemporary cultural items, indicators for online and offline activities. Both datasets are included with a weigth variable calculated by Statistics Finland to correct non-response bias in terms of respondent's age, gender, education and residential area. In this analysis, we do not use these weights as there is only minor difference between weighted and unweighted results.
+In the analysis, two nationally representative postal surveys from Finland are used. These surveys are collected by Statistics Finland in 2007 and 2018. These datasets are "Culture and Leisure in Finland, 2007" (n = 1388, response rate 46.3 %; sample size 3000) and "Culture and Leisure in Finland, 2018" (N = 1425, response rate 40.8 %, sample size 3500). Both of these survey consist of 17-74 year old mainland population in Finland. Surveys are cross-sectional in but they are designed to allow comparison, and there is correspondence in terms of topics covered and exact formulations of questions and items mentioned in the questions. In survey of 2018, there are also additional indicators of more contemporary cultural items, indicators for online and offline activities. Both datasets are included with a weigth variable calculated by Statistics Finland to correct non-response bias in terms of respondent's age, gender, education and residential area. In this analysis, we do not use these weights as there is only minor difference between weighted and unweighted results. We exclude individuals that have not responded in more than 20 % of the active variables (`r sum(index_vanha_data_missingit == FALSE)` observations in 2007 and `r sum(index_uusi_data_missingit == FALSE)` in 2018 datasets), as suggested by Le Roux and Rouanet (2010, 62). 
 
-The space of lifestyles in constructed using set of indicators that cover wide range of cultural practices and tastes. In two first steps of the analysis, fields covered in the space of lifestyles are music, literature, art, tv and movies, sports, dressing and ruumiillisuus?, and food and drinking. To construct the map, `r ncol(vanha$data) - length(sup.vars)` active variables are used, and the number of active modalities is `r mod_määrä(vanha$data[,!(names(vanha$data) %in% sup.vars)])`. In addition to active variables in the analysis, we use also `r length(sup.vars)` supplementary, socio-economic variables, with total number of `r do.call(sum, lapply(vanha$data[,names(vanha$data) %in% sup.vars], function(x) nlevels(x)))` modalities.  Fields and the number of modalities covering them are presented in table 1. Fields with most indicators are music and literature, which both cover 20 % of all modalities in analysis. This choice of cultural indicators is used to construct two spaces of lifestyles in different time points, 2007 and 2018, with sets of identical cultural items. Full list of variables included and their distributions can be found in the appendix 1. **One guideline to discard categories with low frequency is to discard all modalities with frequency lower than 2 % (Di Franco 2015, 1305), and another is lower than 5 % frequency (Le Roux & Rouanet 2010, 39). We proceed to choose our threshold to be 3 % (i.e. categories with more than 41 observations), which leads to retaining contextually interesting categories and deletion of infrequent categories, which possibly contribute disproportionally strongly to the MCA solution. ei vielä poistettu**
 
-The total number of observations in 2007 data is `r nrow(vanha$data)`. `r 1388 - nrow(vanha$data)` observations were dropped from the sample due to high fraction of missing data. In 2018 data, there are `r nrow(uusi$data)` observations, and `r 1425 - nrow(uusi$data)` observations were deleted. For the remaining observations, Multiple imputation method suggested by Josse & Husson (2016) were employed. In the first two steps of analysis, there are `r round(nrow(vanha$data) / (ncol(vanha$data)-length(sup.vars)),2)` and `r round(nrow(uusi$data) / (ncol(uusi$data)-length(sup.vars)),2)`  individuals for active category. In the literature, one suggested guideline to minimum number of observations per active category is 20 (Di Franco 2015, 1305). However, author do not present any mathematical justification or citations for this precept. Despite of low number of observations per active category, we proceed to conduct our analysis with high total number of active categories.   
+## Methods
+
+MCA is a technique which allow representing summary of the relations existing between set of categorical variables (Di Franco 2015, 1301). As a method, MCA has inductive and explanatory nature, and it allows graphical representation of relationships between (possible plentiful) set of categorical variables in multidimensional space (Le Roux & Rouanet 2010). When applying MCA, it is expected that most of the information in the data are defined by several latent dimensios, which are extracted by this method. For interpretation, final solution is found using between 2 to 4 dimensions, which explain majority of the variance in the data. The object of applying MCA is therefore to reveal and analyze hidden structures and their dynamics in our datasets.
+
+In this article, main analysis method is Specific Multiple Correspondence Analysis (SpeMCA, Le Roux & Rouanet 2010, 61). This variant of multiple correspondence analysis (MCA) is used to exclude “junk categories”, i.e. categories that are not in the scope of interest, say, missing values, from the analysis. We use SpeMCA to exclude categories that represent missing values from the analysis. 
+
+We apply MCA to datasets from two different time points with identical set of variables. To examine change that has happened during eleven year period in space of lifestyles in Finland, method proposed by Le Roux & Rouanet (1998, 204), and originally Benzecri (1992, 410), is employed. We combine the data from both years, and conduct the analysis using observations from 2007 as active individuals and observations from 2018 as supplementary individuals. From this analysis, we use the coordinates of supplementary individuals in first and second axis. The Location ${p}$ of modality $i$ on axis $j$ in 2018 on space constructed from observations in 2007 can be found with $$p_{i,j} = {{1\over k}{\sum_{n = 1}^{k}{c_{i,j,n}}}\over\sqrt{\lambda{j}}}$$ where $k$ = number of respondents that chose modality ${i}$ and $\lambda{j}$ = eigenvalue of axis ${j}$.
+
+After calculating the coordinates of modalities of 2018 in space of lifestyles of 2007, we measure distance of modalities obtained using 2007 and 2018 data. For calculation, we use Euclidean distance $d(p_{ij},q_{ij})$: $$d(p_{ij},q_{ij}) = \sqrt{(q_{i1} - p_{i1})^2 + (q_{i2} - p_{i2})^2}$$ where $p_{ij} = (p_{i1}, p_{i2})$, the coordinates of modality $i$ in first and second axis using 2007 data, and $q_{ij} = (q_{i1}, q_{i2})$, the coordinates of modality $i$ in first and second axis $j$ using 2018 data. 
+
+Relative contribution $rctr_{l,k}$, where $l$ is class of modalities and  $j$ is the axis, is calculated in following manner:
+
+$$rctr_{l,j} = ctr_{l,j}({1\over{\sum_{k = i}^{K}k_{l}}}{\sum_{i = 1}^{K} k_{i}\over{\sum_{i = 1}^{I}l}})$$, 
+
+where $ctr_{l,j}$ is absolute contribution of class $l$ in axis $j$,
+      ${1\over{\sum_{k = i}^{K}k_{l}}}$ is repiprocal of sum of modalities $k$ belonging to class $l$,
+      ${\sum_{i = 1}^{K} k_{i}}$ is total number of modalities and
+      ${\sum_{i = 1}^{I}l}$ is total number of classes $l$ in the data. 
+
+## Variables
+
+The space of lifestyles in constructed using set of indicators that cover wide range of cultural practices and tastes. In two first steps of the analysis, fields covered in the space of lifestyles are music, literature, art, tv and movies, sports, dressing and ruumiillisuus?, and food and drinking. To construct the map, `r ncol(vanha$data) - length(sup.vars)` active variables are used, and the number of active modalities is `r mod_määrä(vanha$data[,!(names(vanha$data) %in% sup.vars)])`. In addition to active variables in the analysis, we use also `r length(sup.vars)` supplementary, socio-economic variables, with total number of `r do.call(sum, lapply(vanha$data[,names(vanha$data) %in% sup.vars], function(x) nlevels(x)))` modalities.  Fields and the number of modalities covering them are presented in table 1. Fields with most indicators are music and literature, which both cover 20 % of all modalities in analysis. This choice of cultural indicators is used to construct two spaces of lifestyles in different time points, 2007 and 2018, with sets of identical cultural items. Full list of variables included and their distributions can be found in the appendix 1. 
+
+The total number of observations in 2007 data is `r nrow(vanha$data)`, and `r nrow(uusi$data)` in the 2018 data. There are `r round(nrow(vanha$data) / (ncol(vanha$data)-length(sup.vars)),2)` and `r round(nrow(uusi$data) / (ncol(uusi$data)-length(sup.vars)),2)`  individuals for active category, respectively, and  `r round(nrow(newdat$data) / (ncol(newdat$data)-length(sup.vars)),2)` in the final part of our analysis. In the literature, one suggested guideline to minimum number of observations per active category is 20 (Di Franco 2015, 1305). However, author do not present any mathematical justification or citations for this precept. Despite of low number of observations per active category, we proceed to conduct our analysis with high total number of active categories.   
 
 ```{r}
 # MCA for table
@@ -245,33 +280,13 @@ coords %>%
 ```
 
 
-
-## Methods
-
-In this article, main analysis method is Multiple Correspondence Analysis (MCA).  The history of the method starts from mid-1930's (Di Franco 2015, 1299). Method was re-discovecer by Jean-Paul Benzécri in the 1960, who developed mathematical foundations of MCA as it is know today. Benzércis work was contiuned by Brigitte Le Roux and Henry Rouanet (2004; 2010) as a part of family of "geometric data analysis". In the context of sociological research, MCA is commonly associated with the work of Pierre Bourdieu (Purhonen et al. 2014, 359.)
-
-MCA is a technique which allow representing summary of the relations existing between set of categorical variables (Di Franco 2015, 1301). As a method, MCA has inductive and explanatory nature, and it allows graphical representation of relationships between (possible plentiful) set of categorical variables in multidimensional space (Purhonen et al. 2014 359; Le Roux & Rouanet 2010). Analogously to principal component analysis, the data is assumed to be described by latent dimensions, which are expected to redefine most of the information in the data (Kahma & Toikka 2012, 117). For interpretation, final solution is found using between 2 to 4 dimensions, which explain majority of the variance in the data. The object of applying MCA is therefore to reveal and analyze hidden structures and their dynamics in our datasets.
-
-We apply MCA to datasets from two different time points with identical set of variables. To examine change that has happened during eleven year period in space of lifestyles in Finland, method proposed by Le Roux & Rouanet (1998, 204), and originally Benzecri (1992, 410), is employed. We combine the data from both years, and conduct the analysis using observations from 2007 as active individuals and observations from 2018 as supplementary individuals. From this analysis, we use the coordinates of supplementary individuals in first and second axis. The Location ${p}$ of modality $i$ on axis $j$ in 2018 on space constructed from observations in 2007 can be found with $$p_{i,j} = {{1\over k}{\sum_{n = 1}^{k}{c_{i,j,n}}}\over\sqrt{\lambda{j}}}$$ where $k$ = number of respondents that chose modality ${i}$ and $\lambda{j}$ = eigenvalue of axis ${j}$.
-
-After calculating the coordinates of modalities of 2018 in space of lifestyles of 2007, we measure distance of modalities obtained using 2007 and 2018 data. For calculation, we use Euclidean distance $d(p_{ij},q_{ij})$: $$d(p_{ij},q_{ij}) = \sqrt{(q_{i1} - p_{i1})^2 + (q_{i2} - p_{i2})^2}$$ where $p_{ij} = (p_{i1}, p_{i2})$, the coordinates of modality $i$ in first and second axis using 2007 data, and $q_{ij} = (q_{i1}, q_{i2})$, the coordinates of modality $i$ in first and second axis $j$ using 2018 data. 
-
-Relative contribution $rctr_{l,k}$, where $l$ is class of modalities and  $j$ is the axis, is calculated in following manner:
-
-$$rctr_{l,j} = ctr_{l,j}({1\over{\sum_{k = i}^{K}k_{l}}}{\sum_{i = 1}^{K} k_{i}\over{\sum_{i = 1}^{I}l}})$$, 
-
-where $ctr_{l,j}$ is absolute contribution of class $l$ in axis $j$,
-      ${1\over{\sum_{k = i}^{K}k_{l}}}$ is repiprocal of sum of modalities $k$ belonging to class $l$,
-      ${\sum_{i = 1}^{K} k_{i}}$ is total number of modalities and
-      ${\sum_{i = 1}^{I}l}$ is total number of classes $l$ in the data. 
-
 # Analysis
 
 Our analysis will be conducted in three separate steps. First, we create space of lifestyles in Finland in 2007 using 146 active variables and 6 supplementary variables. After careful examination of space of lifestyles in 2007, we proceed to step 2 and conduct analysis using 2018 data with identical indicators. To examine change that has happened during 11 years, from 2007 to 2018, we use the respondents from 2018 as supplementary individuals in space constructed using individuals from 2007. In third step, we introduce new cultural practices to space of lifestyles in 2018. These new practices consist both offline and online cultural indicators, such as hunting, gardening and art by Banksy, and using the internet or playing games.   
 
-## Space of lifestyles in 2007
+## Space of lifestyles in 2007 and 2018 with identical set of indicators
 
-We start our analysis by creating the space of lifestyles using data from year 2007. Table 3 shows four first dimensions produced by MCA. 
+We start our analysis by creating the spaces of lifestyles using data from 2007 and 2018. Table 1 and 2 shows four first dimensions produced by MCA by respective year. 
 
 ```{r Table3 }
 # Function to calculate Benzecri modified rates
@@ -297,19 +312,26 @@ korjatut_selitysasteet <- function(data){
 }
 
 
-create_kable(data.frame(Axis = 1:4, 
-           Eigenvalue = round(analyysi_vanha$eig[1:4,1],3),
-           "% of explained variance" = round(analyysi_vanha$eig[1:4,2],1),
-           "Benzecri's modified explained variance" = round(korjatut_selitysasteet(analyysi_vanha)[1:4],3)*100
-  ),otsikko =  "Vuoden 2007 datan neljän ensimmäisen ulottuvuuden tunnusluvut")
-
-
-
+create_kable(data.frame(Axis = 1:3, 
+           Eigenvalue = round(analyysi_vanha$eig[1:3,1],3),
+           "% of explained variance" = round(analyysi_vanha$eig[1:3,2],1),
+           "Benzecri's modified explained variance" = round(korjatut_selitysasteet(analyysi_vanha)[1:3],3)*100
+  ),otsikko =  "Vuoden 2007 datan kolmen ensimmäisen ulottuvuuden tunnusluvut")
 ```
 
-The modified rates of explained variance for two first dimensions are `r round(korjatut_selitysasteet(analyysi_vanha)[1],2)` for first axis and `r round(korjatut_selitysasteet(analyysi_vanha)[2],2)` for second axis, composing total `r round(sum(korjatut_selitysasteet(analyysi_vanha)[1], korjatut_selitysasteet(analyysi_vanha)[2]),2)` % of variance explained in the data. Following axes explain considerable smaller fractions of the variance, and thus we will only interpret two first axis. In table 2, the relative contributions of fields included in the analysis to first and second axis and in total are presented.
+```{r Table4}
+create_kable(data.frame(Axis = 1:3, 
+           Eigenvalue = round(analyysi_uusi$eig[1:3,1],3),
+           "% of explained variance" = round(analyysi_uusi$eig[1:3,2],1),
+           "Benzecri's modified explained variance" = round(korjatut_selitysasteet(analyysi_uusi)[1:3],3)*100
+  ), otsikko = "Vuoden 2018 datan kolmen ensimmäisen ulottuvuuden tunnusluvut")
+```
 
-```{r, Table4}
+The modified rates of explained variance for two first dimensions are `r round(korjatut_selitysasteet(analyysi_vanha)[1],2)` for first axis and `r round(korjatut_selitysasteet(analyysi_vanha)[2],2)` for second axis, composing total `r round(sum(korjatut_selitysasteet(analyysi_vanha)[1], korjatut_selitysasteet(analyysi_vanha)[2]),2)` % of variance explained in the data. Compared to analysis conducted using 2007 data, in 2018 first dimension is almost equally strong in explaining variance of the data. Examining second dimension, it seems that there is a drop in explanatory power compared to analysis conducted using 2007 data, and this will be addressed later in the analysis. Together first and second axis account for `r round(sum(korjatut_selitysasteet(analyysi_uusi)[1], korjatut_selitysasteet(analyysi_uusi)[2]),2)` percent of variance according to Benzecri's modified rates. This is on par with recommended 80 % (Hjellbrekke 2018). Following axes explain considerable smaller fractions of the variance, and thus we will only interpret two first axis.
+
+In table 3 and 4, the relative contributions of fields included in the analysis to first and second axis and in total are presented.
+
+```{r, Table5}
 
 calc_contributions <- function(df, year){
   
@@ -343,15 +365,21 @@ calc_contributions(coords, "2007")
 
 ```
 
+```{r, Table6}
+
+coords <- data.frame(analyysi_uusi$var$contrib[,1:2], mod_luokitukset)
+calc_contributions(coords, "2018")
+```
+
 In the first axis, most contributing fields are music, literature and reading, and visual arts, which contributes total of 80 % of the first axis. In second axis, music remains the most important field in contributing the axis. Tv and movies, literature and reading and food and eating are other important contributors in second axis.  
 
-As a result of high number of variables included in our analysis, conventional presentation of all modalitites with higher than mean contribution to the axis is not possible. In figure 1, 20 items in each axis with highest and lowest coordinates are presented. 
+As a result of high number of variables included in our analysis, conventional presentation of all modalitites with higher than mean contribution to the axis is not possible. In figure 1, 10 items in each axis for both years with highest and lowest coordinates are presented. 
 
-```{r Figure1, fig.cap="First and second dimension in 2007 analysis", fig.pos = "c", out.width = "100%"}
+```{r Figure1, fig.cap="First and second dimension in 2007 and 2018 analysises", fig.pos = "c", out.width = "100%"}
 library(ggrepel)
 
 
-yksiulotteiset_kartat <- function(dat, dim = 1, title){
+yksiulotteiset_kartat <- function(dat, dim = 1, title, n = 10){
   
   
   set.seed(42)
@@ -371,7 +399,7 @@ yksiulotteiset_kartat <- function(dat, dim = 1, title){
   ggplot(tmp, aes(x = dim, y = 1, label = var)) +
     geom_point(color = "black", size = 1) +
     geom_text_repel(
-      data = tmp[c(1:20, (nr-20):nr),],
+      data = tmp[c(1:n, (nr-n):nr),],
       nudge_y      = 0.1,
       direction    = "y",
       angle        = 0,
@@ -395,12 +423,17 @@ yksiulotteiset_kartat <- function(dat, dim = 1, title){
 }
 p1 <- yksiulotteiset_kartat(analyysi_vanha, 1, "First dimension in 2007")
 p2 <- yksiulotteiset_kartat(analyysi_vanha, 2, "Second dimensions in 2007")
-gridExtra::grid.arrange (p1, p2, nrow = 1)
+p3 <- yksiulotteiset_kartat(analyysi_uusi, 1, "First dimension in 2018")
+p4 <- yksiulotteiset_kartat(analyysi_uusi, 2, "Second dimensions in 2018")
+gridExtra::grid.arrange (p1, p2, p3, p4, nrow = 2)
+
 ```
 
 The first dimensions in the space of lifestyles in Finland for 2007, presented in figure 1, seems to account variation in cultural tastes, practices and knowledge according their legitimacy. Traditional highbrow practices such as visiting opera, classical music concerts or art galleries are located in far-right in the space of lifestyles. On the other end of first dimension, there are number of dislikes of highbrow activity and tastes, such as never visiting museums, classical concerts or galleries, and disliking cultural products such as classical music and blues. Only positive cultural products are in relation to watching Finnish soap opera and Big Brother. This axis seems to measure legitimacy and illegitimacy of components in space of lifestyles. On the left side of the axis, there are number of modalities that measure non-participation in any kind of actives or cultural practices, whereas on the right side of the axis there are few dislikes or never-doings.
 
 The second dimension seems to be constructed according to traditionality or modernity of cultural products. Cultural products such as watching The Simpsons, having piercings or tattoos and visiting nightclubs are located on positive side of second dimensions. On the other end, there are likings for religious and traditional Finnish literature, folk music and Nordic walking. We consider this axis to be divided by traditionality or modernity of cultural products.
+
+Compared to the analysis conducted with 2007 data, first and second dimensions seem to be unchanged eleven years later in 2018. First dimension shows clearly pattern of high and low legitimacy of cultural items. Most legitimate items are liking books of Flaubert and visiting opera or jazz concerts. Least legitimate items include not liking classical music, visiting museums and watching Big Brother from tv. Second dimension seems to be separated by traditionality or modernity of cultural items. Most modern items are piercings, visiting night clubs and watching The Simpsons, and most traditional items are liking books of traditional Finnish writers such as Kalle Päätalo or Laila Hirvisaari or reading "Apu" or "Seura" magazines regularly.
 
 The space of lifestyles in Finland with 2007 data is constructed from these axes in figure 2. Traditional highbrow cultural items, such as opera and classical concerts are located in the legitimate, right side of the space, lower side of y-axis. More modern indicators of high legitimacy and cultural capital such as impressionism, jazz concerts and movies by Almadovar are located higher on the right side of the space. Some forms of legitimate culture, such as visiting museums or modern literature, are located near zero-point of y-axis, and these items are not separated by traditional-modern-distinction.
 
@@ -412,6 +445,13 @@ Most modern items in space of lifestyles include having piercings and tattoos, a
 
 Some items presented in figure 2 are non-separating in neither dimension, illegitimate-legitimate or traditional-modern. Most of these items are essentially neutral, but also some interesting items are located near origo. For example, liking pizza does not separate in either dimension. Neither does having some cd-records, watching some tv, or going into walks.
 
+In 2018, the first and second dimension are similar to space constructed using 2007 data. Perhaps the biggest change compared to previous space is that majority of the indicators have became less modern and more traditional. This might be explained identical indicators and cohort factor: the younger population, which favored more modern cultural items, were 11 years older, and if their lifestyles were stable during that time, their cultural items became less modern. Same mechanism has chanced already traditional items in 2007 to be even more traditional in 2018 (voisi selittää paremminkin, menköön nyt näin.). As a result of identical set of indicators used to construct the map in 2007 and 2018, there are no "extremely" modern items in space of lifestyles in 2018. 
+
+Excluding the cohort effect, the space of lifestyles in 2018 seems to be very stable, particulary on the illegitimate-legitimate dimensions. Majority of most legitimate cultural items are more traditional than modern. Between traditional items, more legitimate traditional items are liking, doings or knowledge on cultural items, and less legitimate traditional items are not-liking, not-doings and ignorance (?) of cultural items, excluding entertainment from tv or magazines. Among illegitimate items, watching Big Brother is modern, whereas not watching movies is traditional item of low legitimacy.
+
+Majority of modern cultural items have shifted towards legitimate culture. This might be explained by cohort effect and attained education of the youth. If cultural items, preferred by youth in 2007, remained as part of their lifestyles during 11 year period, during same time when youth attained their higher education, those cultural items might have gathered some additional degrees of legitimacy, since they are consumer by people in higher status groups. This mechanism is supported by the dynamic of items that have shifted towards legitimate areas of space of lifestyles, which of majority are positive doings, likings or knowings. Modern items remained in less legitimate section in space of lifestyles in 2018 are more often dislikes and not-doings. Both of these phenomenas are correlated with education (lähde). 
+
+Similar items are near the origo of the space of lifestyles in 2018 as they were in 2007. Cultural items such as liking pizza or reading Pirkka-magazine, which is the most popular magazine in Finland. Next, investigate cloud of individuals in 2018 according to socio-economic supplementary variables. This investigation is presented in figure 6. Interprepation of these clouds of individuals in very similiar as it was for 2007 analysis in chapter 3.1 for figure 3.3.
 
 
 ```{r Figure2, fig.cap="The space of lifestyles in Finland 2007", fig.pos = "c", out.width = "100%"}
@@ -495,6 +535,11 @@ mca_kartta(analyysi_vanha, 0.18, "2007")
 
 
 ```
+
+```{r figure5, fig.cap="The space of lifestyles in Finland 2018.", fig.pos="c", out.width="100%"}
+mca_kartta(analyysi_uusi, 0.18, "2018")
+```
+
 ```{r, include = FALSE}
 
 # MCA analysis with fields included in the space of lifestyles
@@ -582,9 +627,7 @@ mca_kartta_with_fields <- function(data, kriteeri, vuosi){
 }
 ```
   
-Clouds of individuals, marked with socio-economic variables and concentration ellipses (so that 90 % of the observations in category are included) presented in figure 3.
-
-```{r, Figure3, fig.cap="Clouds of individuals in 2007 according to socio-ecominc variables", out.width="100%"}
+```{r, Figure3, fig.cap="Clouds of individuals in 2007 according to socio-ecominc variables", out.width="100%", include=FALSE}
 combine_sup_var_ellipses <- function(dat){
   plot_inds_sup_vars <- function(dat, taustamuuttuja){
   df <- data.frame(taustamuuttuja = dat$call$X[taustamuuttuja], dat$ind$coord)
@@ -632,69 +675,63 @@ combine_sup_var_ellipses <- function(dat){
 combine_sup_var_ellipses(analyysi_vanha)
 ```
 
-From figure 3, we can see that some of the concentration ellipses of age groups do not overlap at all, which indicates very distinct lifestyles between these groups. Age groups are mainly distinctive in terms of second, traditional-modern axis, and it seems that dispersion in locations of individuals on first axis increases when moving to higher age groups. Unlike age, education is distinctive in first, illegitimate-legitimate axis. Group with highest educational status is located to legitimate side of the space, and correspondingly, groups with lowers educational attainment are located on the illegitimate side of the space. Income level, which correlates with educational level, is distributing with corresponding manner. This suggests that individuals in the legitimate side of space are holding holding higher levels of economical and institutionalized cultural capital. Individuals living in rural area are mainly located in illegitimate-traditional side of the space, and individuals from urban area are concentrated more on the legitimate side of the space. This might be explained by increased opportunities to cultural participation in urban areas. Males seem to be more inclined to be on the illegitimate, modern side, as opposed to women, who are majority of individuals in the most right side of the space of lifestyles.
-
-After constructing and examining the space of lifestyles with 2007 data, we proceed to remake the analysis with 2018 data. In the next section, identical process and set of indicators is used. 
-
-## Space of lifestyles in 2018 with identical indicators
-
-
-
-Eigenvalues, percentages of explained variance and Benzecri's modified explanation rates of first 4 axes are presented in table 3. 
-
-```{r Table5}
-create_kable(data.frame(Axis = 1:4, 
-           Eigenvalue = round(analyysi_uusi$eig[1:4,1],3),
-           "% of explained variance" = round(analyysi_uusi$eig[1:4,2],1),
-           "Benzecri's modified explained variance" = round(korjatut_selitysasteet(analyysi_uusi)[1:4],3)*100
-  ), otsikko = "Vuoden 2018 datan neljän ensimmäisen ulottuvuuden tunnusluvut")
-```
-
-Compared to analysis conducted using 2007 data, first dimension is almost equally strong in explaining variance of the data. Examining second dimension, it seems that there is a drop in explanatory power compared to analysis conducted using 2007 data, and this will be addressed later in the analysis. Together first and second axis account for `r round(sum(korjatut_selitysasteet(analyysi_uusi)[1], korjatut_selitysasteet(analyysi_uusi)[2]),2)` percent of variance according to Benzecri's modified rates. This is slightly below recommended 80 % (Hjellbrekke 2018). Still, only first and second dimension are interpreted. The contributions of fields included in the analysis are presented in table 4.
-
-```{r, Table6}
-
-coords <- data.frame(analyysi_uusi$var$contrib[,1:2], mod_luokitukset)
-calc_contributions(coords, "2018")
-```
-
-
-Explanatory analysis of third dimension did not show any consistent structure on the axis. The first and second dimensions are presented in figure 4.
-
-```{r Figure4, fig.cap="First and second dimensions of space of lifestyles in Finland 2018", fig.pos = "c", out.width = "100%"}
-p1 <- yksiulotteiset_kartat(analyysi_uusi, 1, "First dimension in 2018")
-p2 <- yksiulotteiset_kartat(analyysi_uusi, 2, "Second dimensions in 2018")
-gridExtra::grid.arrange (p1, p2, nrow = 1)
-
-```
-
-Compared to the analysis conducted with 2007 data, first and second dimensions seem to be unchanged eleven years later in 2018. First dimension shows clearly pattern of high and low legitimacy of cultural items. Most legitimate items are liking books of Flaubert and visiting opera or jazz concerts. Least legitimate items include not liking classical music, visiting museums and watching Big Brother from tv. Second dimension seems to be separated by traditionality or modernity of cultural items. Most modern items are piercings, visiting night clubs and watching The Simpsons, and most traditional items are liking books of traditional Finnish writers such as Kalle Päätalo or Laila Hirvisaari or reading "Apu" or "Seura" magazines regularly. In figure 5, these dimensions are used to construct the 2018 version of space of lifestyles in Finland.
-
-```{r figure5, fig.cap="The space of lifestyles in Finland 2018.", fig.pos="c", out.width="100%"}
-mca_kartta(analyysi_uusi, 0.18, "2018")
-```
-
-
-The first and second dimension are similar to space constructed using 2007 data. Perhaps the biggest change compared to previous space is that majority of the indicators have became less modern and more traditional. This might be explained identical indicators and cohort factor: the younger population, which favored more modern cultural items, were 11 years older, and if their lifestyles were stable during that time, their cultural items became less modern. Same mechanism has chanced already traditional items in 2007 to be even more traditional in 2018 (voisi selittää paremminkin, menköön nyt näin.). As a result of identical set of indicators used to construct the map in 2007 and 2018, there are no "extremely" modern items in space of lifestyles in 2018. 
-
-Excluding the cohort effect, the space of lifestyles in 2018 seems to be very stable, particulary on the illegitimate-legitimate dimensions. Majority of most legitimate cultural items are more traditional than modern. Between traditional items, more legitimate traditional items are liking, doings or knowledge on cultural items, and less legitimate traditional items are not-liking, not-doings and ignorance (?) of cultural items, excluding entertainment from tv or magazines. Among illegitimate items, watching Big Brother is modern, whereas not watching movies is traditional item of low legitimacy.
-
-Majority of modern cultural items have shifted towards legitimate culture. This might be explained by cohort effect and attained education of the youth. If cultural items, preferred by youth in 2007, remained as part of their lifestyles during 11 year period, during same time when youth attained their higher education, those cultural items might have gathered some additional degrees of legitimacy, since they are consumer by people in higher status groups. This mechanism is supported by the dynamic of items that have shifted towards legitimate areas of space of lifestyles, which of majority are positive doings, likings or knowings. Modern items remained in less legitimate section in space of lifestyles in 2018 are more often dislikes and not-doings. Both of these phenomenas are correlated with education (lähde). 
-
-Similar items are near the origo of the space of lifestyles in 2018 as they were in 2007. Cultural items such as liking pizza or reading Pirkka-magazine, which is the most popular magazine in Finland. Next, investigate cloud of individuals in 2018 according to socio-economic supplementary variables. This investigation is presented in figure 6. Interprepation of these clouds of individuals in very similiar as it was for 2007 analysis in chapter 3.1 for figure 3.3.
-
-```{r, Figure6, fig.cap="Clouds of individuals in 2018 according to socio-ecominc variables", out.width="100%"}
+```{r, Figure6, fig.cap="Clouds of individuals in 2018 according to socio-ecominc variables", out.width="100%", include=FALSE}
 combine_sup_var_ellipses(analyysi_uusi)
+```
+
+### Supplementary variables
+
+In both of our analyses, we used socio-economic indicators as supplementary variables. These items included age, sex, education, income level, professional occupation classified to nine distinct groups and type of residential area. These supplementary variables projected on spaces of lifestyles are presented in figure 9.
+
+```{r figure9, fig.cap="Supplemenatry variables in 2007 and 2018 projected on space of lifestyle in respective year", out.width="100%"}
+
+plot_sup_vars <- function(anal, vuosi){
+  df <- data.frame(anal$quali.sup$coord[,1:2],
+                   colr = factor(rep(1:length(sup.vars), sapply(anal$call$X[,names(anal$call$X) %in% sup.vars], function(x){
+                     if(sum(is.na(x)) == 0) {length(levels(x))}
+                     else {length(levels(x)) + 1}}))))
+  names(df) <- c("dim1", "dim2", "colr")
+  
+  df <- df[str_detect(rownames(df), "NA", negate = TRUE),] # exclude na-levels
+
+  
+  size = 5
+  
+  limx <- c(-1.2, 1.4)
+  limy <- c(-1.2, 1.2)
+  bre <- round(seq(-1.6, 2, 0.2),2)
+  
+  ggplot(df, aes(x = dim1, y = dim2, color = colr)) +
+    geom_hline(yintercept = 0, colour = "gray70") +
+    geom_vline(xintercept = 0, colour = "gray70") +
+    geom_text_repel(aes(label = rownames(df)),size = size) +
+    geom_point(size = size / 2)+
+    scale_x_continuous(breaks = bre, limits = limx) +
+    scale_y_continuous(breaks = bre, limits = limy) +
+    ggtitle(paste("Vuoden", vuosi, "sosioekonomiset muuttujat heijastettuna\n kulttuuriseen karttaan")) +
+    labs(x = paste("1. Dimensio"), y = paste("2. Dimensio")) +
+    theme_minimal() +
+    theme(legend.position="none", plot.title = element_text(hjust = 0.5))
+}
+p1 <- plot_sup_vars(analyysi_vanha, "2007")
+p2 <- plot_sup_vars(analyysi_uusi, "2018")
+gridExtra::grid.arrange(p1, p2, ncol = 2)
+
+
 
 ```
 
+Socio-economic indicators seem to be quite stable during 11 year period. In the spaces, age groups are distributed strongly in modern-traditional axis; youngest age groups are located in the modern side and older in the traditional side of the axis. The youngest cohort in 2007, 18-24 years old, remained quite close to their position in 2018, when they had became cohort of 25-34. This suggest that for the youngest cohort, their lifestyle and consumed cultural products remained stable during this period, which is not the case for the cohort of 25-34 in 2007. They had became less modern during eleven year period, locating lower on the axis.
 
+Our correlated supplementary variables, income level, education and occupational group, move diagonally on the space. The modalities of those variables start from the area of low legitimacy and traditionality, and as their values increase, they move towards more legitimate and modern side of the space. This mechanic seems to be stable over eleven year period. Among these modalities, most legitimate ones are being special expert and having highest educational level. Being in highest income group does not signal highest legitimacy but rather higher modernity. This might be due low number of observations being in highest income group in both years (2007 n = `r length(vanha$tulotaso[vanha$tulotaso == "yli 5000"])`, 2018 n = `r length(uusi$tulotaso[uusi$tulotaso == "yli 5000"])`). 
 
+Being manager has became more legitimate and slightly more traditional from 2007 to 2018. On the other hand, manual workers, such as construction, process and logistic workers have shifted from modern to traditional, showing low legitimacy in both years. Farmers have became more traditional. Some non-separating occupations in neither dimension are experts and customer service workers.
 
-### Modalities from 2018 data projected to the map constructed using 2007 data
+Living in urban area does not separate in either dimension, as it locates close to the origo of the space. On the other hand, living in rural area, does locate in area of low legitimacy and traditionality. Being male is weakly associated to modern-illegitimate side, and being woman is associated with traditional-legitimate side of the space. However, these locations are quite close to the origo of the space. 
 
+### Change in the location of the modalities in the space of lifestyles from 2007 to 2018
 
-Using these distances, we can determine which modalities have experienced greatest changes in their location in space of lifestyles during eleven years. 20 modalities with highest and smallest difference in their location is presented in figure 7.
+Next, we will analyze the change in the space of lifestyles from 2007 to 2018. We present cultural modalities that have highest change in their location in the space of lifestyles from 2007 to 2018 in figure 5.
 
 ```{r figure7, fig.cap="Items with highest difference in their location in space of lifestyles during 2007-2018 in Finland.", out.width="100%"}
 
@@ -848,7 +885,7 @@ plot_change <- function(suunta = 1, nvar = 15, sign = "+"){
     theme(legend.position="none", plot.title = element_text(hjust = 0.5))
 }
 
-plot_change(1, 25, sign = "+")
+plot_change(1, 30, sign = "+")
 
 
 
@@ -856,9 +893,7 @@ plot_change(1, 25, sign = "+")
 
 In figure 5, some major changes in the space of lifestyles in Finland are present. Bigger trend seems to be that many of the modalities calculated using 2018 individuals are located in more legitimate and modern location in the space of lifestyles of 2007. Never watching news from tv used to be marker of low legitimacy in 2007, but in 2018 it has became non-separating item in illegitimate-legitimate dimensions. Liking comedy movies has become more modern cultural practice, whereas disliking action movies has shifted from being traditional to being less separating in traditional-modem dimensions. During 11 years, reading moderate amount (from two to nine) books per year has became sign of legitimacy, compared to 2007, when reading was perfectly non-separating in both dimensions.
 
-On the other hand, reading more than nine book per year has stable location in the space of lifestyles. Most of the most stable modalities locate on the modern side of the space. Only traditional stable practice among 15 most stable modalities is watching more than three hours of tv per day. Reality tv kept it's location on the modern, slightly illegitimate location. Disliking classical music was stable marker of low legitimacy and modernity, whereas liking impressionism was stable marker of high legitimacy and modernity.  
-
-Similar shift might be present when comparing clouds of individuals in 2018 and 2007. These clouds are presented in figure 8.
+Similar shift might be present when comparing clouds of individuals in 2018 and 2007. These clouds are presented in figure 6.
 
 ```{r figure8, fig.cap="Cloud of individuals of 2018 as supplementary individuals in cloud of active individuals of 2007", out.width="100%"}
 inds <- rbind(data.frame(dim1 = analyysi_molemmat$ind$coord[,1],
@@ -974,59 +1009,9 @@ knitr::kable(tb, caption = otsikko) %>%
 ```
 
 
-### Supplementary variables
-
-In both of our analyses, we used socio-economic indicators as supplementary variables. These items included age, sex, education, income level, professional occupation classified to nine distinct groups and type of residential area. These supplementary variables projected on spaces of lifestyles are presented in figure 9.
-
-```{r figure9, fig.cap="Supplemenatry variables in 2007 and 2018 projected on space of lifestyle in respective year", out.width="100%"}
-
-plot_sup_vars <- function(anal, vuosi){
-  df <- data.frame(anal$quali.sup$coord[,1:2],
-                   colr = factor(rep(1:length(sup.vars), sapply(anal$call$X[,names(anal$call$X) %in% sup.vars], function(x){
-                     if(sum(is.na(x)) == 0) {length(levels(x))}
-                     else {length(levels(x)) + 1}}))))
-  names(df) <- c("dim1", "dim2", "colr")
-  
-  df <- df[str_detect(rownames(df), "NA", negate = TRUE),] # exclude na-levels
-
-  
-  size = 5
-  
-  limx <- c(-1.2, 1.4)
-  limy <- c(-1.2, 1.2)
-  bre <- round(seq(-1.6, 2, 0.2),2)
-  
-  ggplot(df, aes(x = dim1, y = dim2, color = colr)) +
-    geom_hline(yintercept = 0, colour = "gray70") +
-    geom_vline(xintercept = 0, colour = "gray70") +
-    geom_text_repel(aes(label = rownames(df)),size = size) +
-    geom_point(size = size / 2)+
-    scale_x_continuous(breaks = bre, limits = limx) +
-    scale_y_continuous(breaks = bre, limits = limy) +
-    ggtitle(paste("Vuoden", vuosi, "sosioekonomiset muuttujat heijastettuna\n kulttuuriseen karttaan")) +
-    labs(x = paste("1. Dimensio"), y = paste("2. Dimensio")) +
-    theme_minimal() +
-    theme(legend.position="none", plot.title = element_text(hjust = 0.5))
-}
-p1 <- plot_sup_vars(analyysi_vanha, "2007")
-p2 <- plot_sup_vars(analyysi_uusi, "2018")
-gridExtra::grid.arrange(p1, p2, ncol = 2)
-
-
-
-```
-
-Socio-economic indicators seem to be quite stable during 11 year period. In the spaces, age groups are distributed strongly in modern-traditional axis; youngest age groups are located in the modern side and older in the traditional side of the axis. The youngest cohort in 2007, 18-24 years old, remained quite close to their position in 2018, when they had became cohort of 25-34. This suggest that for the youngest cohort, their lifestyle and consumed cultural products remained stable during this period, which is not the case for the cohort of 25-34 in 2007. They had became less modern during eleven year period, locating lower on the axis.
-
-Our correlated supplementary variables, income level, education and occupational group, move diagonally on the space. The modalities of those variables start from the area of low legitimacy and traditionality, and as their values increase, they move towards more legitimate and modern side of the space. This mechanic seems to be stable over eleven year period. Among these modalities, most legitimate ones are being special expert and having highest educational level. Being in highest income group does not signal highest legitimacy but rather higher modernity. This might be due low number of observations being in highest income group in both years (2007 n = `r length(vanha$tulotaso[vanha$tulotaso == "yli 5000"])`, 2018 n = `r length(uusi$tulotaso[uusi$tulotaso == "yli 5000"])`). 
-
-Being manager has became more legitimate and slightly more traditional from 2007 to 2018. On the other hand, manual workers, such as construction, process and logistic workers have shifted from modern to traditional, showing low legitimacy in both years. Farmers have became more traditional. Some non-separating occupations in neither dimension are experts and customer service workers.
-
-Living in urban area does not separate in either dimension, as it locates close to the origo of the space. On the other hand, living in rural area, does locate in area of low legitimacy and traditionality. Being male is weakly associated to modern-illegitimate side, and being woman is associated with traditional-legitimate side of the space. However, these locations are quite close to the origo of the space. 
-
 Next, we will try to find clusters from space of individuals and to identify most important cultural products for those clusters. We try to identify robust groups in space of lifestyles, and examine if there is change during eleven year period in these groups.
 
-## Examining clusters of lifestyles in 2007 and 2018
+### Examining clusters of lifestyles in 2007 and 2018
 
 To cluster our data, we use hierarchical clustering on principal components from FactoMineR r-package (Husson et al. 2010). Results from cluster analysis on axes obtained by multiple correspondence analysis are presented in figures 10 and 11. To determine the most proper number of clusters, we use recommended number of clusters by HCPC-function from FactoMineR-package, which seems to be 3.
 
@@ -1064,7 +1049,9 @@ find_most_important_categories_for_clusters <- function(dat, sign = "+", vuosi){
   
   options(scipen = 1)
   
-  for (i in 1:3){
+  res <- list()
+  
+  for (i in seq_len(length(dat$desc.var$category))){
     df <- data.frame(dat$desc.var$category[[i]])
     df$category <- rownames(df)
 
@@ -1074,10 +1061,12 @@ find_most_important_categories_for_clusters <- function(dat, sign = "+", vuosi){
       top_n(15, v.test)
     
     rownames(p) <- NULL
-      
-    assign(paste0("p",i),p)
+    
+    res[[i]] <- p
+    
   }
-  list(p1, p2, p3)
+  
+  res
 }
 
 olds <- find_most_important_categories_for_clusters(clust_vanha, sign = "+", vuosi = "2007")
@@ -1118,8 +1107,8 @@ calc_contributions(coords, "kattavalla muuttujavalikoimalla")
 
 
 ```{r, figure12, fig.cap="First and second axis of Space of lifestyles in 2018 using comprehensive set of cultural indicators.", out.width = "100%"}
-p1 <- yksiulotteiset_kartat(newdat_mca, 1, "First dimension in 2018 using comprehensive set of indicators")
-p2 <- yksiulotteiset_kartat(newdat_mca, 2, "Second dimensions in 2018 using comprehensive set of indicators")
+p1 <- yksiulotteiset_kartat(newdat_mca, 1, "First dimension in 2018 using comprehensive set of indicators", n = 15)
+p2 <- yksiulotteiset_kartat(newdat_mca, 2, "Second dimensions in 2018 using comprehensive set of indicators", n = 15)
 gridExtra::grid.arrange (p1, p2, nrow = 1)
 
 ```
@@ -1283,7 +1272,8 @@ new_whole
   * Two dimensions are sufficient to represent space of lifestyles in Finland, both 2007 and 2018
     * Both dimensions remained quite stable during 11 year period
     * With identical set of indicators in 2007 and 2018, the explanatory power of traditional-modern axis declined, possible because of 1) cohort effect (most traditional age group got off the survey) and 2) no emerging indicators of contemporary lifestyle practices were included (e.g. gaming, online indicators), which leaded to underpresentation of cultural goods consumed by youngest age cohort, 18-24 year old young adults. This can be confirmed from Figure 3.7, where age group of 25-34 year old adults are as modern as 18-24 year old, which was not the case in 2007. Adding cultural good consumed by youngest population to the analysis, the youngest cohort became also the most modern. 
-    * Considering individual items used to construct the space of lifestyles in 2007 and 2018, some cultural indicators experienced notable change in their location in the space. 
+    * Considering individual items used to construct the space of lifestyles in 2007 and 2018, some cultural indicators experienced notable change in their location in the space. For example, reading at least some books turned from not being separating in neither axis in 2007 to being modern and legitimate practice.
+  
   * Conducting MCA with comprehensive set of indicators revealed position of contemporary lifestyle practices in the space of lifestyles. From the indicators available in the survey but not yet included in first two steps of the analysis, majority were contributing more strongly in second, traditional-modern axis. 
   * Being involved in gaming were indicator of modern and slightly illegitimate lifestyle. Activities online and in social media were located also in modern side of the space, but more strongly in the legitimate side of the space.  
 
