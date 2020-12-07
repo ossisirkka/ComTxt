@@ -1,0 +1,24 @@
+---
+title: "introduction and theory"
+author: "Ossi Sirkka"
+date: "7 12 2020"
+output: html_document
+bibliography: space-of-lifestyles.bib
+---
+
+```{r tags, include = FALSE}
+bib2df::bib2df("space-of-lifestyles.bib")$BIBTEXKEY
+```
+
+# Introduction / Theory
+
+### Aim of this paper
+
+In this article, we will examine the space of lifestyles in Finland in 2007 and 2018. Additionally, we will redo the analysis of 2018 with additional indicators relating to e.g. digital and mundane cultural practices. This allows us to answer to our two-fold research questions: 1) has the social structure in the space of lifestyles remained stable during 11-year period, and 2) what is the impact of additional, both modern and mundane, indicators, when they are added to the space of lifestyles? To answer these questions, we use comprehensive set of lifestyle indicators drawn from nationally representative data from Finland from the respective years. To analyze the data, we use Spesific Multiple Correspondence Analysis [@le_roux_multiple_2010], and elaborate our results with hierarchical clustering analysis of the SpeMCA-solutions.
+
+The space of lifestyles visualizes cultural tastes and practices in a society in relation to each other. Individuals and their lifestyles can be mapped to the space in relations to other individuals and their lifestyles. This complex space of lifestyles can then be reduced to include two main structuring dimensions that separates different lifestyles. In the classical work of Pierre Bourdieu [-@bourdieu_distinction_1984], these dimensions were composition and amount of cultural and economic capital. With different approach to the analysis of lifestyles and social space, these dimensions have been legitimacy and modernity of cultural tastes and practices [e.g. @purhonen_suomalainen_2014]. Regardless of the approach, these spaces have been structured by the principle of homology [@bourdieu_distinction_1984], correspondence between social class and cultural preferences. Homology thesis is important starting point for examining cultural tastes and practices, as it assumes that individuals class position, habitus and lifestyles are intertwined [@weingartner_changing_2019]. Interesting guestion is, how this relationship shifts in time; is there any changes in the space of lifestyles and their relationship to social determinants in Finland, and if there are, is the change in the scale of main distinctive dimensions that separate lifestyles, or in locations of individual cultural indicators in the space of lifestyles? 
+
+The era in the scope of this article, 2007-2018, in Finland, is marked by rapid digitization of cultural consumption and production. Social media platforms such as Facebook, Instagram and Twitter have become increasingly important in the daily life, and cultural goods, such as music, is in theory easily accessible regardless of time and space. How this rapid change effects to the space of lifestyles, is however unclear, and will be a subject of examination in this article.   
+
+
+

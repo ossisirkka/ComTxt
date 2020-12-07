@@ -1023,7 +1023,7 @@ yksilöiden_pilvi_2007 <- ggplot(as.data.frame(analyysi_temp$ind), aes(x = analy
 #Data
 
 ```{r}
-data <- read_sav("C:/Users/Ossi/OneDrive/KOULU 2018-2019/Suomalaisen kulttuurin muutos/uusi_aineisto_korjattu_5_3.sav")
+data <- haven::read_sav("C:/Users/Ossi/OneDrive/KOULU 2018-2019/Suomalaisen kulttuurin muutos/uusi_aineisto_korjattu_5_3.sav")
 
 ```
 
@@ -2040,22 +2040,27 @@ nettiväittämät <- data %>%
 
 yhteisöpalvelut <- data %>% 
   select("Youtube" = K49_a, "Facebook" = K49_b, "Twitter" = K49_c, "Instagram" = K49_d, "TripAdvisor" = K49_e, "Suomi24" = K49_f,
-         "IS tai IL keskustelupalsta" = K49_g, "MV-lehti" = K49_h, "Jokin harrastesivu" = K49_i, "Jokin poliittinen sivu" = K49_j) %>% 
+         "IS tai IL keskustelupalsta" = K49_g, "MV_lehti" = K49_h, "Jokin harrastesivu" = K49_i, "Jokin poliittinen sivu" = K49_j) %>% 
   mutate_each(funs(replace(., . == 1, 2))) %>% # Käyttää säännöllisesti
   mutate_each(funs(replace(., . == 4, 1))) %>% # käyttää silloin tällöin
   mutate_each(funs(replace(., . == 3, 1))) %>% # Käyttää silloin tällöin
   mutate_each(funs(replace(., . == 5, 0))) %>% # Ei käytä koskaan
-  funktio_3lk()
+  mutate(Suomi24 = replace(Suomi24, Suomi24 == 2, 1)) %>% 
+  mutate(MV_lehti = replace(MV_lehti, MV_lehti == 2, 1)) %>% 
+  funktio_3lk_plus()
+names(yhteisöpalvelut)
 
 harrastukset <- data %>% 
   select("Puutarhanhoito" = K51_a, "Leipominen" = K51_b, "Käsityöt" = K51_c, "Tekniset työt" = K51_d, "Kalastus" = K51_e, "Metsästys" = K51_f,
          "Marjastus tai sienestys" = K51_g, "Ristikot, sudokut tai palapelit" = K51_h, "Pelikorteilla pelaaminen" = K51_i,
-         "Lautapelien pelaaminen" = K51_j, "Pihapelin pelaaminen"  = K51_k) %>% 
+         "Lautapelien pelaaminen" = K51_j, "Pihapelin_pelaaminen"  = K51_k) %>% 
   mutate_each(funs(replace(., . == 3, 0))) %>% 
   mutate_each(funs(replace(., . == 1, 4))) %>% 
   mutate_each(funs(replace(., . == 2, 1))) %>%
-  mutate_each(funs(replace(., . == 4, 2))) %>% 
-  funktio_3lk()
+  mutate_each(funs(replace(., . == 4, 2))) %>%
+  mutate(Metsästys = replace(Metsästys, Metsästys == 2, 1)) %>% 
+  mutate(Pihapelin_pelaaminen = replace(Pihapelin_pelaaminen, Pihapelin_pelaaminen == 2, 1)) %>% 
+  funktio_3lk_plus()
 
 pelaaminen <- data %>% 
   select(K60_a, K60_b) %>% 

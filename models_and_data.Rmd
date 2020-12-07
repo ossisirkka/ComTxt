@@ -1,0 +1,189 @@
+---
+title: "models_and_data"
+author: "Ossi Sirkka"
+date: "7 12 2020"
+output: html_document
+---
+
+
+```{r, load-data}
+# Libraries
+library(FactoMineR)
+library(factoextra)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+
+
+# Open the data
+path <- paste0(getwd(), "/data_for_mca.RData")
+load(path)
+
+vanha <- complete_vanha_aineisto$completeObs
+uusi <- complete_uusi_aineisto$completeObs
+
+# Extract the number of supplementary variables from the dataframe
+sup.vars <- c("ikä", "koulutus", "ammattiluokka", "sukupuoli", "alue", "tulotaso")
+```
+
+```{r}
+
+index_str <- c("Scifielokuvat", "TV_Pesäpallo", "Urheiluohjelmat", "Mäkelä", "Harlin", "Morse", "Poliisisarjat", "Musikaalielokuvat", "TV_Yleisurheilu", "DVD",
+               "Levyt", "Kaustinen", "Suurajot", "Britney", "Ooppera", "Klassinen", "Rock", "Jazz", "X3nainen", "Tangomarkkinat",
+               
+               "Vuorinen", "Viihde.romant.kirjat","KirjojaKotona",
+               
+               "Vesi", "Maito", "Kuha", "Wieninleike",
+               
+               "Asetelmat", "Muotokuvat", "Renesanssitaide","TaulujaKotona", 
+               
+               "Uinti", "Kävely", "Pyöräily",
+               
+               "Nettimusiikki", "Nettilehdet", "Nettichattaily", "Nettitaide", "Nettipelaaminen")
+               
+               
+               # 26.11.2020: remove these also
+               
+#                "TV_Jalkapallo", "Salibandy", "Kreiksalaat", "Dekkarit", "Tietokirjat", "SuomenKuvalehti", "X7päivää", "Toimintaelokuvat", "Vanhat.kotim.elokuvat", "Kotikatu",
+#  "tosi_tv", "Merkkitiet", "Netti")
+```
+
+
+```{r,indexstring_to_reduce_modalities, eval = TRUE}
+#load("index_for_removing_mod_classifiers.RData")
+#mod_luokitukset <- mod_luokitukset[!index_for_removing_mod_classifiers, "mod_luokitukset"]
+```
+
+```{r}
+# Here is function to create our dataset for spesific mca. We use data matrix where NA values are present, instead of multiple imputation.
+
+get_data_for_spesific_mca <- function(active_df, sup_df, karsittavat_str = index_str){
+  
+  # Get data set that includes supplementary and active variables. Exclude variables that have been determined to not be in the analysis (karsittavat_str)
+  dat_with_na_levels <- data.frame(active_df[,!names(active_df) %in% karsittavat_str], sup_df) %>% 
+    mutate_if(is.character, as.factor) %>% 
+    mutate_each(funs(addNA(., ifany = TRUE)))
+  
+  # Discard observations that have more than 20 % missing values
+  
+  dat_with_na_levels <- dat_with_na_levels[apply(dat_with_na_levels, 1, function(x) sum(is.na(x)) < 0.2 * ncol(dat_with_na_levels)),]
+  
+  # Get indices of null categories. This is important for MCA-function to conduct spesific mca. 
+  index_for_null_categories <- active_df[,!names(active_df) %in% karsittavat_str] %>%
+    mutate_if(is.character, as.factor) %>% 
+    mutate_each(funs(addNA(., ifany = TRUE))) %>%  
+    sapply(., function(x) levels(x)) %>% 
+    unlist(.) %>% 
+    is.na(.) %>% 
+    which(. == TRUE) %>% 
+    'names<-' (NULL)
+  
+  # Get all the factor levels in the analysis
+  levels_in_analysis <- dat_with_na_levels %>%   
+    sapply(., function(x) levels(x)) %>% 
+    unlist(.) %>% unname(.)
+  
+  # Create vector of "NA1, NA2, ..., NAx", to give every NA-level unique identifier. Otherwise MCA-function includes variable name to 
+  # every category which makes the map messy.
+  na_levels_with_identifier <- paste0((levels_in_analysis[index_for_null_categories]), seq_len(length(index_for_null_categories)))
+  
+  # Loop over every NA level and replace that with NAx.
+  i <- 1
+  for(col in 1:ncol(dat_with_na_levels)){
+    if(NA %in% levels(dat_with_na_levels[,col])){
+      levels(dat_with_na_levels[,col]) <- c(levels(dat_with_na_levels[,col])[-length(levels(dat_with_na_levels[,col]))],
+                                                na_levels_with_identifier[i])
+      i <- i + 1
+      
+    }
+  }
+  
+  # Return data and index for null categories
+  list(data = dat_with_na_levels, null_categories = index_for_null_categories)
+} 
+
+```
+
+
+
+
+```{r firstAnalysis}
+# get data for 2007 analysis
+
+vanha <- get_data_for_spesific_mca(matriisi_mca1_missingit, suplementary_variables1, index_str)
+
+
+# Create mca-analysis
+
+analyysi_vanha <- MCA(vanha$data, 
+                      ncp = 3,
+                      ind.sup = NULL,
+                      excl = vanha$null_categories,
+                      quali.sup = which(names(vanha$data) %in% sup.vars),
+                      graph = FALSE,
+                      row.w = NULL # Uniform weights for observations
+                      )
+
+```
+
+```{r secondAnalysis}
+uusi <- get_data_for_spesific_mca(matriisi_mca_missingit, suplementary_variables)
+
+
+analyysi_uusi <- MCA(uusi$data, 
+                      ncp = 5,
+                      ind.sup = NULL,
+                      excl = uusi$null_categories,
+                      quali.sup = which(names(uusi$data) %in% sup.vars),
+                      graph = FALSE,
+                      row.w = NULL # Uniform weights for observations
+                      )
+```
+
+```{r, thirdAnalysis}
+new <- c(
+  # vanhojen päivitys
+  "Cheeck", "Jooga", "Banksy",
+  
+  # online
+  "Ammuskelupelit", "Toimintapelit", "Urheilupelit", "pelaaminen_per_päivä",
+  "Facebook", "Youtube", "Twitter", "Suomi24", "IS.tai.IL.keskustelupalsta", "NettiBlogit",
+  "NettiUutiset", "Instagram", "MV_lehti",
+  
+  # arkiset
+  "Puutarhanhoito", "Leipominen", "Käsityöt", "Tekniset.työt", "Kalastus", "Metsästys", "Marjastus.tai.sienestys", "Ristikot..sudokut.tai.palapelit",
+  "Pelikorteilla.pelaaminen", "Lautapelien.pelaaminen", "Pihapelin.pelaaminen"
+)
+
+# Try these, modify modality classes respectfully
+
+new_vars <- uudet_muuttujat[,names(uudet_muuttujat) %in% new]
+newdat <-get_data_for_spesific_mca(cbind(matriisi_mca_missingit, new_vars), suplementary_variables)
+newmods <- unname(unlist(sapply(newdat$data[,names(newdat$data) %in% new], function(x) levels(x))))
+newmods <- newmods[str_detect(newmods, "NA", negate = TRUE)]
+
+mod_luokitukset_uudet_muuttujat <- mod_luokitukset_uudet_muuttujat[mod_luokitukset_uudet_muuttujat$mod %in% newmods, 2]
+
+
+newdat_mca <- MCA(newdat$data,
+                  quali.sup = which(names(newdat$data) %in% sup.vars),
+                  excl = newdat$null_categories,
+                  ncp = 5, 
+                  graph = FALSE)
+```
+
+```{r}
+# Function to get number of modalities in data.frame
+  mod_määrä <- function(dat){
+    määrä <- sum(sapply(dat, function(x) nlevels(x)))
+    määrä
+  }
+```
+
+```{r, get-right-modality-classes}
+tmp <- unname(unlist(sapply(analyysi_vanha$call$X[,!names(analyysi_vanha$call$X) %in% sup.vars], function(x) levels(x))))
+tmp <- tmp[str_detect(tmp, "NA", negate = TRUE)]
+
+mod_luokitukset <- mod_luokitukset[mod_luokitukset$mod %in% tmp, 2]       
+
+```
