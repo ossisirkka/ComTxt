@@ -5,7 +5,7 @@ date: "7 12 2020"
 output: html_document
 ---
 
-```{r global_options, include=FALSE}
+```{r global_options_local, include=FALSE}
 knitr::opts_chunk$set(fig.width=14, fig.height=14,
                       dev = "png",
                       fig.path=paste0(getwd(),'/images_for_article/'),

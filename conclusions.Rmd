@@ -1,0 +1,17 @@
+---
+title: "conclusions"
+author: "Ossi Sirkka"
+date: "8 12 2020"
+output: html_document
+---
+
+
+# Conclusions
+
+  * Two dimensions are sufficient to represent space of lifestyles in Finland, both 2007 and 2018
+    * Both dimensions remained quite stable during 11 year period
+    * With identical set of indicators in 2007 and 2018, the explanatory power of traditional-modern axis declined, possible because of 1) cohort effect (most traditional age group got off the survey) and 2) no emerging indicators of contemporary lifestyle practices were included (e.g. gaming, online indicators), which leaded to underpresentation of cultural goods consumed by youngest age cohort, 18-24 year old young adults. This can be confirmed from Figure 3.7, where age group of 25-34 year old adults are as modern as 18-24 year old, which was not the case in 2007. Adding cultural good consumed by youngest population to the analysis, the youngest cohort became also the most modern. 
+    * Considering individual items used to construct the space of lifestyles in 2007 and 2018, some cultural indicators experienced notable change in their location in the space. For example, reading at least some books turned from not being separating in neither axis in 2007 to being modern and legitimate practice.
+  
+  * Conducting MCA with comprehensive set of indicators revealed position of contemporary lifestyle practices in the space of lifestyles. From the indicators available in the survey but not yet included in first two steps of the analysis, majority were contributing more strongly in second, traditional-modern axis. 
+  * Being involved in gaming were indicator of modern and slightly illegitimate lifestyle. Activities online and in social media were located also in modern side of the space, but more strongly in the legitimate side of the space. 

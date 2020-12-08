@@ -11,6 +11,7 @@ output:
   pdf_document:
     toc: TRUE
 bibliography: space-of-lifestyles.bib
+csl: apa.csl
 ---
 
 ```{r BIBTEXTAGS, include = FALSE}
@@ -39,70 +40,14 @@ knitr::opts_chunk$set(fig.width=14, fig.height=14,
 ```{r, child = "analysis.Rmd"}
 ```
 
-# Conclusions
-
-  * Two dimensions are sufficient to represent space of lifestyles in Finland, both 2007 and 2018
-    * Both dimensions remained quite stable during 11 year period
-    * With identical set of indicators in 2007 and 2018, the explanatory power of traditional-modern axis declined, possible because of 1) cohort effect (most traditional age group got off the survey) and 2) no emerging indicators of contemporary lifestyle practices were included (e.g. gaming, online indicators), which leaded to underpresentation of cultural goods consumed by youngest age cohort, 18-24 year old young adults. This can be confirmed from Figure 3.7, where age group of 25-34 year old adults are as modern as 18-24 year old, which was not the case in 2007. Adding cultural good consumed by youngest population to the analysis, the youngest cohort became also the most modern. 
-    * Considering individual items used to construct the space of lifestyles in 2007 and 2018, some cultural indicators experienced notable change in their location in the space. For example, reading at least some books turned from not being separating in neither axis in 2007 to being modern and legitimate practice.
-  
-  * Conducting MCA with comprehensive set of indicators revealed position of contemporary lifestyle practices in the space of lifestyles. From the indicators available in the survey but not yet included in first two steps of the analysis, majority were contributing more strongly in second, traditional-modern axis. 
-  * Being involved in gaming were indicator of modern and slightly illegitimate lifestyle. Activities online and in social media were located also in modern side of the space, but more strongly in the legitimate side of the space.  
+```{r, child = "conclusions.Rmd"}
+```
+ 
+```{r, child = "appendix.Rmd"}
+```
 
 # References
-# Appendix
-
-## Appendix 1
-
-```{r, appendix1, eval = TRUE}
-tables_2007 <- lapply(vanha$data, table, exclude = TRUE)
-tables_2018 <- lapply(uusi$data, table, exclude = TRUE)
-
-tables_list <- lapply(seq_len(length(tables_2007)), function(i){
-  
-  if (all(which(c(length(tables_2007[[i]]), length(tables_2018[[i]])) == min(c(length(tables_2007[[i]]), length(tables_2018[[i]])))) == 1)){
-    tables_2007[[i]][length(tables_2007[[i]]) + 1] <- NA
-  } else if (all(which(c(length(tables_2007[[i]]), length(tables_2018[[i]])) == min(c(length(tables_2007[[i]]), length(tables_2018[[i]])))) == 2)){
-  tables_2018[[i]][length(tables_2018[[i]]) + 1] <- NA
-}
-    
-  
-  data.frame(
-    Variable = c(str_sub(names(tables_2007[[i]][1]), start = 1, end = nchar(names(tables_2007[[i]][1]))-1 ),
-                 rep(" ", length(names(tables_2007[[i]]))-1)),
-    Label = names(tables_2007[[i]]),
-    Frequency_2007 = c(unname(tables_2007[[i]])),
-    Frequency_2018 = c(unname(tables_2018[[i]])))
-})
-
-tables_df <- do.call(rbind, tables_list)
-tables_df <- tables_df[!str_detect(tables_df$Label, "NA") & !is.na(tables_df$Label),]
-tables_df <- add_column(tables_df,
-                        Class = c(mod_luokitukset, rep(" ", nrow(tables_df) - length(mod_luokitukset))),
-                        .before = "Frequency_2007")
 
 
-create_kable(tables_df, otsikko = "Full list of indicators used to constuct identical spaces of lifestyles in 2007 and 2018 ")
-```
-
-## Appendix 2
-
-```{r, appendix2, eval = TRUE}
-new_vars_tables <- lapply(newdat$data[, which(names(newdat$data) == "Toimintapelit"):ncol(newdat$data[,!names(newdat$data) %in% sup.vars])], table, exclude = TRUE)
-tables_new_list <- lapply(seq_len(length(new_vars_tables)), function(i){
-  data.frame(
-    Variable = c(str_sub(names(new_vars_tables[[i]][1]), start = 1, end = nchar(names(new_vars_tables[[i]][1]))-1 ),
-                 rep(" ", length(names(new_vars_tables[[i]]))-1)),
-    Label = names(new_vars_tables[[i]]),
-    Frequency = c(unname(new_vars_tables[[i]])))
-})
-
-new_tables_df <- do.call(rbind, tables_new_list)
-new_tables_df <- add_column(new_tables_df[str_detect(new_tables_df$Label, "NA", negate = TRUE),], Class = mod_luokitukset_uudet_muuttujat, .after = "Label")
-
-
-create_kable(new_tables_df, otsikko = "List of additional indicators used to constuct comprehensive space of lifestyles with 2018 data")
-
-```
 
 # References

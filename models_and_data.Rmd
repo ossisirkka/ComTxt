@@ -6,7 +6,7 @@ output: html_document
 ---
 
 
-```{r, load-data}
+```{r}
 # Libraries
 library(FactoMineR)
 library(factoextra)
@@ -49,7 +49,7 @@ index_str <- c("Scifielokuvat", "TV_Pesäpallo", "Urheiluohjelmat", "Mäkelä", 
 ```
 
 
-```{r,indexstring_to_reduce_modalities, eval = TRUE}
+```{r, eval = TRUE}
 #load("index_for_removing_mod_classifiers.RData")
 #mod_luokitukset <- mod_luokitukset[!index_for_removing_mod_classifiers, "mod_luokitukset"]
 ```
@@ -107,7 +107,7 @@ get_data_for_spesific_mca <- function(active_df, sup_df, karsittavat_str = index
 
 
 
-```{r firstAnalysis}
+```{r}
 # get data for 2007 analysis
 
 vanha <- get_data_for_spesific_mca(matriisi_mca1_missingit, suplementary_variables1, index_str)
@@ -126,7 +126,7 @@ analyysi_vanha <- MCA(vanha$data,
 
 ```
 
-```{r secondAnalysis}
+```{r}
 uusi <- get_data_for_spesific_mca(matriisi_mca_missingit, suplementary_variables)
 
 
@@ -140,7 +140,7 @@ analyysi_uusi <- MCA(uusi$data,
                       )
 ```
 
-```{r, thirdAnalysis}
+```{r}
 new <- c(
   # vanhojen päivitys
   "Cheeck", "Jooga", "Banksy",
@@ -180,7 +180,7 @@ newdat_mca <- MCA(newdat$data,
   }
 ```
 
-```{r, get-right-modality-classes}
+```{r}
 tmp <- unname(unlist(sapply(analyysi_vanha$call$X[,!names(analyysi_vanha$call$X) %in% sup.vars], function(x) levels(x))))
 tmp <- tmp[str_detect(tmp, "NA", negate = TRUE)]
 
