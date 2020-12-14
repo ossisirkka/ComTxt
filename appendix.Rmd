@@ -58,3 +58,30 @@ new_tables_df <- add_column(new_tables_df[str_detect(new_tables_df$Label, "NA", 
 create_kable(new_tables_df, otsikko = "List of additional indicators used to constuct comprehensive space of lifestyles with 2018 data")
 
 ```
+
+## Appendix 3
+
+```{r}
+
+cat("\nSignificant changes in axis 1\n")
+res_df_axis1 %>%
+  mutate(pval_1 = as.numeric(pval_1)) %>% 
+  arrange(pval_1) %>% 
+  filter(pval_1 < 0.01)
+
+
+cat("\nSignificant changes in axis 2\n")
+res_df_axis2 %>%
+  mutate(pval_2 = as.numeric(pval_2)) %>% 
+  arrange(pval_2) %>% 
+  filter(pval_2 < 0.01)
+
+
+cat("\nSignificant changes in plane of axes 1 and 2\n")
+res_df_plane %>%
+  mutate(pval = as.numeric(pval)) %>% 
+  arrange(pval) %>% 
+  filter(pval < 0.01)
+
+```
+

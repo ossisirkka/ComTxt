@@ -15,7 +15,7 @@ csl: apa.csl
 ---
 
 ```{r BIBTEXTAGS, include = FALSE}
-bib2df::bib2df("space-of-lifestyles.bib")$BIBTEXKEY
+sort(bib2df::bib2df("space-of-lifestyles.bib")$BIBTEXKEY)
 ```
 
 ```{r global_options, include=FALSE}
@@ -45,9 +45,5 @@ knitr::opts_chunk$set(fig.width=14, fig.height=14,
  
 ```{r, child = "appendix.Rmd"}
 ```
-
-# References
-
-
 
 # References
