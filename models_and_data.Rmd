@@ -141,6 +141,20 @@ analyysi_uusi <- MCA(uusi$data,
 ```
 
 ```{r}
+molemmat <- get_data_for_spesific_mca(rbind(matriisi_mca1_missingit, matriisi_mca_missingit), rbind(suplementary_variables1, suplementary_variables))
+
+
+
+analyysi_molemmat <- MCA(molemmat$data,
+                             ncp=5,
+                             quali.sup = which(names(molemmat$data) %in% sup.vars),
+                             excl = molemmat$null_categories,
+                             ind.sup = c((nrow(vanha$data) + 1):nrow(molemmat$data)), # 2018 individuals are included as support individuals
+                             graph = FALSE)
+```
+
+
+```{r}
 new <- c(
   # vanhojen päivitys
   "Cheeck", "Jooga", "Banksy",

@@ -15,3 +15,13 @@ output: html_document
   
   * Conducting MCA with comprehensive set of indicators revealed position of contemporary lifestyle practices in the space of lifestyles. From the indicators available in the survey but not yet included in first two steps of the analysis, majority were contributing more strongly in second, traditional-modern axis. 
   * Being involved in gaming were indicator of modern and slightly illegitimate lifestyle. Activities online and in social media were located also in modern side of the space, but more strongly in the legitimate side of the space. 
+  
+  
+The analysis shows that two dimensions are sufficient to represent space of lifestyles in Finland, in both 2007 and 2018. Same dimensions remained the most important when we introduced new lifestyle indicators regarding both online and offline everyday activities, although the online indicators did increase the explanation power of second dimensions at the expense of first dimension. The emergence of these dimensions, legitimacy and modernity/traditionality of cultural practices, as the main structuring factors of the space of lifestyles, did not come as surprise; similar result was obtained by Purhonen et al. [-@purhonen_suomalainen_2014] in study of space of lifestyles in Finland in 2007, using the same data set as in this article.
+
+Outside of Finland, similar results are found in the studies of lifestyles. Specifically the second structuring dimension, modernity-traditionality, have been found in numerous studies with similar research design [e.g @bennet_culture_2009, @roose_culture_2012, @coulangeon_changing_2013, @cveticanin_art_2011]. This dimension is has been interpreted with different labels, e.g.  "contemporary - established" ["bennet_culture_2009], but the meaning is essentially the same. As it was shown in the analysis, this dimensions is mainly structured by age (with correlation coefficient -0.8). Clearly age is very important background variable when studying stratification of lifestyles. Our analysis also hints that average position of age cohort remained relatively stable from 2007 to 2018, which indicates that cultural tastes are linked to the cultural history of the generation individual comes from [@glevarec_structure_2020]. In other words, inter-cohort effects seem to play more significant role in the changing landscape in the cultural map than intra-cohort ones. 
+
+
+
+
+

@@ -22,7 +22,7 @@ knitr::opts_chunk$set(fig.width=14, fig.height=14,
 
 # Analysis
 
-Our analysis will be conducted in three separate steps. First, we create space of lifestyles in Finland in 2007 using `r ncol(molemmat[,!names(molemmat) %in% sup.vars])` active variables and `r length(sup.vars)` supplementary variables. After careful examination of space of lifestyles in 2007, we proceed to step 2 and conduct analysis using 2018 data with identical indicators. To examine change that has happened during 11 years, from 2007 to 2018, we use the respondents from 2018 as supplementary individuals in space constructed using individuals from 2007. In third step, we introduce new cultural practices to space of lifestyles in 2018. These new practices consist both offline and online cultural indicators, such as hunting, gardening and art by Banksy, and using the internet or playing games.   
+Our analysis will be conducted in three separate steps. First, we create space of lifestyles in Finland in 2007 using `r ncol(molemmat$data[,!names(molemmat$data) %in% sup.vars])` active variables and `r length(sup.vars)` supplementary variables. After careful examination of space of lifestyles in 2007, we proceed to step 2 and conduct analysis using 2018 data with identical indicators. To examine change that has happened during 11 years, from 2007 to 2018, we use the respondents from 2018 as supplementary individuals in space constructed using individuals from 2007. In third step, we introduce new cultural practices to space of lifestyles in 2018. These new practices consist both offline and online cultural indicators, such as hunting, gardening and art by Banksy, and using the internet or playing games.   
 
 ## Space of lifestyles in 2007 and 2018 with identical set of indicators
 
@@ -483,25 +483,15 @@ Next, we will analyze the change in the space of lifestyles from 2007 to 2018. T
 
 ```{r, calculate_sup_vars}
 
-molemmat <- molemmat[,!names(molemmat) %in% index_str]
-
-
-analyysi_molemmat <- MCA(molemmat,
-                             ncp=5,
-                             quali.sup = which(names(molemmat) %in% sup.vars),
-                             ind.sup = c((nrow(complete_vanha_aineisto$completeObs)
- + 1):nrow(molemmat)), # 2018 individuals are included as support individuals
-                             graph = FALSE)
-
-
-
 calculate_sup_vars <- function(dat, sarake){
   dim1 <- dat$ind.sup$coord[,1] # coordinates of support individuals for first dimension 
   dim2 <- dat$ind.sup$coord[,2] # Coordinates of support individuals for second dimension
   weigth <- rep(1, length(dim1)) # Vector of ones
-  df <- data.frame(complete_uusi_aineisto$completeObs[,!names(complete_uusi_aineisto$completeObs) %in% index_str], dim1, dim2, weigth) # dataframe, where is imputated survey data and our coordinates
+  df <- data.frame(dat$call$X[(nrow(vanha$data) + 1):nrow(dat$call$X),!names(dat$call$X) %in% index_str], dim1, dim2, weigth) # dataframe, where is imputated survey data and our coordinates
   
   temp <- split(df, df[,sarake]) # Split the data to as many sets as there are categories in the variable
+  temp <- temp[str_detect(names(temp), "NA", negate = TRUE)] # Delete NA-split from the data; this is not part of the analysis
+
   
   v1 <- temp[[1]] # data for first category
   v2 <- temp[[2]] # data for second category
@@ -595,19 +585,19 @@ all_coordinates$euc_dist <- euclidian_distance(all_coordinates$dim1_07,
 
 homogenity_test_for_pc_axis <- function(var = NULL, axis = 1){
   
-  mods <- levels(molemmat[,var])
+  mods <- levels(molemmat$data[,var])[str_detect(levels(molemmat$data[,var]), "NA", negate = TRUE)]
   out <- data.frame(matrix(ncol = 3))
   names(out) <- c("mod", paste0("Z_stat_", axis), paste0("pval_", axis))
-  lambda <- analyysi_molemmat$eig[axis]
-  total_n <- nrow(molemmat)
+  lambda <- analyysi_molemmat$eig[axis,1]
+  total_n <- nrow(molemmat$data)
   
   for(mod in mods) {
     n_2007 <- nrow(analyysi_molemmat$ind$coord)
     n_2018 <- nrow(analyysi_molemmat$ind.sup$coord)
     
     n_tilda <- 1/(
-      1 / length(molemmat[1:n_2007, var] == mod) +
-        1 / length(molemmat[(n_2007+1) : n_2018, var] == mod)    
+      1 / length(molemmat$data[1:n_2007, var] == mod) +
+        1 / length(molemmat$data[(n_2007+1) : n_2018, var] == mod)    
     )
     
     V <- (total_n / (total_n - 1)) * (lambda / n_tilda) # Variance of permutation distribution
@@ -615,7 +605,6 @@ homogenity_test_for_pc_axis <- function(var = NULL, axis = 1){
     d_diacritic <- all_coordinates[mod, paste0("dim", axis, "_07")] - all_coordinates[mod, paste0("dim", axis, "_18")]
     
     Z_stat <- d_diacritic / sqrt(V)
-    
     p_Z <- dnorm(Z_stat, mean = 0, sd = 1)
     out[which(mods == mod),] <- cbind(mod = mod, Z = Z_stat, pval = p_Z)
     
@@ -624,9 +613,10 @@ homogenity_test_for_pc_axis <- function(var = NULL, axis = 1){
 }
 
 
+
 homogenity_test_for_plane <- function(var = NULL){
   
-  mods <- levels(molemmat[,var])
+  mods <- levels(molemmat$data[,var])
   out <- data.frame(matrix(ncol = 3))
   names(out) <- c("mod", "chisq", "pval")
   
@@ -634,8 +624,8 @@ homogenity_test_for_plane <- function(var = NULL){
     n_2007 <- nrow(analyysi_molemmat$ind$coord)
     n_2018 <- nrow(analyysi_molemmat$ind.sup$coord)
     
-    lambda_1 <- analyysi_molemmat$eig[1]
-    lambda_2 <- analyysi_molemmat$eig[2]
+    lambda_1 <- analyysi_molemmat$eig[1,1]
+    lambda_2 <- analyysi_molemmat$eig[2,1]
     
     d_hat_1 <- all_coordinates[mod, "dim1_07"] - all_coordinates[mod, "dim1_18"]
     d_hat_2 <- all_coordinates[mod, "dim2_07"] - all_coordinates[mod, "dim2_18"]
@@ -643,8 +633,8 @@ homogenity_test_for_plane <- function(var = NULL){
     D_squared <- (d_hat_1^2 / lambda_1) + (d_hat_2^2 / lambda_2) 
     
     n_tilda <- 1/(
-      1 / length(molemmat[1:n_2007, var] == mod) +
-      1 / length(molemmat[(n_2007+1) : n_2018, var] == mod)    
+      1 / length(molemmat$data[1:n_2007, var] == mod) +
+      1 / length(molemmat$data[(n_2007+1) : n_2018, var] == mod)    
     )
     
     chi_squared <- n_tilda * ((n_2007 + n_2018 -1) / (n_2007 + n_2018)) * D_squared
@@ -657,9 +647,9 @@ homogenity_test_for_plane <- function(var = NULL){
 }
 
 
-res_df_axis1 <- do.call(rbind, lapply(names(molemmat[,!names(molemmat) %in% sup.vars]), homogenity_test_for_pc_axis))
-res_df_axis2 <- do.call(rbind, lapply(names(molemmat[,!names(molemmat) %in% sup.vars]), homogenity_test_for_pc_axis, axis = 2))
-res_df_plane <- do.call(rbind, lapply(names(molemmat[,!names(molemmat) %in% sup.vars]), homogenity_test_for_plane))
+res_df_axis1 <- do.call(rbind, lapply(names(molemmat$data[,!names(molemmat$data) %in% sup.vars]), homogenity_test_for_pc_axis))
+res_df_axis2 <- do.call(rbind, lapply(names(molemmat$data[,!names(molemmat$data) %in% sup.vars]), homogenity_test_for_pc_axis, axis = 2))
+res_df_plane <- do.call(rbind, lapply(names(molemmat$data[,!names(molemmat$data) %in% sup.vars]), homogenity_test_for_plane))
 ```
 
 
@@ -786,7 +776,7 @@ plot_change <- function(suunta = 1, nvar = 15, sign = "+"){
     change <- all_coordinates %>% 
       top_n(nvar, euc_dist)
     title <- "Modalities with biggest change in space of lifestyles during 2007-2018"
-    limx <- c(-1.2, 1.6)
+    limx <- c(-1.2, 1.9)
     limy <- c(-1, 1.8)
   } else if(suunta == -1){
     change <- all_coordinates %>% 
@@ -899,9 +889,54 @@ rownames(table3) <- c("mean (1. dimension)",
 create_kable(table3, otsikko = "Keskiarvot ja keskihajonnat 1. ja 2. ulottuvuudella eri vuosien havainnoilla")
 ```
 
-In the first dimension, shift of individuals is towards legitimate side in space of lifestyles compared to 2007 (p = `r table3[1,4]`). In second dimension, 2018 individuals were more modern than individuals in 2007 (p < `r table3[2,4]`). Variance in both dimensions were higher among 2007 than 2018 individuals. Shift towards modern side of the space can be partly explained with cohort effect; the most traditional group in 2007 was not present in 2018 data, and oldest cohort in 2018 data was did not prefer as traditional cultural indicators as previous cohort. It is also notable that even individuals in 2018 were more modern than invidivuals in 2007, there are no individuals in 2018 that are more modern than most modern indivuals in 2007. This might be explained by identical set of indicators, picked before first survey in 2007. Items that were considered most modern in 2007 are still most modern in 2018, selitä paremmin.
+In the first dimension, shift of individuals is towards legitimate side in space of lifestyles compared to 2007 (p = `r table3[1,4]`). In second dimension, 2018 individuals were more modern than individuals in 2007 (p < `r table3[2,4]`). Variance in both dimensions were higher among 2007 than 2018 individuals. Shift towards modern side of the space can be partly explained with cohort effect; the most traditional group in 2007 was not present in 2018 data, and oldest cohort in 2018 data was did not prefer as traditional cultural indicators as previous cohort. It is also notable that even individuals in 2018 were more modern than invidivuals in 2007, there are no individuals in 2018 that are more modern than most modern individuals in 2007. This might be explained by identical set of indicators, picked before first survey in 2007. Items that were considered most modern in 2007 are still most modern in 2018, selitä paremmin.
 
-Next, we examine the change in terms of movement in two main axis between 2007 and 2018 individuals in distinct sociodemographic groups. This shift is analyzed by comparing mean points of individuals that chose particular sociodemographic modality in 2007 and 2018. This analysis is presented in table  `r tablenum <- tablenum + 1 ; tablenum`.
+Next, we examine the change in terms of movement in two main axis between 2007 and 2018 individuals in distinct sociodemographic groups. This shift is analyzed by comparing mean points of individuals that chose particular socio demographic modality in 2007 and 2018. This analysis is presented in table  `r tablenum <- tablenum + 1 ; tablenum` and visualized in figure `r fignum <- fignum + 1; fignum`.
+
+```{r}
+plot_inds_sup_vars <- function(taustamuuttuja){
+  coords_and_sup_vars <- data.frame(rbind(analyysi_molemmat$ind$coord[,1:2], analyysi_molemmat$ind.sup$coord[,1:2]),
+                                    rbind(analyysi_molemmat$call$X[,names(analyysi_molemmat$call$X) %in% sup.vars]),
+                                    aineisto = c(rep("2007", nrow(analyysi_molemmat$ind$coord)),
+                                                 rep("2018", nrow(analyysi_molemmat$ind.sup$coord))))
+  coords_and_sup_vars <-coords_and_sup_vars %>% 
+    group_by(.data[[taustamuuttuja]],aineisto) %>% 
+    summarise(Dim.1 = mean(Dim.1),
+              Dim.2 = mean(Dim.2) )%>% 
+  filter(str_detect(.data[[taustamuuttuja]], "NA", negate = TRUE))
+#  return(coords_and_sup_vars)
+  
+  coords_and_sup_vars$pari <- rep(seq_len(nrow(unique(coords_and_sup_vars[,1]))), each = 2)
+  var <- rlang::enquo(taustamuuttuja)
+  
+  limx <- c(-0.4, 0.4)
+  limy <- c(-0.4, 0.4)
+  bre <- round(seq(-1.6, 2, 0.2),2)
+  ggplot(coords_and_sup_vars, aes(x = Dim.1, y = Dim.2, label = interaction(.data[[taustamuuttuja]], aineisto),
+                                  color = .data[[taustamuuttuja]])) +
+    geom_point(size = 1) + 
+    geom_text_repel(size = 2.7) +
+    geom_line(aes(group = pari),color = "black", size = 0.01, linetype = "dashed", alpha = 0.8) +
+    geom_hline(yintercept = 0, colour = "gray70") +
+    geom_vline(xintercept = 0, colour = "gray70") +
+    scale_x_continuous(breaks = bre, limits = limx) +
+    scale_y_continuous(breaks = bre, limits = limy) +
+    scale_color_discrete(name = "") +
+    ggtitle(var) +
+    labs(x = "1. dimensio", y = "2. dimensio") +
+    theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5), legend.position = "none")
+}
+p1 <- plot_inds_sup_vars("ikä")
+p2 <- plot_inds_sup_vars("koulutus")
+p3 <- plot_inds_sup_vars("ammattiluokka")
+p4 <- plot_inds_sup_vars("alue")
+p5 <- plot_inds_sup_vars("tulotaso")
+p6 <- plot_inds_sup_vars("sukupuoli")
+
+gridExtra::grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 3)
+```
+
 
 ```{r}
 get_mean_and_test_table2 <- function(muuttuja, dimensio = 1){
@@ -909,7 +944,14 @@ get_mean_and_test_table2 <- function(muuttuja, dimensio = 1){
                                   rbind(analyysi_molemmat$call$X[,names(analyysi_molemmat$call$X) %in% sup.vars]),
                                   aineisto = c(rep("2007", nrow(analyysi_molemmat$ind$coord)),
                                                rep("2018", nrow(analyysi_molemmat$ind.sup$coord))))
-
+  
+  tmp <- split(coords_and_sup_vars, coords_and_sup_vars[[muuttuja]])
+  tmp <- tmp[str_detect(names(tmp), "NA", negate = TRUE)]
+  tmp <- do.call(rbind, tmp)
+  coords_and_sup_vars <- tmp
+  coords_and_sup_vars[[muuttuja]] <- factor(coords_and_sup_vars[[muuttuja]])
+  
+  
   if(dimensio == 1){
     df <- data.frame(sapply(levels(coords_and_sup_vars[[muuttuja]]), function(x) t.test(Dim.1 ~ aineisto, coords_and_sup_vars[coords_and_sup_vars[[muuttuja]] == x,])))
   }  else if(dimensio == 2){
@@ -937,7 +979,7 @@ tb <- data.frame(
   do.call(rbind, lapply(sup.vars, function(x) get_mean_and_test_table2(x, 2))))
 
 library(kableExtra)
-otsikko <- "Sosiodemografisten modaliteettien keskiarvon muutos kahdella ensimmäisellä ulottuvuudella 2007 ja 2018 vastauksien mukaan. Vuoden 2007 havainnot ovat aktiivisia havaintoja ja vuoden 2018 havainnot ovat analyysissä supplementaarihavaintoja. Boldattujen rivine kohdalla muutos ainakin toisella akselilla on ollu tilastollisesti merkitsevä."
+otsikko <- "Sosiodemografisten modaliteettien keskiarvon muutos kahdella ensimmäisellä ulottuvuudella 2007 ja 2018 vastauksien mukaan. Vuoden 2007 havainnot ovat aktiivisia havaintoja ja vuoden 2018 havainnot ovat analyysissä supplementaarihavaintoja. Boldattujen rivien kohdalla muutos ainakin toisella akselilla on ollu tilastollisesti merkitsevä."
 knitr::kable(tb, caption = otsikko) %>%
              kable_styling(bootstrap_options = c("striped", "hover"), font_size = 12, latex_options = c("scale_down","hold_position")) %>% 
              row_spec(which(tb$p.value < 0.05 | tb$p.value.1 < 0.05), bold = T) %>% 
@@ -946,6 +988,7 @@ knitr::kable(tb, caption = otsikko) %>%
 
 ```
 
+We can see from table `r tablenum` that two youngest cohorts occupy stable location in the space from 2007 to 2018. For the rest of the cohorts, all of them were more modern in 2018 than in 2007, which might be explained by stability of cultural practices in individuals. Despite of aging, lifestyle of the individual might remain more or less stable, which is indicated by the fact that location of cohorts (excluding two youngest ones) in 2018 reflects locations of the same cohorts in 2007, so, for example cohort of 55-64 year old in 2018 occupies the same location of 45-54 in 2007.
 
 Next, we will try to find clusters from space of individuals and to identify most important cultural products for those clusters. We try to identify robust groups in space of lifestyles, and examine if there is change during eleven year period in these groups.
 
