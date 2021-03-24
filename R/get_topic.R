@@ -42,32 +42,16 @@ get_topic <- function(){
                mallet_df <- model
 
            ##words in topic
-           topic_mallet_list <- reactive({
-             req(mallet_df())
+
              topic.words <- mallet.topic.words(mallet_df(), smoothed = T, normalized = T)
              mallet_words_list <- list()
              for (i in 1:as.numeric(input$mt_n)) {
                mallet_words_list[[i]] <- mallet.top.words(mallet_df(), topic.words[i,], 500)
              }
-             mallet_words_list
-           })
+              topic_mallet_list <- mallet_words_list
 
-           topic_mallet <- reactive({
-             list.cbind(topic_mallet_list())
-           })
+           topic_mallet <- list.cbind(topic_mallet_list())
+
 
            output$mallet_table <- renderTable(topic_mallet())
 
-
-
-           ##Panel 5words cloud mallet---------
-
-
-
-
-
-
-
-hello <- function() {
-  print("Hello, world!")
-}

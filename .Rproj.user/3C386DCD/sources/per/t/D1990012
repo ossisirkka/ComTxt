@@ -3,22 +3,22 @@
     "path": "~/ComTxt/R/get_topic.R",
     "project_path": "R/get_topic.R",
     "type": "r_source",
-    "hash": "2727149082",
+    "hash": "2084016621",
     "contents": "",
-    "dirty": true,
+    "dirty": false,
     "created": 1616574468173.0,
     "source_on_save": false,
     "relative_order": 4,
     "properties": {
-        "cursorPosition": "57,0",
-        "scrollLine": "28"
+        "cursorPosition": "14,0",
+        "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1616574588,
+    "lastKnownWriteTime": 1616574934,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1616574704175,
+    "last_content_update": 1616574934472,
     "read_only": false,
     "read_only_alternatives": []
 }

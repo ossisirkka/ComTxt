@@ -15,27 +15,20 @@
 
 
 
+get_topic <- function(){
+
+}
 
            ##load preprocessed documents and cleaned without accent
-           df_attach <- eventReactive(input$mallet,{
-
-             req(input$processed_data_mallet)
-             df <- read.csv(input$processed_data_mallet$datapath,header = TRUE, sep = ",", stringsAsFactors=FALSE)
+           df_attach <-
              df$status_id <- as.character(as.factor(df$status_id))
              df <- df[, c("status_id", "text")]
              colnames(df) <- c("doc.id", "text")
-             df
-           })
+
 
            ##mallet analysis
-           mallet_df <- reactive({
-             withProgress(message = 'Progress for Mallet analysis..', value = 10, {
-               ##writing stopwords into mallet
-               #tmp <- tempfile()
-               #writeLines(stopwords_text(), tmp)
-
                ##import as mallet format
-               mallet.instances <- mallet.import(df_attach()$doc.id, df_attach()$text,paste0("stopwords_", input$st_lang, ".txt"), token.regexp = "\\p{L}[\\p{L}\\p{P}]+\\p{L}")
+               mallet.instances <- mallet.import(df_attach$doc.id, df_attach()$text,paste0("stopwords_", input$st_lang, ".txt"), token.regexp = "\\p{L}[\\p{L}\\p{P}]+\\p{L}")
 
                ##mallet analysis
                model <- MalletLDA(num.topics = as.numeric(input$mt_n))
@@ -46,36 +39,19 @@
                model$setAlphaOptimization(2000, 4000)
                model$train(2000)
                model$maximize(30)
-               model
-             })
-           })
+               mallet_df <- model
+
            ##words in topic
-           topic_mallet_list <- reactive({
-             req(mallet_df())
+
              topic.words <- mallet.topic.words(mallet_df(), smoothed = T, normalized = T)
              mallet_words_list <- list()
              for (i in 1:as.numeric(input$mt_n)) {
                mallet_words_list[[i]] <- mallet.top.words(mallet_df(), topic.words[i,], 500)
              }
-             mallet_words_list
-           })
+              topic_mallet_list <- mallet_words_list
 
-           topic_mallet <- reactive({
-             list.cbind(topic_mallet_list())
-           })
+           topic_mallet <- list.cbind(topic_mallet_list())
+
 
            output$mallet_table <- renderTable(topic_mallet())
 
-
-
-           ##Panel 5words cloud mallet---------
-
-
-
-
-
-
-
-hello <- function() {
-  print("Hello, world!")
-}
