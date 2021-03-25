@@ -1,20 +1,40 @@
 # Topic modelling
-#
+
 # This is an example function named 'get_topics'
 # which looks for topics in your original text.
 
-get_topic <- function(df, language, mt_n){
+library(mallet)
+library(stopwords)
+get_topic <- function(df, language, n_topic){
 ##load  data
-    df_attach <- df$status_id <- as.character(as.factor(df$status_id))
+    df$status_id <- as.character(as.factor(df$status_id))
     df <- df[, c("status_id", "text")]
     colnames(df) <- c("doc.id", "text")
+    df$text <- iconv(df$text, "UTF-8", sub="")
+
+    df$text <- tolower(df$text)
+    df$text <- gsub("@\\w*", "", df$text)
+    df$text <- gsub("#\\w*", "", df$text)
+    df$text <- gsub("https://t.co/\\w*", "",  df$text)
+
+    library(stringr)
+    for(i in 1:nrow(df)){
+        df$text[[i]] <- paste(str_extract_all(df$text[[i]], '\\w{4,}')[[1]], collapse=' ')
+    }
+
+
+    stop.tmp <- stopwords::data_stopwords_smart
+    stopwords_text <- stopwords::stopwords(language, source = "stopwords-iso")
+    stopwords_text <- c(stop.tmp, stopwords_text)
+    write.table(stopwords_text, file="stopwords_es.txt", fileEncoding="UTF-8", row.names = FALSE, col.names =  FALSE,quote = FALSE)
+
 
     ##mallet analysis
     ##import as mallet format
-    mallet.instances <- mallet.import(df_attach$doc.id, df_attach$text, paste0("stopwords_", language, ".txt"), token.regexp = "\\p{L}[\\p{L}\\p{P}]+\\p{L}")
+    mallet.instances <- mallet.import(df$doc.id, df$text, paste0("stopwords_", language, ".txt"), token.regexp = "\\p{L}[\\p{L}\\p{P}]+\\p{L}")
 
     ##mallet analysis
-     model <- MalletLDA(num.topics = as.numeric(mt_n))
+     model <- MalletLDA(num.topics = as.numeric(n_topic))
      model$model$setRandomSeed(12345L)
      model$loadDocuments(mallet.instances)
 
@@ -25,5 +45,5 @@ get_topic <- function(df, language, mt_n){
      mallet_df <- model
 }
 
-
+topic <- get_topic(df_tmp, langauge = "es", n_topic= 7)
 

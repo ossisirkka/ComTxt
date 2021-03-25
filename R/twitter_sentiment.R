@@ -19,26 +19,27 @@ library(igraph) #ngram network diagrams
 library(ggraph) #ngram network diagrams
 
 
-nrc_df <- pre_df
 
-twitter_sentiment <- function(){
-  undesirable_words <- c("holy shit", "bullshit", "fucking", "shit", "damn")
+undesirable_words <- c("holy shit", "bullshit", "fucking", "shit", "damn")
+
+twitter_sentiment <- function(df){
 
   #Create tidy text format: Unnested, Unsummarized, -Undesirables, Stop and Short words
-  nrc_tidy <- nrc_df %>%
-  unnest_tokens(word, textOriginal) %>% #Break the lyrics into individual words
+  nrc_tidy <- df %>%
+  unnest_tokens(word, text) %>% #Break the lyrics into individual words
   filter(!word %in% undesirable_words) %>% #Remove undesirables
   filter(!nchar(word) < 3) %>% #Words like "ah" or "oo" used in music
   anti_join(stop_words)
-
   ## Nrc analysis
   youtube_nrc <- nrc_tidy %>%
   inner_join(get_sentiments("nrc"))
-
 }
 
 
+## sentiment of bar chart per year :: NEED TO PREPROCESS PER MONTH/ YEAR
+bar_sentiment <- function(){
 
+}
 
 
 ## divide shelby, mat, you, girlfriends, your, review, boyfriend
