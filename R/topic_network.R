@@ -1,13 +1,18 @@
 ## semantic network for mallet
+library(igraph)
+library(RColorBrewer)
+topic_network <- function(topic, n_nodes = 50, igraph_semantic_vertex = 0.04, igraph_semantic_label= 0.01){
 
-topic_network <- function(mallet_df, degree_weight = 20, igraph_semantic_vertex = 0.4, igraph_semantic_label= 20){
+  mallet_df <- topic
   topic.words <- mallet.topic.words(mallet_df, smoothed = T, normalized = T)
 
   tmp.1 <- list()
   for(j in 1:nrow(topic.words)){
     topic.df <- mallet.top.words(mallet_df, topic.words[j,],nrow(t(topic.words)))
     #topic.df <- topic.df[topic.df$words != "cultura",]
-    topic.df <- topic.df[topic.df$weight >= degree_weight,]
+    #topic.df <- topic.df[topic.df$weight >= degree_weight,]
+    topic.df <- head(topic.df[order(topic.df$weights, decreasing = TRUE),], n_nodes)
+
     tmp <- list()
     for(i in 1:nrow(topic.df )){
       from <- topic.df[i,1]
@@ -38,12 +43,21 @@ topic_network <- function(mallet_df, degree_weight = 20, igraph_semantic_vertex 
   net <- igraph::graph_from_data_frame(mallet_edges, directed=TRUE, vertices= mallet_nodes)
   ## make a distance
   V(net)$degree <- degree(net, mode="all")
-  net <- induced_subgraph(net, which(V(net)$degree> input$igraph_semantic_degree))
+
+  df <- as_data_frame(net, what="edges")
+
+  #topic <- list()
+  #for(i in 1:nrow(df)){
+  # topic[[i]] <- unique(mallet_edges[mallet_edges$from == df[[1]][i] | mallet_edges$to == df[[1]][i], ]$topic)
+  #}
+  E(net)$topic <- df$topic
+
+  #net <- induced_subgraph(net, 1:200)
   l.1 <- igraph::layout_nicely(net)## change the layout
   deg <- igraph::degree(net, mode = "all")
 
   colrs <- unique(c(brewer.pal(12, "Set3"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"),brewer.pal(9, "Pastel1")))
-
+  set.seed(1234)
   igraph::plot.igraph(net,
                       layout = l.1,
                       vertex.color = "#F8F7F2",
@@ -53,11 +67,11 @@ topic_network <- function(mallet_df, degree_weight = 20, igraph_semantic_vertex 
                       vertex.label.cex = deg*igraph_semantic_label,
                       edge.arrow.size = 0,
                       edge.color = colrs[as.numeric(as.factor(E(net)$topic))],
-                      edge.width = as.numeric(as.factor(E(net)$weight))*0.001,
+                      edge.width = as.numeric(as.factor(E(net)$weight))*0.0001,
                       edge.lty = 1
   )
   title("mallet semantic network across topic",cex.main=1.5,col.main="#6B8B8D")
   legend("bottomleft",levels(as.factor(E(net)$topic)), pch=21, col=colrs, pt.bg=colrs, pt.cex=2, cex=.6, bty="n", ncol=1, horiz = F)
 }
 
-
+topic_network(topic, n_nodes = 50, igraph_semantic_vertex = 0.04, igraph_semantic_label= 0.007)
