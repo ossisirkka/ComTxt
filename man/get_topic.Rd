@@ -16,9 +16,6 @@ This function allows you to train Mallet topic modelling on Twitter data using M
 }
 
 \examples{
-library(ComTxt)
-library(rtweet)
-basic_tweets <- search_tweets("hashtags", 100)
 
 topics <- get_topic(basic_tweets, language = "es", n_topic = 7)
 

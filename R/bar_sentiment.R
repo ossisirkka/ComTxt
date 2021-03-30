@@ -16,23 +16,28 @@ library(magick) #Memes - images with plots (image_read)
 library(yarrr)  #Pirate plot
 library(radarchart) #Visualizations
 library(igraph) #ngram network diagrams
-library(ggraph) #ngram network diagrams
+library(ggraph)
 
 
-twitter_sentiment <- function(df, language, undesirable_words){
-  stopwords <- data.frame(word = stopwords::stopwords(language = language, source = "stopwords-iso"))
-  stopwords$lexicon <- language
-  stopwords <- as_tibble(stopwords)
-  #Create tidy text format: Unnested, Unsummarized, -Undesirables, Stop and Short words
-  nrc_tidy <- df %>%
-  unnest_tokens(word, text) %>% #Break the lyrics into individual words
-  filter(!word %in% undesirable_words) %>% #Remove undesirables
-  filter(!nchar(word) < 3) %>% #Words like "ah" or "oo" used in music
-  anti_join(stopwords)
+## sentiment of bar chart per year :: NEED TO PREPROCESS PER MONTH/ YEAR
+bar_sentiment <- function(df, by = "%m%Y"){
 
-  youtube_nrc <- nrc_tidy %>%
-  inner_join(get_sentiments("nrc"))
+  df$created_at <- format(df$created_at, by)
+
+
+  df %>%
+    group_by(created_at, sentiment) %>%
+    summarise(word_count = n()) %>%
+    ungroup() %>%
+    mutate(sentiment = reorder(sentiment, word_count)) %>%
+    ggplot(aes(sentiment, word_count, fill = sentiment)) +
+    geom_col() +
+    facet_wrap(~created_at)+
+    labs(x = "sentiment" , y = "Word Count") +
+    ggtitle("NRC Sentiment")+
+    theme(legend.position = "none")
+
 }
 
 
-twitter_sentiment(basic_tweets,"en", c("shit", "bullshit"))
+bar_sentiment(d, "%Y")

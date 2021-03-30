@@ -45,5 +45,4 @@ get_topic <- function(df, language, n_topic){
      mallet_df <- model
 }
 
-topic <- get_topic(df_tmp, language = "es", n_topic= 7)
 

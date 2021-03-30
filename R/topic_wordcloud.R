@@ -22,4 +22,3 @@ topic_wordcloud <- function(mallet_df, par_row = 3, par_col = 3, n_topic =7,maxi
   }
 }
 
-topic_wordcloud(topic)

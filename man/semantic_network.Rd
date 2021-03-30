@@ -1,4 +1,4 @@
-\name{topic_words}
+\name{semantic_network}
 \alias{Mallet Topic Modelling}
 \title{The Matrix of Words and Weight for Topics}
 \usage{
@@ -16,9 +16,6 @@ This function retrive the matrix of words and its weight for topics.
 }
 
 \examples{
-library(ComTxt)
-
-topics <- get_topic(basic_tweets, language = "es", n_topic = 7)
 
 words <- topic_words(topics, n_topic = 7, n_words = 100)
 }

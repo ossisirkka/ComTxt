@@ -1,9 +1,8 @@
 ## semantic network for mallet
 library(igraph)
 library(RColorBrewer)
-topic_network <- function(topic, n_nodes = 50, igraph_semantic_vertex = 0.04, igraph_semantic_label= 0.01){
+topic_network <- function(mallet_df, n_nodes = 50, igraph_semantic_label= 0.01){
 
-  mallet_df <- topic
   topic.words <- mallet.topic.words(mallet_df, smoothed = T, normalized = T)
 
   tmp.1 <- list()
@@ -61,7 +60,7 @@ topic_network <- function(topic, n_nodes = 50, igraph_semantic_vertex = 0.04, ig
   igraph::plot.igraph(net,
                       layout = l.1,
                       vertex.color = "#F8F7F2",
-                      vertex.size = deg*igraph_semantic_vertex,
+                      vertex.size = deg*0.01,
                       vertex.frame.color = "#F8F7F2",
                       vertex.label.color = "#538797",
                       vertex.label.cex = deg*igraph_semantic_label,
@@ -74,4 +73,3 @@ topic_network <- function(topic, n_nodes = 50, igraph_semantic_vertex = 0.04, ig
   legend("bottomleft",levels(as.factor(E(net)$topic)), pch=21, col=colrs, pt.bg=colrs, pt.cex=2, cex=.6, bty="n", ncol=1, horiz = F)
 }
 
-topic_network(topic, n_nodes = 50, igraph_semantic_vertex = 0.04, igraph_semantic_label= 0.007)

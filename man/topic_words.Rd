@@ -16,7 +16,7 @@ This function retrive the matrix of words and its weight for topics.
 }
 
 \examples{
-library(ComTxt)
+
 
 topics <- get_topic(basic_tweets, language = "es", n_topic = 7)
 

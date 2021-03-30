@@ -22,7 +22,6 @@ This function display wordclouds plot of topics.
 }
 
 \examples{
-library(ComTxt)
 
 topics <- get_topic(basic_tweets, language = "es", n_topic = 7)
 

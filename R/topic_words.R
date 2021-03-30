@@ -13,5 +13,3 @@ topic_words <- function(mallet_df, n_topic =7, n_words = 500){
   #kable(topic_mallet, "simple")
 }
 
-View(topic_words(topic, n_topic = 7, n_words = 100))
-

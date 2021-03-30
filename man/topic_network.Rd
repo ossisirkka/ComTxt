@@ -1,27 +1,28 @@
-\name{topic_words}
+\name{topic_network}
 \alias{Mallet Topic Modelling}
-\title{The Matrix of Words and Weight for Topics}
+\title{The network plot of topic model}
 \usage{
-topic_words(mallet_df, n_topic, n_words)
+topic_network(mallet_df, n_nodes, igraph_semantic_label)
 }
 \description{
-This function retrive the matrix of words and its weight for topics.
+This function display semantic network of topic model.
 }
 \arguments{
   \item{mallet_df}{The model trained by get_topic function}
 
-  \item{n_topic}{The numbers of topics for the model}
+  \item{n_nodes}{The number of nodes/words. default 50}
 
-  \item{n_words}{The number of words for the matrix}
+  \item{igraph_semantic_label}{The size of vertex labels. default 0.01}
 }
 
 \examples{
-library(ComTxt)
+
 
 topics <- get_topic(basic_tweets, language = "es", n_topic = 7)
-
-words <- topic_words(topics, n_topic = 7, n_words = 100)
+topic_network(topics, n_nodes = 50, igraph_semantic_label= 0.007)
 }
 \source{
+Csardi G, Nepusz T (2006). The igraph software package for complex network research.
+
 David Mimno (2013) mallet: A wrapper around the Java machine learning tool MALLET
 }
