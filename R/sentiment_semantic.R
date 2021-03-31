@@ -27,7 +27,5 @@ sentiment_semantic <- function(df, select = "surprise", n_nodes = 100){
 }
 
 
-sentiment_semantic(d, select = "anticipation", n_nodes = 200)
-
 
 

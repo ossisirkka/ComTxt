@@ -49,4 +49,3 @@ radar_map <- function(df){
 
 }
 
-radar_map(d)

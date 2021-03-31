@@ -39,5 +39,3 @@ bar_sentiment <- function(df, by = "%m%Y"){
 
 }
 
-
-bar_sentiment(d, "%Y")
