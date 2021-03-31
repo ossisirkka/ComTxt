@@ -47,5 +47,4 @@ circos_map <- function(df){
   title("Relationship Between Mood and Years")
 }
 
-circos_map(d)
 
