@@ -10,12 +10,6 @@ get_topic <- function(df, language, n_topic){
     df$status_id <- as.character(as.factor(df$status_id))
     df <- df[, c("status_id", "text")]
     colnames(df) <- c("doc.id", "text")
-    df$text <- iconv(df$text, "UTF-8", sub="")
-
-    df$text <- tolower(df$text)
-    df$text <- gsub("@\\w*", "", df$text)
-    df$text <- gsub("#\\w*", "", df$text)
-    df$text <- gsub("https://t.co/\\w*", "",  df$text)
 
     library(stringr)
     for(i in 1:nrow(df)){
