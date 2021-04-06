@@ -1,7 +1,7 @@
 ## example
 
 library(devtools)
-install_github("BeaJJ/ComTxt")
+install_github("BeaJJ/ComTxt",ref='trunk')
 
 library(ComTxt)
 
