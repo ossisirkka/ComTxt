@@ -2,7 +2,7 @@
 library(quanteda)
 library(quanteda.textplots)
 
-sentiment_semantic <- function(df, select = "surprise", n_nodes = 100){
+sentiment_semantic <- function(df, select = "Surprise", n_nodes = 100){
   select_nrc <- df %>%
     filter(sentiment %in% select)
 

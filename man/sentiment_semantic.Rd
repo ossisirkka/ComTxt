@@ -10,7 +10,7 @@ This function drows semantic network plot of sentiment words.
 \arguments{
   \item{sentiment_df}{The sentiment data frame from tidytext}
 
-  \item{select}{The NRC sentiment lexicon categories, "anticipation", "anger", "surprise", "joy", "fear", "sadness"}
+  \item{select}{The NRC sentiment lexicon categories, "Anticipation", "Anger", "Surprise", "Joy", "Fear", "Sadness"}
 
   \item{n_nodes}{The number of nodes in igraph}
 }

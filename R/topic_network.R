@@ -41,7 +41,7 @@ topic_network <- function(mallet_df, n_nodes = 50, igraph_semantic_label= 0.01){
 
   net <- igraph::graph_from_data_frame(mallet_edges, directed=TRUE, vertices= mallet_nodes)
   ## make a distance
-  V(net)$degree <- degree(net, mode="all")
+  V(net)$degree <- igraph::degree(net, mode="all")
 
   df <- as_data_frame(net, what="edges")
 
