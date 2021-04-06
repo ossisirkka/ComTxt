@@ -5,7 +5,7 @@
 
 library(mallet)
 library(stopwords)
-get_topic <- function(df, language, n_topic){
+twitter_topic <- function(df, language, n_topic){
 ##load  data
     df$status_id <- as.character(as.factor(df$status_id))
     df <- df[, c("status_id", "text")]

@@ -17,9 +17,10 @@ This function display semantic network of topic model.
 
 \examples{
 
+df_ pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stopwords_lang = "es")
+df_topics <- twitter_topic(df_pre, language = "es", n_topic = 7)
+topic_network(df_topics, n_nodes = 50, igraph_semantic_label= 0.007)
 
-topics <- get_topic(basic_tweets, language = "es", n_topic = 7)
-topic_network(topics, n_nodes = 50, igraph_semantic_label= 0.007)
 }
 \source{
 Csardi G, Nepusz T (2006). The igraph software package for complex network research.

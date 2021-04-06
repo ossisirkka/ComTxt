@@ -1,24 +1,26 @@
 \name{semantic_network}
-\alias{Mallet Topic Modelling}
-\title{The Matrix of Words and Weight for Topics}
+\alias{semantic network}
+\title{Semantic network plot}
 \usage{
-topic_words(mallet_df, n_topic, n_words)
+semantic_network(df, language = "en", n_top = 40, vertext_size = 0.5)
 }
 \description{
-This function retrive the matrix of words and its weight for topics.
+This function retrives semantic network plot.
 }
 \arguments{
-  \item{mallet_df}{The model trained by get_topic function}
+  \item{df}{The preprocessed twetter data}
 
-  \item{n_topic}{The numbers of topics for the model}
+  \item{language}{stopwords language}
 
-  \item{n_words}{The number of words for the matrix}
+  \item{n_top}{top n tokens}
+
+  \item{vertext_size}{the size of vertext in network graph}
 }
 
 \examples{
-
-words <- topic_words(topics, n_topic = 7, n_words = 100)
+df_pre <- twitter_preprocess(twitter_df, ud_lang = "spanish", stopwords_lang = "es")
+semantic_network(df_pre, language = "en", n_top = 40, vertext_size = 0.5)
 }
 \source{
-David Mimno (2013) mallet: A wrapper around the Java machine learning tool MALLET
+Benoit et al (2018) quanteda: An R package for the quantitative analysis of textual data
 }

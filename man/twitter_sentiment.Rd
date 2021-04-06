@@ -8,7 +8,7 @@ twitter_sentiment(df, language, undesirable_words)
 This function is to get NRC sentiment lexicons using tidytext package. The function joins one column of words and another column of categories of lexicon. NRC provides 105 different langauge lexicon
 }
 \arguments{
-  \item{df}{The twitter data frame}
+  \item{df}{The preprocessed twitter data frame}
 
   \item{language}{The language set}
 
@@ -17,7 +17,7 @@ This function is to get NRC sentiment lexicons using tidytext package. The funct
 
 \examples{
 
-twitter_sentiment(basic_tweets, language = "es", undesirable_words = c("lol", "wtf"))
+df_sent <- twitter_sentiment(df_pre, language = "es", undesirable_words = c("lol", "wtf"))
 
 }
 \source{

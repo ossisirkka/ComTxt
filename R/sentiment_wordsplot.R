@@ -19,15 +19,15 @@ library(igraph) #ngram network diagrams
 library(ggraph) #ngram network diagrams
 
 ## each words used in each video---------------------------------------
-words_sentiment <- function(df){
-  plot_words_UnderstandingLOU2 <- df %>%
+sentiment_wordsplot <- function(df){
+  df_tmp <- df %>%
     group_by(sentiment) %>%
     count(word, sort = TRUE) %>%
     arrange(desc(n)) %>%
     slice(seq_len(10)) %>%
     ungroup()
 
-  plot_words_UnderstandingLOU2 %>%
+  df_tmp %>%
     ggplot(aes(word, 1, label = word, fill = sentiment )) +
     geom_point(color = "transparent") +
     geom_label_repel(force = 1,nudge_y = .5,

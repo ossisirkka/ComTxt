@@ -2,7 +2,7 @@
 \alias{Mallet Topic Modelling}
 \title{The Matrix of Words and Weight for Topics}
 \usage{
-topic_words(mallet_df, n_topic, n_words)
+topic_getwords(mallet_df, n_topic, n_words)
 }
 \description{
 This function retrive the matrix of words and its weight for topics.
@@ -16,11 +16,9 @@ This function retrive the matrix of words and its weight for topics.
 }
 
 \examples{
-
-
-topics <- get_topic(basic_tweets, language = "es", n_topic = 7)
-
-words <- topic_words(topics, n_topic = 7, n_words = 100)
+df_ pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stopwords_lang = "es")
+df_topics <- twitter_topic(df_pre, language = "es", n_topic = 7)
+words <- topic_getwords(df_topics, n_topic = 7, n_words = 100)
 }
 \source{
 David Mimno (2013) mallet: A wrapper around the Java machine learning tool MALLET

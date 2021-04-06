@@ -23,9 +23,9 @@ This function display wordclouds plot of topics.
 
 \examples{
 
-topics <- get_topic(basic_tweets, language = "es", n_topic = 7)
-
-topic_wordcloud(topics, par_row = 3, par_col = 3, n_topic = 7, maximum_n = 200, cloud_scale = 2.5)
+df_ pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stopwords_lang = "es")
+df_topics <- twitter_topic(df_pre, language = "es", n_topic = 7)
+topic_wordcloud(df_topics, par_row = 3, par_col = 3, n_topic = 7, maximum_n = 200, cloud_scale = 2.5)
 
 }
 \source{

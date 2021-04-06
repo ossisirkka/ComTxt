@@ -2,7 +2,7 @@
 \alias{Sentiment Words Plot}
 \title{Sentiment Words plot}
 \usage{
-words_sentiment(sentiment_df)
+sentiment_wordsplot(sentiment_df)
 }
 \description{
 This function get the sentiment words plot.
@@ -12,8 +12,8 @@ This function get the sentiment words plot.
 }
 
 \examples{
-sentiment_df <- twitter_sentiment(tweets_df, language = "en", undesirable_words = c("lol", "shit"))
-words_sentiment(sentiment_df)
+sentiment_df <- twitter_sentiment(df_pre, language = "en", undesirable_words = c("lol", "shit"))
+sentiment_wordsplot(sentiment_df)
 }
 \source{
 Silge and Robinson (2016) tidytext: Text Mining and Analysis Using Tidy Data Principles in R

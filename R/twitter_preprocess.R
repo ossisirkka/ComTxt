@@ -2,7 +2,7 @@ library(udpipe)
 library(dplyr)
 
 
-preprocess <- function(df, ud_lang, stopwords_lang){
+twitter_preprocess <- function(df, ud_lang, stopwords_lang){
 
   tmp <- data.frame(doc_id = df$status_id, text = df$text, stringsAsFactors = FALSE)
   tmp$text <- tolower(tmp$text)

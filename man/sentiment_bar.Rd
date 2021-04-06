@@ -1,8 +1,8 @@
-\name{topic_words}
-\alias{Mallet Topic Modelling}
-\title{The Matrix of Words and Weight for Topics}
+\name{sentiment_bar}
+\alias{Sentiment Analysis}
+\title{NRC sentiment analysis bar plot}
 \usage{
-bar_sentiment(sentiment_df, by)
+sentiment_bar(sentiment_df, by)
 }
 \description{
 This function drows bar sentiment chart.
@@ -15,10 +15,8 @@ This function drows bar sentiment chart.
 }
 
 \examples{
-
-sentiment_df <- twitter_sentiment(df, language, undesirable_words)
-
-bar_sentiment(d)
+df_sent <- twitter_sentiment(df_pre, language = "es", undesirable_words = c("lol", "wtf"))
+sentiment_bar(df_sent)
 }
 \source{
 Silge and Robinson (2016) tidytext: Text Mining and Analysis Using Tidy Data Principles in R

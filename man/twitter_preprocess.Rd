@@ -1,8 +1,8 @@
-\name{preprocess}
+\name{twitter_preprocess}
 \alias{preprocess textual data}
 \title{Preprocess Twitter textual data}
 \usage{
-preprocess(df, ud_lang, stopwords_lang)
+twitter_preprocess(df, ud_lang, stopwords_lang)
 }
 \description{
 This function retrives lemma version of text data.
@@ -50,7 +50,7 @@ This function retrives lemma version of text data.
 "tr" "uk" "ur" "vi" "yo" "zu"}
 }
 \examples{
-preprocess(twitter_df, ud_lang = "spanish", stopwords_lang = "es")
+df_ pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stopwords_lang = "es")
 
 }
 \source{

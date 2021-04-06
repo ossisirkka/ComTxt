@@ -19,7 +19,7 @@ library(igraph) #ngram network diagrams
 library(ggraph)
 
 ## circos map -----------------------------------------------------
-circos_map <- function(df){
+sentiment_circos <- function(df){
   df$created_at <- format(df$created_at, "%Y")
   my_colors <- c(brewer.pal(8, "Accent"), brewer.pal(8, "Dark2"), brewer.pal(12, "Paired"))
 

@@ -1,11 +1,11 @@
-\name{topic_words}
-\alias{Mallet Topic Modelling}
-\title{The Matrix of Words and Weight for Topics}
+\name{sentiment_wordsplot}
+\alias{Sentiment Analysis}
+\title{NRC sentiment analysis wordsplot}
 \usage{
-radar_map(sentiment_df)
+sentiment_circos(sentiment_df)
 }
 \description{
-This function drows sentiment radar map.
+This function drows bar sentiment chart.
 }
 \arguments{
   \item{sentiment_df}{The sentiment data frame from tidytext}
@@ -13,10 +13,8 @@ This function drows sentiment radar map.
 }
 
 \examples{
-
-sentiment_df <- twitter_sentiment(df, language, undesirable_words)
-
-bar_sentiment(sentiment_df)
+df_sent <- twitter_sentiment(df_pre, language = "es", undesirable_words = c("lol", "wtf"))
+sentiment_circos(df_sent)
 }
 \source{
 Silge and Robinson (2016) tidytext: Text Mining and Analysis Using Tidy Data Principles in R

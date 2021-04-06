@@ -5,8 +5,8 @@ library(RColorBrewer)
 library(dplyr)
 
 
-semantic_network <- function(text, language = "en", n_top = 40, vertext_size = 0.5){
-  toks <- tokens(df$Answer, remove_punct = TRUE, remove_symbols = TRUE, verbose = TRUE)
+semantic_network <- function(df, language = "en", n_top = 40, vertext_size = 0.5){
+  toks <- tokens(df$text, remove_punct = TRUE, remove_symbols = TRUE, verbose = TRUE)
   toks <- tokens_tolower(toks)
   toks <- tokens_remove(toks, pattern = stopwords::stopwords(language, source = "stopwords-iso"), padding = FALSE, min_nchar =3)
   toks <- tokens_wordstem(toks, language = language)

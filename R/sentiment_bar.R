@@ -20,7 +20,7 @@ library(ggraph)
 
 
 ## sentiment of bar chart per year :: NEED TO PREPROCESS PER MONTH/ YEAR
-bar_sentiment <- function(df, by = "%m%Y"){
+sentiment_bar <- function(df, by = "%m%Y"){
 
   df$created_at <- format(df$created_at, by)
 

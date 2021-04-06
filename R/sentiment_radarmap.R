@@ -19,7 +19,7 @@ library(igraph) #ngram network diagrams
 library(ggraph) #ngram network diagrams
 
 ## sentiment radarmap ------------------------------
-radar_map <- function(df){
+sentiment_radarmap <- function(df){
   df$created_at <- format(df$created_at, "%Y")
 
   prince_nrc_sub <- df %>%
