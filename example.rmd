@@ -1,7 +1,18 @@
-## example
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
 
-library(devtools)
-install_github("BeaJJ/ComTxt")
+# Computational text analysis for Twitter data 
+
+This package is for text analysis including preprocessing, topic modelling, semantic network, and sentiment analysis. The function includes both analysis and graphic visualization.  
+
+
+```{r}
+#library(devtools)
+#install_github("BeaJJ/ComTxt",ref='trunk')
 
 library(ComTxt)
 ## preprocessing
@@ -51,11 +62,28 @@ library(ggplot2)
 
 library(grid)
 library(gridExtra)
+```
 
+## Preprocessing 
+
+The preprocessing is based on UDpipe package. The function eliminate URLs, Emoticon, stopwords and finally return to lemma. 
+
+
+```{r include=FALSE}
 ## preprocess : lemmatization, stopwords, urls, emoticons
-df_pre <- twitter_preprocess(twitter_df, ud_lang = "spanish", stopwords_lang = "es")
+df_tweets <- readRDS("F:/Bea/PostDoc/RESEARCH/ComTxt/data-raw/basic_tweets.Rds")
+```
 
+```{r}
+df_pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stopwords_lang = "es")
+```
+
+## Mallet Topic Modeling  
+
+
+```{r}
 ## Topic modeling------------------------------------------------------
+topic_number(df,maxN = 10)
 ### mallet topic modeling
 df_topics <- twitter_topic(df_pre, language = "es", n_topic = 7)
 
@@ -70,14 +98,24 @@ topic_wordcloud(df_topics, par_row = 3, par_col = 3, n_topic = 7, maximum_n = 20
 dev.off()
 topic_network(df_topics, n_nodes = 50, igraph_semantic_label= 0.007)
 
+```
 
+## Semantic network 
+
+```{r}
 ## semantic network ----------------------------------------
 ### semantic general
 semantic_network(df_pre, n_top = 40)
-
+hub <- semantic_get_hub(df_pre)
+kable(hub , "simple")
 ### semantic hub network
 semantic_network_hub(df_pre, hub = "arte")
 
+```
+
+## Sentiment analysis 
+
+```{r}
 ## Sentiment analysis ------------------------------
 ### NRC sentiment analysis
 df_sent <- twitter_sentiment(df_pre, language = "es", undesirable_words = c("lol", "wtf"))
@@ -97,11 +135,5 @@ sentiment_radarmap(df_sent)
 ### sentiment semantic network
 sentiment_semantic(df_sent, select = "Anticipation", n_nodes = 200)
 
-
-
-
-
-
-
-
+```
 
