@@ -5,7 +5,7 @@
 
 library(mallet)
 library(stopwords)
-twitter_topic <- function(df, language, n_topic){
+twitter_topic <- function(df, n_topic){
 ##load  data
     df$status_id <- as.character(as.factor(df$status_id))
     df <- df[, c("status_id", "text")]
@@ -18,15 +18,15 @@ twitter_topic <- function(df, language, n_topic){
 
 
     stop.tmp <- stopwords::data_stopwords_smart
-    stopwords_text <- stopwords::stopwords(language, source = "stopwords-iso")
-    stopwords_text <- c(stop.tmp, stopwords_text)
-    write.table(stopwords_text, file="stopwords_es.txt", fileEncoding="UTF-8", row.names = FALSE, col.names =  FALSE,quote = FALSE)
+    #stopwords_text <- stopwords::stopwords(language, source = "stopwords-iso")
+    #stopwords_text <- c(stop.tmp, stopwords_text)
+    write.table(stop.tmp , file="stopwords.txt", fileEncoding="UTF-8", row.names = FALSE, col.names =  FALSE,quote = FALSE)
 
 
     ##mallet analysis
     ##import as mallet format
-    mallet.instances <- mallet.import(df$doc.id, df$text, paste0("stopwords_", language, ".txt"), token.regexp = "\\p{L}[\\p{L}\\p{P}]+\\p{L}")
-
+    #mallet.instances <- mallet.import(df$doc.id, df$text, paste0("stopwords_", language, ".txt"), token.regexp = "\\p{L}[\\p{L}\\p{P}]+\\p{L}")
+    mallet.instances <- mallet.import(df$doc.id, df$text, "stopwords.txt", token.regexp = "\\p{L}[\\p{L}\\p{P}]+\\p{L}")
     ##mallet analysis
      model <- MalletLDA(num.topics = as.numeric(n_topic))
      model$model$setRandomSeed(12345L)

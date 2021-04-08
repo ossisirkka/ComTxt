@@ -14,6 +14,10 @@ This function retrives lemma version of text data.
 
   \item{stopwords_lang}{stopwords langauges}
 
+  \item{location_country}{country name}
+
+  \item{multi_name}{multiple names of country in different language}
+
 }
 \value{
   \item{df}{rtweet data frame}
@@ -48,9 +52,14 @@ This function retrives lemma version of text data.
  "fr" "gl" "de" "el" "ha" "he" "hi" "hu" "id" "ga" "it" "ja" "ko" "ku" "la" "lt" "lv"
  "ms" "mr" "no" "fa" "pl" "pt" "ro" "ru" "sk" "sl" "so" "st" "es" "sw" "sv" "th" "tl"
 "tr" "uk" "ur" "vi" "yo" "zu"}
+
+ \item{location_country}{"spain", "uk", "netherlands", "serbia and montenegro", "croatia", "france", "switzerland", "denmark" ... }
+
+  \item{multi_name}{c("españa","spagna"),  c(dänemark), c("republic of serbia", "srbija"), c("republic of croatia"),  c("schweiz", "suisse", "suiza"), c("united kingdom", "britain") ... }
+
 }
 \examples{
-df_ pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stopwords_lang = "es")
+df_ pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stopwords_lang = "es", location_country = "spain",  multi_name = c("españa","spagna"))
 
 }
 \source{

@@ -69,31 +69,31 @@ a <- ggplot(data.frame(seqk, hm_total), aes(x = seqk, y = hm_total)) + geom_path
   theme_minimal()
 
 ## by perperxity
-dtm <- DocumentTermMatrix(Corpus(VectorSource(df$text)))
+#dtm <- DocumentTermMatrix(Corpus(VectorSource(df$text)))
 
 #Filtering empty rows of the matrix (DTM) - important for performance
-rowTotals <- apply(dtm, 1, sum)
-dtm_filter <- dtm[rowTotals > 0,]
+#rowTotals <- apply(dtm, 1, sum)
+#dtm_filter <- dtm[rowTotals > 0,]
 
 #Model optimization - calculating perplexity for different values of k
-set.seed(123)
-train = sample(rownames(dtm_filter), nrow(dtm_filter) * .75)
-dtm_train = dtm_filter[rownames(dtm_filter) %in% train, ]
-dtm_test = dtm_filter[!rownames(dtm_filter) %in% train, ]
+#set.seed(123)
+#train = sample(rownames(dtm_filter), nrow(dtm_filter) * .75)
+#dtm_train = dtm_filter[rownames(dtm_filter) %in% train, ]
+#dtm_test = dtm_filter[!rownames(dtm_filter) %in% train, ]
 
-perplexity = data.frame(k = 2:maxN, p=NA) #calculating perplexity for k 5:20
-for (k in perplexity$k) {
-  message("k=", k)
-  m = LDA(dtm_train, method = "Gibbs", k = k,  control = list(alpha = 5/k))
-  perplexity$p[perplexity$k==k] = perplexity(m, dtm_test)
-}
-perplexity
+#perplexity = data.frame(k = 2:maxN, p=NA) #calculating perplexity for k 5:20
+#for (k in perplexity$k) {
+#  message("k=", k)
+#  m = LDA(dtm_train, method = "Gibbs", k = k,  control = list(alpha = 5/k))
+#  perplexity$p[perplexity$k==k] = perplexity(m, dtm_test)
+#}
+#perplexity
 
-b <- ggplot(perplexity, aes(x = k, y = p)) +
-  geom_point() +
-  geom_line(group = 1)+
-  ggtitle("Best topic number by perplexity score") + theme_minimal() +
-  scale_x_continuous(breaks = seq(1,40,1)) + ylab("perplexity")
+#b <- ggplot(perplexity, aes(x = k, y = p)) +
+#  geom_point() +
+#  geom_line(group = 1)+
+#  ggtitle("Best topic number by perplexity score") + theme_minimal() +
+#  scale_x_continuous(breaks = seq(1,40,1)) + ylab("perplexity")
 
 
 #create DTM
@@ -137,11 +137,11 @@ c <- ggplot(coherence_mat, aes(x = k, y = coherence)) +
   geom_line(group = 1)+
   ggtitle("Best Topic number by Coherence Score") + theme_minimal() +
   scale_x_continuous(breaks = seq(1,40,1)) + ylab("Coherence")
-pushViewport(viewport(layout = grid.layout(3, 2)))
+pushViewport(viewport(layout = grid.layout(2, 2)))
 vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
 print(a, vp = vplayout(1, 1:2))  # key is to define vplayout
-print(b, vp = vplayout(2, 1:2))
-print(c, vp = vplayout(3, 1:2))
+#print(b, vp = vplayout(2, 1:2))
+print(c, vp = vplayout(2, 1:2))
 }
 
 
