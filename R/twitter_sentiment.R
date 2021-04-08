@@ -11,13 +11,13 @@ twitter_sentiment <- function(df, language, undesirable_words){
   #stopwords <- as_tibble(stopwords)
 
 
-  NRC_Emotion_Lexicon <- read_excel("source/NRC-Emotion-Lexicon-v0.92-In105Languages-Nov2017Translations.xlsx")
-  names <- colnames(NRC_Emotion_Lexicon)
-  names <-gsub(".* ","",names)
-  names <-gsub("[()]","",names)
+  #NRC_Emotion_Lexicon <- read_excel("source/NRC-Emotion-Lexicon-v0.92-In105Languages-Nov2017Translations.xlsx")
+  #names <- colnames(NRC_Emotion_Lexicon)
+  #names <-gsub(".* ","",names)
+  #names <-gsub("[()]","",names)
 
-  colnames(NRC_Emotion_Lexicon) <- names
-  NRC_Emotion_Lexicon <- NRC_Emotion_Lexicon %>% select(-"en...1")
+  #colnames(NRC_Emotion_Lexicon) <- names
+  #NRC_Emotion_Lexicon <- NRC_Emotion_Lexicon %>% select(-"en...1")
 
   custom_lexicon <- NRC_Emotion_Lexicon %>% select(language, Anger, Anticipation, Disgust,Fear, Joy, Sadness, Surprise, Trust)
 

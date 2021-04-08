@@ -1,7 +1,7 @@
 ## example
 
 library(devtools)
-install_github("BeaJJ/ComTxt",ref='trunk')
+install_github("BeaJJ/ComTxt")
 
 library(ComTxt)
 ## preprocessing
