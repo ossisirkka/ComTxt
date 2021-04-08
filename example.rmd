@@ -11,8 +11,8 @@ This package is for text analysis including preprocessing, topic modelling, sema
 
 
 ```{r}
-#library(devtools)
-#install_github("BeaJJ/ComTxt",ref='trunk')
+library(devtools)
+install_github("BeaJJ/ComTxt",ref='trunk')
 
 library(ComTxt)
 ## preprocessing
