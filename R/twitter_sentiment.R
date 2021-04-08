@@ -18,7 +18,7 @@ twitter_sentiment <- function(df, language, undesirable_words){
 
   #colnames(NRC_Emotion_Lexicon) <- names
   #NRC_Emotion_Lexicon <- NRC_Emotion_Lexicon %>% select(-"en...1")
-  load("data/NRC_Emotion_Lexicon.Rda")
+
   custom_lexicon <- NRC_Emotion_Lexicon %>% select(language, Anger, Anticipation, Disgust,Fear, Joy, Sadness, Surprise, Trust)
 
  colnames(custom_lexicon) <- c("word", "Anger", "Anticipation", "Disgust","Fear", "Joy", "Sadness", "Surprise", "Trust" )
