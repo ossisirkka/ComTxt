@@ -4,7 +4,7 @@ library(purrr)
 library(dplyr)
 library(maps)
 
-twitter_preprocess <- function(df, ud_lang, stopwords_lang, location_country, multi_name){
+twitter_preprocess <- function(df, ud_lang, stopwords_lang){
 
   tmp <- data.frame(doc_id = df$status_id, text = df$text, stringsAsFactors = FALSE)
   tmp$text <- tolower(tmp$text)
@@ -38,7 +38,6 @@ twitter_preprocess <- function(df, ud_lang, stopwords_lang, location_country, mu
    tmp.2 <- df[df$status_id %in% preprocess_tmp$V1, ]
    tmp.2$text <- preprocess_tmp$V2
 
-   tmp.2 <- clean_location(tmp.2, location_country, multi_name)
    return(tmp.2)
 }
 

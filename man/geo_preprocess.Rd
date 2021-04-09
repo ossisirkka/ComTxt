@@ -1,8 +1,8 @@
-\name{clean_location}
-\alias{clean_location}
+\name{geo_preprocess}
+\alias{geo_preprocess}
 \title{Preprocess profile location data}
 \usage{
-clean_location(df, location_country = "spain",  multi_name = c("españa","spagna"))
+geo_preprocess(df, location_country,  multi_name )
 }
 \description{
 This function preprocess profile location data adds country and city data.
@@ -23,7 +23,7 @@ This function preprocess profile location data adds country and city data.
   \item{multi_name}{c("españa","spagna"),  c(dänemark), c("republic of serbia", "srbija"), c("republic of croatia"),  c("schweiz", "suisse", "suiza"), c("united kingdom", "britain") ... }
 }
 \examples{
-df_ pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stopwords_lang = "es")
-df_ pre <- clean_location(df_ pre, location_country = "spain",  multi_name = c("españa","spagna"))
+df_pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stopwords_lang = "es")
+df_pre <- geo_preprocess(df_pre, location_country = "spain",  multi_name = c("españa","spagna"))
 }
 

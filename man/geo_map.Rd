@@ -1,8 +1,8 @@
-\name{twitter_map}
-\alias{twitter_map}
+\name{geo_map}
+\alias{geo_map}
 \title{Drawing twitter map}
 \usage{
-twitter_map(df, location_country)
+geo_map(df, location_country)
 }
 \description{
 This function draw location map.
@@ -22,7 +22,7 @@ This function draw location map.
 }
 \examples{
 
-twitter_map(df_pre, location_country = "spain")
+geo_map(df_pre, location_country = "spain")
 
 }
 
