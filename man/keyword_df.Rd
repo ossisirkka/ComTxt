@@ -10,13 +10,15 @@ This function retrives top features key word.
 \arguments{
   \item{df}{The preprocessed twetter data}
 
+  \item{keyword_remove}{keyword to remove}
+
   \item{top_n}{top n keywords}
 
 }
 
 \examples{
 df_pre <- twitter_preprocess(twitter_df, ud_lang = "spanish", stopwords_lang = "es")
-keyword_df(df, top_n = 10)
+keyword_df(df, keyword_remove = "cultura", top_n = 10)
 }
 \source{
 Benoit et al (2018) quanteda: An R package for the quantitative analysis of textual data

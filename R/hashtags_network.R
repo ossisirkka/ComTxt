@@ -6,6 +6,7 @@ library(dplyr)
 
 
 hashtags_network <- function(df, hashtag_remove = "#cultura", n_top = 40){
+
   for(i in 1:nrow(df)){
     df$hashtags[[i]] <- tolower(paste(paste0("#", df$hashtags[[i]]), collapse = " "))
   }

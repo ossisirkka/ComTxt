@@ -2,7 +2,7 @@
 \alias{hashtags Semantic network hub}
 \title{hashtags Semantic network hub}
 \usage{
-hashtags_network_hub(df, language, hub)
+hashtags_network_hub(df, hub, n_top = 40)
 }
 \description{
 This function draws zoomed in semantic network around hub.
@@ -10,15 +10,15 @@ This function draws zoomed in semantic network around hub.
 \arguments{
   \item{df}{The preprocessed twitter data}
 
-  \item{language}{stopwords language "es"}
-
   \item{hub}{zoomed in word}
+
+  \item{n_top}{The number of nodes in the plot}
 }
 
 \examples{
 
 df_pre <- twitter_preprocess(twitter_df, ud_lang = "spanish", stopwords_lang = "es")
-hashtags_network_hub(df_pre, language = "es", hub = "arte")
+hashtags_network_hub(df_pre, hub = "#art", n_top = 40)
 }
 \source{
 Benoit et al (2018) quanteda: An R package for the quantitative analysis of textual data

@@ -24,6 +24,10 @@ twitter_sentiment <- function(df, language, undesirable_words){
  colnames(custom_lexicon) <- c("word", "Anger", "Anticipation", "Disgust","Fear", "Joy", "Sadness", "Surprise", "Trust" )
 
  custom_lexicon <- custom_lexicon[rowSums(custom_lexicon[,2:9]) >0,]
+
+ df$text <- gsub("@\\w*", "", df$text)
+ df$text <- gsub("#\\w*", "", df$text)
+
   #Create tidy text format: Unnested, Unsummarized, -Undesirables, Stop and Short words
   nrc_tidy <- df %>%
   unnest_tokens(word, text) %>% #Break the lyrics into individual words

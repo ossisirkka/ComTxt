@@ -5,7 +5,7 @@ library(RColorBrewer)
 library(dplyr)
 
 
-hashtags_network_hub <- function(df, hashtag_remove, n_top = 40){
+hashtags_network_hub <- function(df, hub, n_top = 40){
   for(i in 1:nrow(df)){
     df$hashtags[[i]] <- tolower(paste(paste0("#", df$hashtags[[i]]), collapse = " "))
   }
@@ -21,8 +21,17 @@ hashtags_network_hub <- function(df, hashtag_remove, n_top = 40){
   colnames(tmp) <- c("nodes", "degree")
   tmp <- tmp[tmp$degree > 0, ]
 
+  nodes_degree <- tmp[tmp$nodes == hub, ]$degree
+  high_nodes <- tmp[tmp$degree > nodes_degree, ]$nodes
+
   fcm_local <- fcm_select(fcmat, pattern = c(tmp, hub))
-  fcm_local <- fcm_remove(fcm_local, hashtag_remove)
+  fcm_local <- fcm_remove(fcm_local, high_nodes)
+
+  ##reduce only top words
+  feat <-  names(topfeatures(fcm_local, n_top))
+
+  fcm_local <- fcm_select(fcmat, pattern = c(tmp, hub))
+
   ##text plot
   quanteda::textplot_network(fcm_local, min_freq = 0.1, edge_color = "grey",vertex_color ="#538797")
 }
