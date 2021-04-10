@@ -24,9 +24,9 @@ get_tweet_preprocess <- function(list){
   for (i in 1:nrow(x$data)){
     url_t.co <- x$data$entities$urls[[i]][[3]]
     if(length(url_t.co)==0){
-      url_t.co <- list(NA)
+      url_t.co <- NA
     } else {
-      url_t.co <- list(url_t.co)
+      url_t.co <- url_t.co
     }
     tmp.1[[i]] <- url_t.co
   }
@@ -35,9 +35,9 @@ get_tweet_preprocess <- function(list){
   for (i in 1:nrow(x$data)){
     url_extended_url<- x$data$entities$urls[[i]][[4]]
     if(length(url_extended_url)==0){
-      url_extended_url <- list(NA)
+      url_extended_url <- NA
     } else {
-      url_extended_url <- list(url_extended_url)
+      url_extended_url <- url_extended_url
     }
     tmp.1[[i]] <- url_extended_url
   }
@@ -47,9 +47,9 @@ get_tweet_preprocess <- function(list){
   for (i in 1:nrow(x$data)){
     hashtags <- x$data$entities$hashtags[[i]][[3]]
     if(length(hashtags) == 0){
-      hashtags <- list(NA)
+      hashtags <- NA
     } else{
-      hashtags <- list(hashtags)
+      hashtags <- hashtags
     }
     tmp.1[[i]] <- hashtags
   }
@@ -57,16 +57,16 @@ get_tweet_preprocess <- function(list){
 
   tmp.1 <- list()
   for (i in 1:nrow(x$data)){
-    mention <- x$data$entities$mentions[[i]][[3]]
-    if(length(mention)==0){
-      mention <- list(NA)
+    mentions_screen_name <- x$data$entities$mentions[[i]][[3]]
+    if(length(mentions_screen_name)==0){
+      mentions_screen_name <- NA
     }  else {
-      mention <- list(mention)
+      mentions_screen_name <- mentions_screen_name
     }
-    tmp.1[[i]] <- mention
+    tmp.1[[i]] <- mentions_screen_name
   }
 
-  tmp$mention <- tmp.1
+  tmp$mentions_screen_name <- tmp.1
   ## from user data
 
   names(x$includes$users)[names(x$includes$users) == "id"] <- "author_id"
@@ -86,9 +86,9 @@ get_tweet_preprocess <- function(list){
   for (i in 1:length(df$entities.y$url$urls)){
     profile_url <- df$entities.y$url$urls[[1]][[4]]
     if(length(profile_url)==0){
-      profile_url <- list(NA)
+      profile_url <- NA
     } else {
-      profile_url <- list(profile_url)
+      profile_url <- profile_url
     }
     tmp.2[[i]] <- data.frame(profile_url)
   }
@@ -99,7 +99,7 @@ get_tweet_preprocess <- function(list){
 
 df_tweets <- do.call(rbind.data.frame, tweets_list_clean)
 colnames(df_tweets)[colnames(df_tweets) == 'id'] <- 'status_id'
-
+colnames(df_tweets)[colnames(df_tweets) == "author_id"] <- 'user_id'
 ## until Here ---------
 geom <- list()
 for(i in 1:nrow(df_tweets)){
@@ -113,11 +113,11 @@ df_tweets <-
   df_tweets %>%
   mutate(geo_coord = geom)
 
-col_order <- c("author_id", "status_id", "created_at","screen_name", "text",
-               "source", "conversation_id", "in_reply_to_user_id","mention",
-               "retweet_count","reply_count", "like_count", "quote_count",
-               "hashtags","url_t.co", "url_extended_url","lang","geo_coord",
-               "context_annotations","name","location", "description",
+col_order <- c("user_id", "status_id", "created_at","screen_name", "text",
+               "source", "conversation_id", "in_reply_to_user_id",
+               "mentions_screen_name","retweet_count","reply_count", "like_count",
+               "quote_count","hashtags","url_t.co", "url_extended_url","lang",
+               "geo_coord","context_annotations","name","location", "description",
                "followers_count","following_count", "tweet_count",
                "listed_count", "account_created_at","verified",
                "profile_image_url", "profile_url")

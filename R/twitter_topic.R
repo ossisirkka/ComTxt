@@ -11,8 +11,8 @@ twitter_topic <- function(df, n_topic){
     df <- df[, c("status_id", "text")]
     colnames(df) <- c("doc.id", "text")
 
-    df$text <- gsub("@\\w*", "", df$text)
-    df$text <- gsub("#\\w*", "", df$text)
+    #df$text <- gsub("@\\w*", "", df$text)
+    #df$text <- gsub("#\\w*", "", df$text)
 
     library(stringr)
     for(i in 1:nrow(df)){
