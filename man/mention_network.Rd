@@ -10,8 +10,6 @@ This function retrives hashtags semantic network plot.
 \arguments{
   \item{df}{The preprocessed twetter data}
 
-  \item{hashtag_remove}{hashtag_remove to remove}
-
   \item{n_top}{top n tokens}
 
 }

@@ -1,8 +1,8 @@
-\name{geo_df}
-\alias{geo_df}
+\name{geo_table}
+\alias{geo_table}
 \title{top location}
 \usage{
-geo_df(df)
+geo_table(df)
 }
 \description{
 This function retreives top 10 locations in twitter data.
@@ -18,7 +18,7 @@ This function retreives top 10 locations in twitter data.
 }
 \examples{
 
-geo_df(df_pre)
+geo_table(df_pre)
 
 }
 

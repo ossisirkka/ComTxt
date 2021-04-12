@@ -100,6 +100,9 @@ get_tweet_preprocess <- function(list){
 df_tweets <- do.call(rbind.data.frame, tweets_list_clean)
 colnames(df_tweets)[colnames(df_tweets) == 'id'] <- 'status_id'
 colnames(df_tweets)[colnames(df_tweets) == "author_id"] <- 'user_id'
+colnames(df_tweets)[colnames(df_tweets) == "following_count"] <- 'friends_count'
+colnames(df_tweets)[colnames(df_tweets) == "tweet_count"] <- 'statuses_count'
+
 ## until Here ---------
 geom <- list()
 for(i in 1:nrow(df_tweets)){
@@ -118,7 +121,7 @@ col_order <- c("user_id", "status_id", "created_at","screen_name", "text",
                "mentions_screen_name","retweet_count","reply_count", "like_count",
                "quote_count","hashtags","url_t.co", "url_extended_url","lang",
                "geo_coord","context_annotations","name","location", "description",
-               "followers_count","following_count", "tweet_count",
+               "followers_count","friends_count", "statuses_count",
                "listed_count", "account_created_at","verified",
                "profile_image_url", "profile_url")
 df_tweets <- df_tweets[, col_order]

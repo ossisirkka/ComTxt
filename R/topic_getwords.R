@@ -10,6 +10,6 @@ topic_getwords <- function(mallet_df, n_topic =7, n_words = 500){
   topic_mallet_list <- mallet_words_list
 
   topic_mallet <- list.cbind(topic_mallet_list)
-  #kable(topic_mallet, "simple")
+  print(kable(topic_mallet, "simple"))
 }
 

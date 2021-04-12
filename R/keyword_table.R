@@ -1,5 +1,5 @@
 library(dplyr)
-keyword_df <- function(df, keyword_remove, top_n = 10){
+keyword_table <- function(df, keyword_remove, top_n = 10){
   df$text <- gsub("@\\w*", "", df$text)
   df$text <- gsub("#\\w*", "", df$text)
   toks <- tokens(df$text, remove_punct = TRUE, remove_symbols = TRUE, verbose = TRUE)

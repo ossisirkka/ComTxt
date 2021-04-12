@@ -1,7 +1,7 @@
 ## most tweeted cities
 library(kableExtra)
 
-geo_df <- function(df){
+geo_table <- function(df){
   hashtag_frequencies <- sort(table(all_hashtags), decreasing = TRUE)
   colnames(tmp) <- c("city", "freq")
   rownames(tmp) <- NULL
