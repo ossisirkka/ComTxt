@@ -2,7 +2,6 @@ library(udpipe)
 library(dplyr)
 library(purrr)
 library(dplyr)
-library(maps)
 
 twitter_preprocess <- function(df, ud_lang, stopwords_lang){
 

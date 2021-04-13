@@ -1,8 +1,9 @@
 ##topic_wordsplot
 library(dplyr)
 library(tidytext)
-
-
+library(mallet)
+library(rlist)
+library(ggrepel)
 #create function that accepts the lda model and num word to display
 topic_wordplot <- function(mallet_df, k, num_words = 10) {
   topic.words <- mallet.topic.words(mallet_df, smoothed = T, normalized = T)

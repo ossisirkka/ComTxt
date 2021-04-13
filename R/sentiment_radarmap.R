@@ -22,16 +22,16 @@ library(ggraph) #ngram network diagrams
 sentiment_radarmap <- function(df){
   df$created_at <- format(df$created_at, "%Y")
 
-  prince_nrc_sub <- df %>%
-    filter(!sentiment %in% c("positive", "negative"))
+  #prince_nrc_sub <- df %>%
+    #filter(!sentiment %in% c("positive", "negative"))
 
-  year_sentiment_nrc <- prince_nrc_sub %>%
+  year_sentiment_nrc <- df  %>%
     group_by(created_at, sentiment) %>%
     count(created_at, sentiment) %>%
     select(created_at, sentiment, sentiment_year_count = n)
 
   #Get the total count of sentiment words per video_name (not distinct)
-  total_sentiment_video <- prince_nrc_sub %>%
+  total_sentiment_video <- df  %>%
     count(created_at) %>%
     select(created_at, year_total = n)
 

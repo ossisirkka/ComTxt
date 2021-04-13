@@ -1,5 +1,6 @@
 library(rlist)
 library(kableExtra)
+library(mallet)
 ##words in topic
 topic_getwords <- function(mallet_df, n_topic =7, n_words = 500){
   topic.words <- mallet.topic.words(mallet_df, smoothed = T, normalized = T)
