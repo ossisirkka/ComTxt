@@ -3,6 +3,7 @@ library(kableExtra)
 
 geo_table <- function(df){
   tmp <- sort(table(df$city), decreasing = TRUE)
+  tmp <- data.frame(tmp)
   colnames(tmp) <- c("city", "freq")
   rownames(tmp) <- NULL
   tmp <- tmp[order(-tmp$freq),]
