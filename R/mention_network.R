@@ -5,7 +5,7 @@ library(RColorBrewer)
 library(dplyr)
 
 
-mention_network <- function(df, n_top = 50){
+mention_network <- function(df, top_n = 50){
 
   dd <- lapply(df$mentions_screen_name, data.frame)
   tmp <- list()
@@ -25,7 +25,7 @@ mention_network <- function(df, n_top = 50){
 
  hash_dfm <- dfm(df.network$communication)
 
- toptag <- names(topfeatures(hash_dfm, n_top)) # Most important mentions_screen_name; we dont want to plot every hashtag
+ toptag <- names(topfeatures(hash_dfm, top_n)) # Most important mentions_screen_name; we dont want to plot every hashtag
  tag_fcm <- fcm(hash_dfm) # Feature-occurance matrix which shows the network structure
  topgat_fcm <- fcm_select(tag_fcm, pattern = toptag) # Filter results so that we plot only 50 top mentions_screen_name
 

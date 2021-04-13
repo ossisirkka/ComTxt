@@ -20,7 +20,7 @@ mention_table <- function(df, top_n = 10){
 
   hash_dfm <- dfm(df.network$communication)
 
-  toptag <- topfeatures(hash_dfm, n_top)
+  toptag <- topfeatures(hash_dfm, top_n)
 
   print(kable(as.table(toptag), "simple", caption = paste("Top", top_n, "mention_id")))
 }

@@ -2,7 +2,7 @@
 \alias{topic word plot}
 \title{The word term plot for topics}
 \usage{
-topic_wordplot(mallet_df, k, num_words = 10)
+topic_wordplot(mallet_df, n_topic, num_words = 10)
 }
 \description{
 This function display word term plot of topics.
@@ -10,7 +10,7 @@ This function display word term plot of topics.
 \arguments{
   \item{mallet_df}{The model trained by get_topic function}
 
-  \item{k}{The numbers topics of model}
+  \item{n_topic}{The numbers topics of model}
 
   \item{num_words}{The number top terms. default 10}
 
@@ -20,7 +20,7 @@ This function display word term plot of topics.
 
 df_ pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stopwords_lang = "es")
 df_topics <- twitter_topic(df_pre, language = "es", n_topic = 7)
-topic_wordplot(df_topics, k, num_words = 10)
+topic_wordplot(df_topics, n_topic, num_words = 10)
 
 }
 \source{

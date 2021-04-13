@@ -2,7 +2,7 @@
 \alias{topic_radarmap}
 \title{Topic distribution by year}
 \usage{
-topic_radarmap(df ,mallet_df, k)
+topic_radarmap(df ,mallet_df, n_topic)
 }
 \description{
 This function display word term plot of topics.
@@ -12,7 +12,7 @@ This function display word term plot of topics.
 
   \item{mallet_df}{mallet topic model}
 
-  \item{k}{The numbers topics of model}
+  \item{n_topic}{The numbers topics of model}
 
 }
 
@@ -20,7 +20,7 @@ This function display word term plot of topics.
 
 df_pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stopwords_lang = "es")
 df_topics <- twitter_topic(df_pre, language = "es", n_topic = 7)
-topic_radarmap(df_pre ,df_topics, k =7)
+topic_radarmap(df_pre ,df_topics, n_topic =7)
 
 }
 \source{

@@ -5,10 +5,10 @@ library(mallet)
 library(rlist)
 library(ggrepel)
 #create function that accepts the lda model and num word to display
-topic_wordplot <- function(mallet_df, k, num_words = 10) {
+topic_wordplot <- function(mallet_df, n_topic, num_words = 10) {
   topic.words <- mallet.topic.words(mallet_df, smoothed = T, normalized = T)
   mallet_words_list <- list()
-  for (i in 1:as.numeric(k)) {
+  for (i in 1:as.numeric(n_topic)) {
     mallet_words_list[[i]] <- mallet.top.words(mallet_df, topic.words[i,], 100)
   }
   topic_mallet_list <- mallet_words_list
@@ -17,7 +17,7 @@ topic_wordplot <- function(mallet_df, k, num_words = 10) {
 
   ## top num_words words per topic
   sort <- list()
-  for(i in 1:k*2-1){
+  for(i in 1:n_topic*2-1){
     sort[[i]] <- c(i,i+1)
   }
   sort <- do.call(rbind,sort)
@@ -76,7 +76,7 @@ top_terms <- topics_tidy %>%
     mutate(row = row_number()) %>%
     ungroup()
   #create a title to pass to word_chart
-  title <- paste("Mallet Top",num_words  ,"Terms for", k, "Topics")
+  title <- paste("Mallet Top",num_words  ,"Terms for", n_topic, "Topics")
   #call the word_chart function you built in prep work
   word_chart(top_terms, top_terms$words, title)
 }

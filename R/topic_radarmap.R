@@ -5,14 +5,14 @@ library(ggplot2)
 library(scales)
 library(mallet)
 #create function that accepts the lda model and num word to display
-topic_radarmap <- function(df ,mallet_df, k) {
+topic_radarmap <- function(df ,mallet_df, n_topic) {
 
   doc.topics.m <- mallet.doc.topics(mallet_df, smoothed=T,
                                     normalized=T)
 
 
-  tmp_df <- df[rep(seq_len(nrow(df)), each = k), ]
-  #tmp_df$topic <- paste("Topic", rep(1:k,  nrow(df)))
+  tmp_df <- df[rep(seq_len(nrow(df)), each = n_topic), ]
+  #tmp_df$topic <- paste("Topic", rep(1:n_topic,  nrow(df)))
 
   tt <- list()
   for(i in 1:nrow(doc.topics.m)){
@@ -20,7 +20,7 @@ topic_radarmap <- function(df ,mallet_df, k) {
   }
 
   tmp_df$prob <- unlist(tt)
-  tmp_df$topic <- paste("Topic", rep(1:k,  nrow(df)))
+  tmp_df$topic <- paste("Topic", rep(1:n_topic,  nrow(df)))
   tmp_df$created_at <- format(as.Date(tmp_df$created_at), "%Y")
 
   year_prob <- aggregate(x = tmp_df$prob,                # Specify data column

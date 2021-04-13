@@ -5,7 +5,7 @@ library(RColorBrewer)
 library(dplyr)
 
 
-keyword_network <- function(df, keyword_remove, n_top = 40){
+keyword_network <- function(df, keyword_remove, top_n = 40){
 
   toks <- tokens(df$text, remove_punct = TRUE, remove_symbols = TRUE, verbose = TRUE)
   toks <- tokens_tolower(toks)
@@ -16,7 +16,7 @@ keyword_network <- function(df, keyword_remove, n_top = 40){
   fcmat <-quanteda::fcm(toks, context = "window", tri = FALSE)
 
   ##reduce only top words
-  feat <-  names(topfeatures(fcmat, n_top))
+  feat <-  names(topfeatures(fcmat, top_n))
 
   ##subset top 40 words
   fcm_1 <- fcm_select(fcmat, pattern = feat)
