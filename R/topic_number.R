@@ -17,7 +17,7 @@ library(gridExtra)
 #tmp <- tempfile()
 #writeLines(stopwords.text, tmp)
 
-topic_number <- function(df, maxN = 40){
+topic_number <- function(df){
   set.seed(123)
   matrix <- DocumentTermMatrix(Corpus(VectorSource(df$text)))
 
@@ -30,7 +30,7 @@ harmonicMean <- function(logLikelihoods, precision = 2000L) {
 
 ##  We will use a sequence of numbers from 2 to 100, stepped by one. Using the lapply function, we run the LDA function using all the values of k. To see how much time is needed to run the process on your system, use the system.time function.
 
-seqk <- seq(2, maxN, 1)
+seqk <- seq(2, 40, 1)
 
 burnin <- 4000 #1000
 iter <- 2000 #1000
@@ -81,7 +81,7 @@ a <- ggplot(data.frame(seqk, hm_total), aes(x = seqk, y = hm_total)) + geom_path
 #dtm_train = dtm_filter[rownames(dtm_filter) %in% train, ]
 #dtm_test = dtm_filter[!rownames(dtm_filter) %in% train, ]
 
-#perplexity = data.frame(k = 2:maxN, p=NA) #calculating perplexity for k 5:20
+#perplexity = data.frame(k = 2:40, p=NA) #calculating perplexity for k 5:20
 #for (k in perplexity$k) {
 #  message("k=", k)
 #  m = LDA(dtm_train, method = "Gibbs", k = k,  control = list(alpha = 5/k))
@@ -110,7 +110,7 @@ vocabulary <- tf$term[ tf$term_freq > 1 & tf$doc_freq < nrow(dtm) / 2 ]
 dtm = dtm
 
 
-k_list <- seq(1, maxN, by = 1)
+k_list <- seq(1, 40, by = 1)
 model_dir <- paste0("models_", digest::digest(vocabulary, algo = "sha1"))
 if (!dir.exists(model_dir)) dir.create(model_dir)
 model_list <- TmParallelApply(X = k_list, FUN = function(k){

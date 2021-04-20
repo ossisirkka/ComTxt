@@ -4,15 +4,48 @@ library(quanteda.textplots)
 library(shinydashboard)
 library(shiny)
 
+shiny_topic <- function(df){
+  require(shiny)
+  shinyApp(
+    ui = fluidPage(
+      sidebarLayout(
+        fluidPage(),
+        mainPanel(plotOutput("radartopic"))
+      )
+    ),
+    server = function(output) {
+      fcm_local <- reactive({
+        toks <- tokens(df$text, remove_punct = TRUE, remove_symbols = TRUE, verbose = TRUE)
+        toks <- tokens_tolower(toks)
+        toks <- tokens_remove(toks, padding = FALSE, min_nchar =3)
+
+        ## A feature co-occurrence matrix
+        fcmat <-quanteda::fcm(toks, context = "window", tri = FALSE)
+
+        ##selecting keywords inside fcmat
+        tmp <- fcmat[, as.character(input$sentiment_select)]
+        tmp <- convert(tmp, to = "data.frame")
+        colnames(tmp) <- c("nodes", "degree")
+        tmp <- tmp[tmp$degree > 0, ]
+        fcm_select(fcmat, pattern = c(tmp, as.character(input$sentiment_select)))
+      })
+
+      output$radartopic <- renderPlot(
+        textplot_network(fcm_local())
+      )
+    }
+  )
+}
+
 shiny_sentiment_semantic <-  function(df) {
   require(shiny)
   shinyApp(
     ui = fluidPage(
       sidebarLayout(
         sidebarPanel(selectInput("sentiment_select", "Sentiment category:",
-                                 c("Anger" = "Anger","Anticipation" = "Anticipation","Disgust" = "Disgust","Fear" = "Fear","Joy" = "Joy","Sadness" = "Sadness","Surprise" = "Surprise","Trust" = "Trust")),
+                                 c("Anger" = "Anger","Anticipation" = "Anticipation","Disgust" = "Disgust","Fear" = "Fear","Joy" = "Joy","Sadness" = "Sadness","Surprise" = "Surprise","Trust" = "Trust"))
                      #numericInput("top_n", "top token", 40, max = 200, min = 10 )
-                     actionButton("semantic", "Semantic network Analysis", class = "btn-primary")),
+                    ),
         mainPanel(plotOutput("setsemanPlot"))
       )
     ),

@@ -2,7 +2,7 @@
 \alias{Mallet Topic Modelling}
 \title{The Matrix of Words and Weight for Topics}
 \usage{
-topic_number(df, maxN)
+topic_number(df)
 }
 \description{
 This function retrive the best topic modelling K by HarmonicMean, Coherenc, and perplexity score
@@ -10,7 +10,6 @@ the algorithm will calculate a  HarmonicMean, Coherenc, and perplexity score sco
 }
 \arguments{
   \item{df}{The preprocessed twitter data}
-   \item{df}{The preprocessed twitter data}
 }
 
 \examples{
