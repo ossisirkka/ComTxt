@@ -119,7 +119,7 @@ model_list <- TmParallelApply(X = k_list, FUN = function(k){
   filename = file.path(model_dir, paste0(k, "_topics.rda"))
 
   if (!file.exists(filename)) {
-    m <- FitLdaModel(dtm = dtm, k = k, iterations = iter)
+    m <- FitLdaModel(dtm = dtm, k = k, iterations = 200)
     m$k <- k
     m$coherence <- CalcProbCoherence(phi = m$phi, dtm = dtm, M = 5)
     save(m, file = filename)
