@@ -22,3 +22,7 @@ list_tweets[1][[1]]$includes$users$name <-str_replace(list_tweets[1][[1]]$includ
 list_tweets[1][[1]]$includes$users$username <-str_replace(list_tweets[1][[1]]$includes$users$username , ".....$", "***")
 
 save(list_tweets, file = "data/list_tweets.rda")
+
+
+colnames(NRC_Emotion_Lexicon)[colnames(NRC_Emotion_Lexicon) == 'en...22'] <- 'en'
+save(NRC_Emotion_Lexicon, file = "data/NRC_Emotion_Lexicon.rda")
