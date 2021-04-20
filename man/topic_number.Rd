@@ -1,5 +1,5 @@
-\name{topic_words}
-\alias{Mallet Topic Modelling}
+\name{topic_number}
+\alias{topic_number}
 \title{The Matrix of Words and Weight for Topics}
 \usage{
 topic_number(df)

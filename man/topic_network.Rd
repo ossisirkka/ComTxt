@@ -1,5 +1,5 @@
 \name{topic_network}
-\alias{Mallet Topic Modelling}
+\alias{topic_network}
 \title{The network plot of topic model}
 \usage{
 topic_network(mallet_df, n_nodes, igraph_semantic_label)

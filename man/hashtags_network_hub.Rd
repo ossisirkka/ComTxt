@@ -1,5 +1,5 @@
 \name{hashtags_network_hub}
-\alias{hashtags Semantic network hub}
+\alias{hashtags_network_hub}
 \title{hashtags Semantic network hub}
 \usage{
 hashtags_network_hub(df, hub, top_n = 40)

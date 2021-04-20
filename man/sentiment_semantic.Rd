@@ -1,5 +1,5 @@
 \name{sentiment_semantic}
-\alias{Semantic network for sentiment words}
+\alias{sentiment_semantic}
 \title{Semantic network for sentiment words}
 \usage{
 sentiment_semantic(sentiment_df, select = "anticipation", n_nodes = 200)

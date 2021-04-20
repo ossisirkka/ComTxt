@@ -1,5 +1,5 @@
-\name{topic_words}
-\alias{Mallet Topic Modelling}
+\name{topic_getwords}
+\alias{topic_getwords}
 \title{The Matrix of Words and Weight for Topics}
 \usage{
 topic_getwords(mallet_df, n_topic, n_words)

@@ -1,5 +1,5 @@
 \name{twitter_sentiment}
-\alias{Sentiment Analysis}
+\alias{twitter_sentiment}
 \title{NRC sentiment analysis}
 \usage{
 twitter_sentiment(df, language, undesirable_words)

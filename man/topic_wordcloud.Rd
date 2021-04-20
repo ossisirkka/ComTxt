@@ -1,5 +1,5 @@
 \name{topic_wordcloud}
-\alias{Mallet Topic Modelling}
+\alias{topic_wordcloud}
 \title{The wordcloud plot for topics}
 \usage{
 topic_wordcloud(mallet_df, par_row, par_col, n_topic, maximum_n, cloud_scale )

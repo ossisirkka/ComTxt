@@ -1,5 +1,5 @@
 \name{keyword_network_hub}
-\alias{keywords Semantic network hub}
+\alias{keyword_network_hub}
 \title{Keywords Semantic network hub}
 \usage{
 keyword_network_hub(df, hub, top_n)

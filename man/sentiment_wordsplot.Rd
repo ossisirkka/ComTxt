@@ -1,5 +1,5 @@
-\name{words_sentiment}
-\alias{Sentiment Words Plot}
+\name{sentiment_wordsplot}
+\alias{sentiment_wordsplot}
 \title{Sentiment Words plot}
 \usage{
 sentiment_wordsplot(sentiment_df)

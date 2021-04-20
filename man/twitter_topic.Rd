@@ -1,5 +1,5 @@
 \name{get_topic}
-\alias{Mallet Topic Modelling}
+\alias{get_topic}
 \title{Mallet Topic Modelling On Twitter Data}
 \usage{
 twitter_topic(df, n_topic)

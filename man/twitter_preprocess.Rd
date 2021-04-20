@@ -1,5 +1,5 @@
 \name{twitter_preprocess}
-\alias{preprocess textual data}
+\alias{twitter_preprocess}
 \title{Preprocess Twitter textual data}
 \usage{
 twitter_preprocess(df, ud_lang, stopwords_lang)

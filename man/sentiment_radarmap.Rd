@@ -1,5 +1,5 @@
 \name{sentiment_radarmap}
-\alias{Sentiment Analysis}
+\alias{sentiment_radarmap}
 \title{NRC sentiment analysis radarmap}
 \usage{
 sentiment_radarmap(sentiment_df)

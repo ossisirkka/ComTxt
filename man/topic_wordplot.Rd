@@ -1,5 +1,5 @@
 \name{topic_wordplot}
-\alias{topic word plot}
+\alias{topic_wordplot}
 \title{The word term plot for topics}
 \usage{
 topic_wordplot(mallet_df, n_topic, num_words = 10)

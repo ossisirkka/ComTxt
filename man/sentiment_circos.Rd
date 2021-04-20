@@ -1,5 +1,5 @@
-\name{sentiment_wordsplot}
-\alias{Sentiment Analysis}
+\name{sentiment_circos}
+\alias{sentiment_circos}
 \title{NRC sentiment analysis wordsplot}
 \usage{
 sentiment_circos(sentiment_df)

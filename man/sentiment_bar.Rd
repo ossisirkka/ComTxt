@@ -1,5 +1,5 @@
 \name{sentiment_bar}
-\alias{Sentiment Analysis}
+\alias{sentiment_bar}
 \title{NRC sentiment analysis bar plot}
 \usage{
 sentiment_bar(sentiment_df, by)
