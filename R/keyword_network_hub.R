@@ -5,9 +5,9 @@ library(quanteda)
 library(RColorBrewer)
 library(dplyr)
 
-keyword_network_hub <- function(df, hub, n_top){
-  df$text <- gsub("@\\w*", "", df$text)
-  df$text <- gsub("#\\w*", "", df$text)
+keyword_network_hub <- function(df, hub, top_n){
+  #df$text <- gsub("@\\w*", "", df$text)
+  #df$text <- gsub("#\\w*", "", df$text)
 
   toks <- tokens(df$text, remove_punct = TRUE, remove_symbols = TRUE, verbose = TRUE)
   toks <- tokens_tolower(toks)
@@ -30,7 +30,7 @@ keyword_network_hub <- function(df, hub, n_top){
   fcm_local <- fcm_remove(fcm_local, high_nodes)
 
   ##reduce only top words
-  feat <-  names(topfeatures(fcm_local, n_top))
+  feat <-  names(topfeatures(fcm_local, top_n))
 
   ##subset top 40 words
   fcm_local <- fcm_select(fcm_local, pattern = feat)

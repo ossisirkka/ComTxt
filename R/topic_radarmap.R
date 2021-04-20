@@ -4,6 +4,7 @@ library(tidytext)
 library(ggplot2)
 library(scales)
 library(mallet)
+library(radarchart)
 #create function that accepts the lda model and num word to display
 topic_radarmap <- function(df ,mallet_df, n_topic) {
 
