@@ -20,9 +20,9 @@ shiny_keyword <- function(df){
         textInput("hub", "Hub Keyword", "libro")),
         mainPanel(
           tabsetPanel(type = "tabs",
-                      tabPanel("Keyword Network", jqui_resizable(plotOutput("keyword_Network"))),
+                      tabPanel("Keyword Network", plotOutput("keyword_Network")),
                       tabPanel("Keyword table", reactableOutput("keyword_table")),
-                      tabPanel("Keyword hub Network", jqui_resizable(plotOutput("keyword_hub")))
+                      tabPanel("Keyword hub Network", plotOutput("keyword_hub"))
           )
         )
       )
