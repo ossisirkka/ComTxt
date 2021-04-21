@@ -9,6 +9,6 @@ Description: This packages is for text preprocessing and computational text anal
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-Imports: udpipe, dplyr, mallet, stopwords, quanteda, tidytext, tidyr, widyr, textdata, scales, RColorBrewer, wordcloud, rlist, kableExtra, igraph, ggplot2, ggrepel, gridExtra, knitr, formattable, circlize, memery, magick, yarrr, radarchart, igraph, ggraph, SparseM, lava, RTextTools, tm, slam, topicmodels, Rmpfr, grid, textmineR, purrr, maps, shinyjqui 
+Imports: udpipe, mallet, tidytext,  widyr, textdata, RColorBrewer, wordcloud, rlist, kableExtra, ggrepel, gridExtra, knitr, formattable, circlize, memery, magick, yarrr, radarchart, ggraph, SparseM, lava, RTextTools, tm, slam, Rmpfr, grid, textmineR, shinyjqui 
 Depends: 
     R (>= 2.10)
