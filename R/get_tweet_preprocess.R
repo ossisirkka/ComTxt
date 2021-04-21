@@ -17,8 +17,10 @@ get_tweet_preprocess <- function(list){
   }
   tmp$in_reply_to_user_id <- in_reply_to_user_id
 
-  tmp$geo_coord <- x$data$geo$coordinates$coordinates
+  tmp$geo_coords <- x$data$geo$coordinates$coordinates
+  tmp$place_id <- x$data$geo$place_id
   tmp$context_annotations <- x$data$context_annotations
+
   tmp <- cbind(tmp, x$data$public_metrics)
   tmp.1 <- list()
   for (i in 1:nrow(x$data)){
@@ -94,6 +96,11 @@ get_tweet_preprocess <- function(list){
   }
   tmp.2 <- do.call(rbind.data.frame, tmp.2)
   tmp$profile_url <- tmp.2
+
+  names(x$includes$places)[names(x$includes$places) == "id"] <- "place_id"
+  x$includes$places <- subset(x$includes$places, select = -geo )
+  tmp <- left_join(tmp, x$includes$places, by = "place_id")
+
   tmp
 })
 
@@ -102,25 +109,26 @@ colnames(df_tweets)[colnames(df_tweets) == 'id'] <- 'status_id'
 colnames(df_tweets)[colnames(df_tweets) == "author_id"] <- 'user_id'
 colnames(df_tweets)[colnames(df_tweets) == "following_count"] <- 'friends_count'
 colnames(df_tweets)[colnames(df_tweets) == "tweet_count"] <- 'statuses_count'
+colnames(df_tweets)[colnames(df_tweets) == "name.y"] <- 'city_name'
+colnames(df_tweets)[colnames(df_tweets) == "name.x"] <- 'name'
 
-## until Here ---------
 geom <- list()
 for(i in 1:nrow(df_tweets)){
-  if(length(df_tweets$geo_coord[[i]]) < 1){
-    df_tweets$geo_coord[[i]] <- c(NA, NA)
+  if(length(df_tweets$geo_coords[[i]]) < 1){
+    df_tweets$geo_coords[[i]] <- c(NA, NA)
   }
-  geom[[i]]<- c(df_tweets$geo_coord[[i]][[2]], df_tweets$geo_coord[[i]][[1]] )
+  geom[[i]]<- c(df_tweets$geo_coords[[i]][[2]], df_tweets$geo_coords[[i]][[1]] )
 }
 
 df_tweets <-
   df_tweets %>%
-  mutate(geo_coord = geom)
+  mutate(geo_coords = geom)
 
 col_order <- c("user_id", "status_id", "created_at","screen_name", "text",
                "source", "conversation_id", "in_reply_to_user_id",
                "mentions_screen_name","retweet_count","reply_count", "like_count",
                "quote_count","hashtags","url_t.co", "url_extended_url","lang",
-               "geo_coord","context_annotations","name","location", "description",
+               "geo_coords","place_id", "place_type","full_name", "country", "city_name" , "country_code" , "context_annotations","name","location", "description",
                "followers_count","friends_count", "statuses_count",
                "listed_count", "account_created_at","verified",
                "profile_image_url", "profile_url")
