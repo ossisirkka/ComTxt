@@ -5,6 +5,8 @@ library(shinydashboard)
 library(shiny)
 library(reactable)
 library(shinyjqui)
+library(shinyalert)
+
 
 shiny_keyword <- function(df){
   require(shiny)
@@ -15,7 +17,7 @@ shiny_keyword <- function(df){
         sidebarPanel(
         sliderInput("top_n", "Bins", 5, 200, 20),
         textInput("keyword", "Keyword", "cultura"),
-        textInput("hub", "Hub Keyword", "culture")),
+        textInput("hub", "Hub Keyword", "libro")),
         mainPanel(
           tabsetPanel(type = "tabs",
                       tabPanel("Keyword Network", jqui_resizable(plotOutput("keyword_Network"))),
@@ -79,11 +81,9 @@ shiny_keyword <- function(df){
         toks <- tokens_tolower(toks)
         toks <- tokens_remove(toks, padding = FALSE, min_nchar =3)
 
-
-        ## A feature co-occurrence matrix
         fcmat <-quanteda::fcm(toks, context = "window", tri = FALSE)
 
-        ##selecting keywords inside fcmat
+          ##selecting keywords inside fcmat
         tmp <- fcmat[, input$hub]
         tmp <- convert(tmp, to = "data.frame")
         colnames(tmp) <- c("nodes", "degree")
@@ -99,15 +99,16 @@ shiny_keyword <- function(df){
         feat <-  names(topfeatures(fcm_local, input$top_n))
 
         ##subset top 40 words
-        fcm_select(fcm_local, pattern = feat)
+        fcm_hub <- fcm_select(fcm_local, pattern = feat)
 
+        fcm_hub
       })
 
       output$keyword_hub <- renderPlot(
+
         textplot_network(fcm_hub(), min_freq = 1, edge_color = "grey",vertex_color ="#538797"), height = 800, width = 1000 )
+}
 
-
-    }
   )
 }
 
