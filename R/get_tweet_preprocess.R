@@ -4,7 +4,7 @@ library(purrr)
 library(dplyr)
 library(maps)
 
-get_tweet_preprocess <- function(list){
+get_tweet_preprocess <- function(list, location_country = "spain"){
 
 
   tweets_list_clean <- lapply(list, function(x){
@@ -19,7 +19,12 @@ get_tweet_preprocess <- function(list){
   }
   tmp$in_reply_to_user_id <- in_reply_to_user_id
 
-  tmp$geo_coords <- x$data$geo$coordinates$coordinates
+  tmp$geo_coords <- if(length(x$data$geo$coordinates$coordinates)!=0){
+    x$data$geo$coordinates$coordinates
+  }else{
+    list(NULL)
+  }
+
   tmp$place_id <- x$data$geo$place_id
   tmp$context_annotations <- x$data$context_annotations
 
@@ -103,39 +108,58 @@ get_tweet_preprocess <- function(list){
   x$includes$places <- subset(x$includes$places, select = -geo )
   tmp <- left_join(tmp, x$includes$places, by = "place_id")
 
+  colnames(tmp)[colnames(tmp) == 'id'] <- 'status_id'
+  colnames(tmp)[colnames(tmp) == "author_id"] <- 'user_id'
+  colnames(tmp)[colnames(tmp) == "following_count"] <- 'friends_count'
+  colnames(tmp)[colnames(tmp) == "tweet_count"] <- 'statuses_count'
+  colnames(tmp)[colnames(tmp) == "name.y"] <- 'city'
+  colnames(tmp)[colnames(tmp) == "name.x"] <- 'name'
+
+  col_order <- c("user_id", "status_id", "created_at","screen_name", "text",
+                 "source", "conversation_id", "in_reply_to_user_id",
+                 "mentions_screen_name","retweet_count","reply_count", "like_count",
+                 "quote_count","hashtags","url_t.co", "url_extended_url","lang",
+                 "geo_coords","place_id", "place_type","full_name", "country", "city" , "country_code" , "context_annotations","name","location", "description",
+                 "followers_count","friends_count", "statuses_count",
+                 "listed_count", "account_created_at","verified",
+                 "profile_image_url", "profile_url")
+  tmp <- tmp[col_order]
+
+  tmp <- tmp[, col_order]
+
   tmp
 })
 
 df_tweets <- do.call(rbind.data.frame, tweets_list_clean)
-colnames(df_tweets)[colnames(df_tweets) == 'id'] <- 'status_id'
-colnames(df_tweets)[colnames(df_tweets) == "author_id"] <- 'user_id'
-colnames(df_tweets)[colnames(df_tweets) == "following_count"] <- 'friends_count'
-colnames(df_tweets)[colnames(df_tweets) == "tweet_count"] <- 'statuses_count'
-colnames(df_tweets)[colnames(df_tweets) == "name.y"] <- 'city_name'
-colnames(df_tweets)[colnames(df_tweets) == "name.x"] <- 'name'
 
-geom <- list()
+#geom <- list()
+#for(i in 1:nrow(df_tweets)){
+#  if(length(df_tweets$geo_coords[[i]]) < 1){
+#    df_tweets$geo_coords[[i]] <- c(NA, NA)
+#  }
+#  geom[[i]]<- c(df_tweets$geo_coords[[i]][[2]], df_tweets$geo_coords[[i]][[1]] )
+#}
+
+#df_tweets <-
+#  df_tweets %>%
+#  mutate(geo_coords = geom)
+
+## now lets find the cities cities
+
+world.cities$country.etc <- tolower(world.cities$country.etc)
+city_df <- world.cities[world.cities$country.etc == location_country, ]
+
 for(i in 1:nrow(df_tweets)){
-  if(length(df_tweets$geo_coords[[i]]) < 1){
-    df_tweets$geo_coords[[i]] <- c(NA, NA)
+  if(nrow(city_df[city_df$name == df_tweets$city[i],])==1){
+    df_tweets$lat[[i]] <- city_df[city_df$name == df_tweets$city[i],]$lat
+    df_tweets$lng[[i]] <- city_df[city_df$name == df_tweets$city[i],]$long
   }
-  geom[[i]]<- c(df_tweets$geo_coords[[i]][[2]], df_tweets$geo_coords[[i]][[1]] )
+  if(nrow(city_df[city_df$name == df_tweets$city[i],])==0) {
+    df_tweets$lat[[i]] <- NA
+    df_tweets$lng[[i]] <- NA
+  }
 }
 
-df_tweets <-
-  df_tweets %>%
-  mutate(geo_coords = geom)
-
-col_order <- c("user_id", "status_id", "created_at","screen_name", "text",
-               "source", "conversation_id", "in_reply_to_user_id",
-               "mentions_screen_name","retweet_count","reply_count", "like_count",
-               "quote_count","hashtags","url_t.co", "url_extended_url","lang",
-               "geo_coords","place_id", "place_type","full_name", "country", "city_name" , "country_code" , "context_annotations","name","location", "description",
-               "followers_count","friends_count", "statuses_count",
-               "listed_count", "account_created_at","verified",
-               "profile_image_url", "profile_url")
-df_tweets <- df_tweets[, col_order]
-df_tweets
 return(df_tweets)
 }
 

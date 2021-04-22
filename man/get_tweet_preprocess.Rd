@@ -2,14 +2,14 @@
 \alias{get_tweet_preprocess}
 \title{Preprocess get_tweet function list frame}
 \usage{
-get_tweet_preprocess(list)
+get_tweet_preprocess(list, location_country)
 }
 \description{
 This function preprocess unstructured tweets list data to data frame
 }
 \arguments{
   \item{list}{list of tweets data from get_tweet function}
-
+  \item{location_country}{your country name in lowercase}
 }
 
 \examples{
@@ -25,6 +25,6 @@ for(i in seq_len(nrow(dates))){
   print(paste0("Going through row ", i))
 }
 
-df_tweets <- get_tweet_preprocess(tweets_list)
+df_tweets <- get_tweet_preprocess(tweets_list, location_country = "spain")
 
 }

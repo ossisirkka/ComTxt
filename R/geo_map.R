@@ -22,6 +22,7 @@ geo_map <- function(df, location_country){
 
 par(mar = c(0, 0, 0, 0))
 maps::map('world', as.character(location_country))
+maps::map('world', as.character(location_country))
 title(paste("tweets in", location_country))
 points(df$lng, df$lat, pch = 20, cex = 1, col = rgb(0, .3, .7, .75))
 }

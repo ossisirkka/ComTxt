@@ -194,8 +194,6 @@ geo_preprocess <- function(df, location_country,  multi_name){
   ## add lat lang from geo_coord
   df <- cbind(df, geo[,1:2])
 
-  world.cities$country.etc <- tolower(world.cities$country.etc)
-
   city_df <- world.cities[world.cities$country.etc == location_country, ]
   city_df$name <- tolower(city_df$name)
 
