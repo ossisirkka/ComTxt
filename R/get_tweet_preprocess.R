@@ -145,7 +145,7 @@ df_tweets <- do.call(rbind.data.frame, tweets_list_clean)
 #  mutate(geo_coords = geom)
 
 ## now lets find the cities cities
-
+df_tweets$city <- iconv(df_tweets$city,from="UTF-8",to="ASCII//TRANSLIT")
 world.cities$country.etc <- tolower(world.cities$country.etc)
 city_df <- world.cities[world.cities$country.etc == location_country, ]
 
@@ -160,6 +160,20 @@ for(i in 1:nrow(df_tweets)){
   }
 }
 
+for(i in 1:nrow(df_tweets)){
+ if(is.na(df_tweets$lat[i])==TRUE){
+   if(length(df_tweets$geo_coords[[i]][[2]])==0){
+     df_tweets$lat[[i]] <- NA
+     df_tweets$lng[[i]] <-NA
+   }else{
+  df_tweets$lat[[i]] <- df_tweets$geo_coords[[i]][[2]]
+  df_tweets$lng[[i]] <- df_tweets$geo_coords[[i]][[1]]
+  }
+ }else{
+   df_tweets$lat[[i]] <- df_tweets$lat[[i]]
+   df_tweets$lng[[i]] <- df_tweets$lng[[i]]
+ }
+}
 return(df_tweets)
 }
 

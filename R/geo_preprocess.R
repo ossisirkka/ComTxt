@@ -152,24 +152,24 @@ geo_preprocess <- function(df, location_country,  multi_name){
   location_df[,2] <- gsub("^\\s+|\\s+$", "", location_df[,2])##deleting space
 
   ##geocode selecting
-  geo <- list()
-  for(i in 1:length(df$location)){
-    if(is.na(df$geo_coords[[i]][[1]])){
-      geo[[i]] <- list(lat = NA, lng = NA)
-    } else {
-      geo[[i]] <- list(lat = df$geo_coords[[i]][[1]], lng = df$geo_coords[[i]][[2]], country = location_country)
-    }
-  }
-  geo <- reduce(geo, bind_rows)
+  #geo <- list()
+  #for(i in 1:length(df$location)){
+  # if(is.na(df$geo_coords[[i]][[1]])){
+  #    geo[[i]] <- list(lat = NA, lng = NA)
+  #  } else {
+  #   geo[[i]] <- list(lat = df$geo_coords[[i]][[1]], lng = df$geo_coords[[i]][[2]], country = location_country)
+  # }
+  #}
+  #geo <- reduce(geo, bind_rows)
 
   ##location_df :combining loctaion_df and location tmp
-  location_df <- cbind(location_df, geo[,3])
+  #location_df <- cbind(location_df, geo[,3])
 
-  for(i in 1:nrow(location_df)){
-    if (is.na(location_df[[i,3]]) == FALSE){
-      location_df[[i,2]] <- as.character(location_df[[i,3]])
-    }
-  }
+  #for(i in 1:nrow(location_df)){
+  #  if (is.na(location_df[[i,3]]) == FALSE){
+  #   location_df[[i,2]] <- as.character(location_df[[i,3]])
+  # }
+  #}
 
   location_df <- location_df[,1:2]
 
@@ -211,6 +211,20 @@ geo_preprocess <- function(df, location_country,  multi_name){
 
   df <- df[which(df$country == location_country),]
 
+  for(i in 1:nrow(df)){
+    if(is.na(df$lat[i])==TRUE){
+      if(is.na(df$geo_coords[[i]][[2]])==TRUE){
+        df$lat[[i]] <- NA
+        df$lng[[i]] <-NA
+      }else{
+        df$lat[[i]] <- df$geo_coords[[i]][[1]]
+        df_tweets$lng[[i]] <- df$geo_coords[[i]][[2]]
+      }
+    }else{
+      df$lat[[i]] <- df$lat[[i]]
+      df$lng[[i]] <- df$lng[[i]]
+    }
+  }
 
   return(df)
 }
