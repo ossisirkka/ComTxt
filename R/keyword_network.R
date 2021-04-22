@@ -1,6 +1,7 @@
 ## Semantic network
 
 library(quanteda)
+library(quanteda.textplots)
 library(RColorBrewer)
 library(dplyr)
 
@@ -22,7 +23,7 @@ keyword_network <- function(df, keyword_remove, top_n = 40){
   fcm_1 <- fcm_select(fcmat, pattern = feat)
   fcm_1 <- fcm_remove(fcm_1, keyword_remove)
   ##draw semantic network plot
-  quanteda::textplot_network(fcm_1, min_freq = 1, edge_color = "grey",vertex_color ="#538797")
+  quanteda.textplots::textplot_network(fcm_1, min_freq = 1, edge_color = "grey",vertex_color ="#538797")
 }
 
 

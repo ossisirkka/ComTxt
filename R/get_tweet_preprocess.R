@@ -5,6 +5,8 @@ library(dplyr)
 library(maps)
 
 get_tweet_preprocess <- function(list){
+
+
   tweets_list_clean <- lapply(list, function(x){
   ##from x$data
   selec_col <- c("created_at","id","text","lang","author_id", "source","conversation_id")
@@ -24,7 +26,7 @@ get_tweet_preprocess <- function(list){
   tmp <- cbind(tmp, x$data$public_metrics)
   tmp.1 <- list()
   for (i in 1:nrow(x$data)){
-    url_t.co <- x$data$entities$urls[[i]][[3]]
+    url_t.co <- x$data$entities$urls[[i]][["url"]]
     if(length(url_t.co)==0){
       url_t.co <- NA
     } else {
@@ -33,42 +35,42 @@ get_tweet_preprocess <- function(list){
     tmp.1[[i]] <- url_t.co
   }
   tmp$url_t.co <- tmp.1
-  tmp.1 <- list()
-  for (i in 1:nrow(x$data)){
-    url_extended_url<- x$data$entities$urls[[i]][[4]]
+  tmp.2 <- list()
+  for (j in 1:nrow(x$data)){
+    url_extended_url<- x$data$entities$urls[[j]][["expanded_url"]]
     if(length(url_extended_url)==0){
       url_extended_url <- NA
     } else {
       url_extended_url <- url_extended_url
     }
-    tmp.1[[i]] <- url_extended_url
+    tmp.2[[j]] <- url_extended_url
   }
-  tmp$url_extended_url <- tmp.1
+  tmp$url_extended_url <- tmp.2
 
-  tmp.1 <- list()
-  for (i in 1:nrow(x$data)){
-    hashtags <- x$data$entities$hashtags[[i]][[3]]
+  tmp.3 <- list()
+  for (k in 1:nrow(x$data)){
+    hashtags <- x$data$entities$hashtags[[k]][["tag"]]
     if(length(hashtags) == 0){
       hashtags <- NA
     } else{
       hashtags <- hashtags
     }
-    tmp.1[[i]] <- hashtags
+    tmp.3[[k]] <- hashtags
   }
-  tmp$hashtags <- tmp.1
+  tmp$hashtags <- tmp.3
 
-  tmp.1 <- list()
-  for (i in 1:nrow(x$data)){
-    mentions_screen_name <- x$data$entities$mentions[[i]][[3]]
+  tmp.4 <- list()
+  for (n in 1:nrow(x$data)){
+    mentions_screen_name <- x$data$entities$mentions[[n]][["username"]]
     if(length(mentions_screen_name)==0){
       mentions_screen_name <- NA
     }  else {
       mentions_screen_name <- mentions_screen_name
     }
-    tmp.1[[i]] <- mentions_screen_name
+    tmp.4[[n]] <- mentions_screen_name
   }
 
-  tmp$mentions_screen_name <- tmp.1
+  tmp$mentions_screen_name <- tmp.4
   ## from user data
 
   names(x$includes$users)[names(x$includes$users) == "id"] <- "author_id"
@@ -84,18 +86,18 @@ get_tweet_preprocess <- function(list){
   tmp$profile_image_url <-df$profile_image_url
   tmp$account_created_at <-df$created_at.y
 
-  tmp.2 <- list()
-  for (i in 1:length(df$entities.y$url$urls)){
-    profile_url <- df$entities.y$url$urls[[1]][[4]]
+  tmp.5 <- list()
+  for (m in 1:length(df$entities.y$url$urls)){
+    profile_url <- df$entities.y$url$urls[[m]][["url"]]
     if(length(profile_url)==0){
       profile_url <- NA
     } else {
       profile_url <- profile_url
     }
-    tmp.2[[i]] <- data.frame(profile_url)
+    tmp.5[[m]] <- data.frame(profile_url)
   }
-  tmp.2 <- do.call(rbind.data.frame, tmp.2)
-  tmp$profile_url <- tmp.2
+  tmp.5 <- do.call(rbind.data.frame, tmp.5)
+  tmp$profile_url <- tmp.5
 
   names(x$includes$places)[names(x$includes$places) == "id"] <- "place_id"
   x$includes$places <- subset(x$includes$places, select = -geo )

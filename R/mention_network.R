@@ -30,7 +30,7 @@ mention_network <- function(df, top_n = 50){
  topgat_fcm <- fcm_select(tag_fcm, pattern = toptag) # Filter results so that we plot only 50 top mentions_screen_name
 
  ##draw semantic network plot
- quanteda::textplot_network(topgat_fcm, min_freq = 1, edge_color = "grey",vertex_color ="#538797")
+ quanteda.textplots::textplot_network(topgat_fcm, min_freq = 1, edge_color = "grey",vertex_color ="#538797")
 }
 
 
