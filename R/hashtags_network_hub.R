@@ -33,7 +33,7 @@ hashtags_network_hub <- function(df, hub, n_top = 40){
   fcm_local <- fcm_select(fcmat, pattern = c(tmp, hub))
 
   ##text plot
-  quanteda::textplot_network(fcm_local, min_freq = 0.1, edge_color = "grey",vertex_color ="#538797")
+  quanteda.textplots::textplot_network(fcm_local, min_freq = 0.1, edge_color = "grey",vertex_color ="#538797")
 }
 
 

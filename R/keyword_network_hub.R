@@ -35,7 +35,7 @@ keyword_network_hub <- function(df, hub, top_n){
   ##subset top 40 words
   fcm_local <- fcm_select(fcm_local, pattern = feat)
   ##text plot
-  quanteda::textplot_network(fcm_local, min_freq = 0.1, edge_color = "grey",vertex_color ="#538797")
+  quanteda.textplots::textplot_network(fcm_local, min_freq = 0.1, edge_color = "grey",vertex_color ="#538797")
 }
 
 

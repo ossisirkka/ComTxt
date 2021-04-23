@@ -2,7 +2,7 @@
 \alias{twitter_preprocess}
 \title{Preprocess Twitter textual data}
 \usage{
-twitter_preprocess(df, ud_lang, stopwords_lang)
+twitter_preprocess(df, ud_lang, stop_words)
 }
 \description{
 This function retrives lemma version of text data.
@@ -44,14 +44,11 @@ This function retrives lemma version of text data.
                           "telugu-mtg", "turkish-imst", "ukrainian-iu", "upper_sorbian-ufal",
                           "urdu-udtb", "uyghur-udt", "vietnamese-vtb", "wolof-wtb"}
 
-  \item{stopwords_lang}{"af" "ar" "hy" "eu" "bn" "br" "bg" "ca" "zh" "hr" "cs" "da" "nl" "en" "eo" "et" "fi"
- "fr" "gl" "de" "el" "ha" "he" "hi" "hu" "id" "ga" "it" "ja" "ko" "ku" "la" "lt" "lv"
- "ms" "mr" "no" "fa" "pl" "pt" "ro" "ru" "sk" "sl" "so" "st" "es" "sw" "sv" "th" "tl"
-"tr" "uk" "ur" "vi" "yo" "zu"}
+  \item{stop_words}{the stopwords data}
 
 }
 \examples{
-df_ pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stopwords_lang = "es")
+df_ pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stop_words)
 
 }
 \source{

@@ -3,7 +3,8 @@ library(dplyr)
 library(purrr)
 library(dplyr)
 
-twitter_preprocess <- function(df, ud_lang, stopwords_lang){
+
+twitter_preprocess <- function(df, ud_lang, stop_words){
 
   tmp <- data.frame(doc_id = df$status_id, text = df$text, stringsAsFactors = FALSE)
   tmp$text <- tolower(tmp$text)
@@ -20,7 +21,7 @@ twitter_preprocess <- function(df, ud_lang, stopwords_lang){
   tmp_1 <- tmp_1 %>%
       select(doc_id, lemma, upos)
 
-  stop_words <- c(stopwords::stopwords(stopwords_lang, source = "stopwords-iso"),stopwords::stopwords(source = "smart"))
+
 
   tmp_1 <- tmp_1[!(tmp_1$lemma %in% stop_words),]
   tmp_1 <- tmp_1[complete.cases(tmp_1),]

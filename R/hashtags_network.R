@@ -19,7 +19,7 @@ hashtags_network <- function(df, hashtag_remove = "#cultura", top_n = 40){
   topgat_fcm <- fcm_select(tag_fcm, pattern = toptag) # Filter results so that we plot only 50 top hashtags
 
   ##draw semantic network plot
-  quanteda::textplot_network(topgat_fcm, min_freq = 1, edge_color = "grey",vertex_color ="#538797")
+  quanteda.textplots::textplot_network(topgat_fcm, min_freq = 1, edge_color = "grey",vertex_color ="#538797")
 }
 
 
