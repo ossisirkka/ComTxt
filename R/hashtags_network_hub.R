@@ -36,8 +36,7 @@ hashtags_network_hub <- function(df, hub, top_n = 40){
   ##reduce only top words
   feat <-  names(topfeatures(fcm_local, top_n))
 
-  fcm_local <- fcm_select(fcmat, pattern = c(tmp, hub))
-
+  fcm_local <- fcm_select(fcm_local, pattern = feat)
   ##text plot
   quanteda.textplots::textplot_network(fcm_local, min_freq = 0.1, edge_color = "grey",vertex_color ="#538797")
 }
