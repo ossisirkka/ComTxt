@@ -11,6 +11,7 @@ hashtags_network <- function(df, hashtag_remove = "#cultura", top_n = 40){
     df$hashtags[[i]] <- tolower(paste(paste0("#", df$hashtags[[i]]), collapse = " "))
   }
   df$hashtags <- gsub("#na", NA, df$hashtags)
+  df$hashtags <- iconv(df$hashtags,from="UTF-8",to="ASCII//TRANSLIT")
   df <- df[!is.na(df$hashtags),]
   hash_dfm <- dfm(df$hashtags)
   hash_dfm <- dfm_remove(hash_dfm, hashtag_remove)# Document-feature matrix

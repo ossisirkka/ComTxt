@@ -18,7 +18,7 @@ shiny_mention <- function(df){
           tabsetPanel(type = "tabs",
                       tabPanel("user table", reactableOutput("user_table", width = "1000px", height = "auto")),
                       tabPanel("mention table", reactableOutput("mention_table")),
-                      tabPanel("mention hub Network", jqui_resizable(plotOutput("mention_network")))
+                      tabPanel("mention Network", jqui_resizable(plotOutput("mention_network")))
           )
         )
       )
