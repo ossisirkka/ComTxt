@@ -1,8 +1,8 @@
 
 library(RColorBrewer)
 library(wordcloud)
-topic_wordcloud <- function(mallet_df, par_row = ceiling(sqrt(mallet_df$model$numTopic)), par_col = ceiling(sqrt(mallet_df$model$numTopic)),
-                            n_topic =7,maximum_n = 200, cloud_scale = 2.5){
+topic_wordcloud <- function(mallet_df, par_row = ceiling(sqrt(mallet_df$model$numTopics)), par_col = ceiling(sqrt(mallet_df$model$numTopics)),
+                            n_topic = mallet_df$model$numTopics, maximum_n = 200, cloud_scale = 2.5){
   pal2 <- brewer.pal(8,"Dark2")
   par(mfrow = c(par_row, par_col),     # 2x2 layout
       oma = c(2, 2, 0, 0), # two rows of text at the outer left and bottom margin

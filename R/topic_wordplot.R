@@ -5,7 +5,7 @@ library(mallet)
 library(rlist)
 library(ggrepel)
 #create function that accepts the lda model and num word to display
-topic_wordplot <- function(mallet_df, n_topic, num_words = 10) {
+topic_wordplot <- function(mallet_df, n_topic = mallet_df$model$numTopics, num_words = 10) {
   topic.words <- mallet.topic.words(mallet_df, smoothed = T, normalized = T)
   mallet_words_list <- list()
   for (i in 1:as.numeric(n_topic)) {

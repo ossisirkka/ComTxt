@@ -59,7 +59,7 @@ shiny_topic <- function(mallet_df, df){
     ui = navbarPage(
       sidebarLayout(
         sidebarPanel(
-          numericInput("n_topic", "Number K", 7, min = 2, max = 100),
+          #numericInput("n_topic", "Number K", 7, min = 2, max = 100),
           numericInput("num_words", "Number Words", 10, min = 2, max = 50)),
         mainPanel(
           tabsetPanel(type = "tabs",
@@ -73,7 +73,7 @@ shiny_topic <- function(mallet_df, df){
       top_terms <- reactive({
         topic.words <- mallet.topic.words(mallet_df, smoothed = T, normalized = T)
         mallet_words_list <- list()
-        for (i in 1:as.numeric(input$n_topic)) {
+        for (i in 1:as.numeric(mallet_df$model$numTopics)) {
           mallet_words_list[[i]] <- mallet.top.words(mallet_df, topic.words[i,], 100)
         }
         topic_mallet_list <- mallet_words_list
@@ -82,7 +82,7 @@ shiny_topic <- function(mallet_df, df){
 
         ## top num_words words per topic
         sort <- list()
-        for(i in 1:input$n_topic*2-1){
+        for(i in 1:mallet_df$model$numTopics*2-1){
           sort[[i]] <- c(i,i+1)
         }
         sort <- do.call(rbind,sort)
@@ -108,7 +108,7 @@ shiny_topic <- function(mallet_df, df){
       })
 
       title <- reactive({
-        paste("Mallet Top",input$num_words  ,"Terms for", input$n_topic, "Topics")
+        paste("Mallet Top",input$num_words  ,"Terms for",mallet_df$model$numTopics, "Topics")
       })
 
       output$topic_word <- renderPlot(
@@ -121,7 +121,7 @@ shiny_topic <- function(mallet_df, df){
                                         normalized=T)
 
 
-      tmp_df <- df[rep(seq_len(nrow(df)), each = input$n_topic), ]
+      tmp_df <- df[rep(seq_len(nrow(df)), each = mallet_df$model$numTopics), ]
       #tmp_df$topic <- paste("Topic", rep(1:n_topic,  nrow(df)))
 
       tt <- list()
@@ -130,7 +130,7 @@ shiny_topic <- function(mallet_df, df){
       }
 
       tmp_df$prob <- unlist(tt)
-      tmp_df$topic <- paste("Topic", rep(1:input$n_topic,  nrow(df)))
+      tmp_df$topic <- paste("Topic", rep(1:mallet_df$model$numTopics,  nrow(df)))
       tmp_df$created_at <- format(as.Date(tmp_df$created_at), "%Y")
 
       year_prob <- aggregate(x = tmp_df$prob,                # Specify data column
