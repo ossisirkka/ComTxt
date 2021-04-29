@@ -5,6 +5,10 @@ date: "7 12 2020"
 output: html_document
 ---
 
+```{r}
+options(kableExtra.auto_format = FALSE)
+```
+
 
 ```{r}
 # Libraries
@@ -65,8 +69,8 @@ get_data_for_spesific_mca <- function(active_df, sup_df, karsittavat_str = index
     mutate_each(funs(addNA(., ifany = TRUE)))
   
   # Discard observations that have more than 20 % missing values
-  
-  dat_with_na_levels <- dat_with_na_levels[apply(dat_with_na_levels, 1, function(x) sum(is.na(x)) < 0.2 * ncol(dat_with_na_levels)),]
+  observations_with_more_than_20p_missing_values <- apply(dat_with_na_levels, 1, function(x) sum(is.na(x)) < 0.2 * ncol(dat_with_na_levels))
+  dat_with_na_levels <- dat_with_na_levels[observations_with_more_than_20p_missing_values,]
   
   # Get indices of null categories. This is important for MCA-function to conduct spesific mca. 
   index_for_null_categories <- active_df[,!names(active_df) %in% karsittavat_str] %>%
@@ -99,7 +103,7 @@ get_data_for_spesific_mca <- function(active_df, sup_df, karsittavat_str = index
   }
   
   # Return data and index for null categories
-  list(data = dat_with_na_levels, null_categories = index_for_null_categories)
+  list(data = dat_with_na_levels, null_categories = index_for_null_categories, observations_with_more_than_20p_missing_values = observations_with_more_than_20p_missing_values)
 } 
 
 ```

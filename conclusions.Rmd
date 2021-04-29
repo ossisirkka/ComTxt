@@ -3,6 +3,8 @@ title: "conclusions"
 author: "Ossi Sirkka"
 date: "8 12 2020"
 output: html_document
+bibliography: space-of-lifestyles.bib
+csl: apa.csl
 ---
 
 
@@ -19,7 +21,7 @@ output: html_document
   
 The analysis shows that two dimensions are sufficient to represent space of lifestyles in Finland, in both 2007 and 2018. Same dimensions remained the most important when we introduced new lifestyle indicators regarding both online and offline everyday activities, although the online indicators did increase the explanation power of second dimensions at the expense of first dimension. The emergence of these dimensions, legitimacy and modernity/traditionality of cultural practices, as the main structuring factors of the space of lifestyles, did not come as surprise; similar result was obtained by Purhonen et al. [-@purhonen_suomalainen_2014] in study of space of lifestyles in Finland in 2007, using the same data set as in this article.
 
-Outside of Finland, similar results are found in the studies of lifestyles. Specifically the second structuring dimension, modernity-traditionality, have been found in numerous studies with similar research design [e.g @bennet_culture_2009, @roose_culture_2012, @coulangeon_changing_2013, @cveticanin_art_2011]. This dimension is has been interpreted with different labels, e.g.  "contemporary - established" ["bennet_culture_2009], but the meaning is essentially the same. As it was shown in the analysis, this dimensions is mainly structured by age (with correlation coefficient -0.8). Clearly age is very important background variable when studying stratification of lifestyles. Our analysis also hints that average position of age cohort remained relatively stable from 2007 to 2018, which indicates that cultural tastes are linked to the cultural history of the generation individual comes from [@glevarec_structure_2020]. In other words, inter-cohort effects seem to play more significant role in the changing landscape in the cultural map than intra-cohort ones. 
+Outside of Finland, similar results are found in the studies of lifestyles. Specifically the second structuring dimension, modernity-traditionality, have been found in numerous studies with similar research design [e.g @bennett_culture_2009; @roose_culture_2012; @coulangeon_changing_2013; @cveticanin_art_2011]. This dimension is has been interpreted with different labels, e.g.  "contemporary - established" ["@bennett_culture_2009], but the meaning is essentially the same. As it was shown in the analysis, this dimensions is mainly structured by age (with correlation coefficient -0.8). Clearly age is very important background variable when studying stratification of lifestyles. Our analysis also hints that average position of age cohort remained relatively stable from 2007 to 2018, which indicates that cultural tastes are linked to the cultural history of the generation individual comes from [@glevarec_structure_2020]. In other words, inter-cohort effects seem to play more significant role in the changing landscape in the cultural map than intra-cohort ones. 
 
 
 

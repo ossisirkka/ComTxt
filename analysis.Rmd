@@ -29,9 +29,8 @@ Our analysis will be conducted in three separate steps. First, we create space o
 We start our analysis by creating the spaces of lifestyles using data from 2007 and 2018. Table `r tablenum <- tablenum + 1 ; tablenum ` and `r tablenum <- tablenum + 1 ; tablenum ` shows four first dimensions produced by MCA by respective year. 
 
 ```{r Table3 }
-
-create_kable <- function(table, cols = ncol(table) , otsikko){
-  return(knitr::kable(table, caption = otsikko) %>%
+create_kable <- function(table, cols = ncol(table) , otsikko, formaatti = "html"){
+  return(knitr::kable(table, caption = otsikko, format = formaatti) %>%
              kable_styling(bootstrap_options = c("striped", "hover"), font_size = 12, latex_options = c("scale_down","hold_position")) %>% 
              column_spec(column = cols, width = "4cm"))
 }
@@ -477,7 +476,7 @@ Being manager has became more legitimate and slightly more traditional from 2007
 
 Living in urban area does not separate in either dimension, as it locates close to the origo of the space. On the other hand, living in rural area, does locate in area of low legitimacy and traditionality. Being male is weakly associated to modern-illegitimate side, and being woman is associated with traditional-legitimate side of the space. However, these locations are quite close to the origo of the space. 
 
-### Change in the location of the modalities in the space of lifestyles from 2007 to 2018
+## Change in the location of the modalities in the space of lifestyles from 2007 to 2018
 
 Next, we will analyze the change in the space of lifestyles from 2007 to 2018. To examine change that has happened, we compare locations of individual lifestyle indicators in both first axes, and in the space of lifestyles as a two dimensional plane. In figure  `r fignum <- fignum + 1 ; fignum`, distributions of all changes aggregated by fields are presented. 
 
@@ -653,7 +652,7 @@ res_df_plane <- do.call(rbind, lapply(names(molemmat$data[,!names(molemmat$data)
 ```
 
 
-```{r, fig.cap="Distributions of difference in locations of lifestyle indicators in 2007 and 2018 in first and second axis and in the two-dimensional plane", out.width="100%"}
+```{r, fig.cap="Distributions of difference in locations of lifestyle indicators in 2007 and 2018 in first and second axis and in the two-dimensional plane. Outliers in each fields are labeled.", out.width="100%"}
 
 
 
@@ -763,7 +762,7 @@ p3 <- p3 + geom_text_repel(data = labels_dat, aes(kenttä, value, label = mod),
 cowplot::plot_grid(p1, p2, p3, nrow = 3)
 ```
 
-Figure `r fignum` shows that changes during eleven years were more significant in second than in first axis.  Considering the first axis, most stable fields of lifestyles was arts and urheilu, pukeutuminen ja ruumiillisuus, and most dynamic fields were tv and movies and food. Outliers, marked as dot and label, reveal some of the most stable and most dynamic lifestyle indicators. For example, reading +20 books per year occupied the same location in the space of lifestyles in 2007 and 2018, but reading to some extend changed its location. In the second axis, there are more variance and on average higher differences in the locations, which indicates lifestyle indicators have shifted in the dimension of modernity in more diverse manner during 11 years, comparing to dimension of legitimacy. Third part of figure `r fignum` presents euclidian distance of modalities in 2007 and 2018 in two-dimensional plane, and it reflects results from first and second axis. To show the modalities with biggest differences in their locations in space of lifestyles and to examine the direction of change, we present figure  `r fignum <- fignum + 1 ; fignum`. In Appendix 3, all statistically significant (p < 0.01) changes of modalities in axis 1, axis 2, or in the plane composed of those axes are presented. 
+Figure `r fignum` shows that changes during eleven years were more significant in second than in first axis.  Considering the first axis, most stable fields of lifestyles was arts and urheilu, pukeutuminen ja ruumiillisuus, and most dynamic fields were tv and movies and food. Outliers, marked as dot and label, reveal some of the most stable and most dynamic lifestyle indicators. In the second axis, there are more variance and on average higher differences in the locations, which indicates lifestyle indicators have shifted in the dimension of modernity in more diverse manner during 11 years, comparing to dimension of legitimacy. Third part of figure `r fignum` presents euclidian distance of modalities in 2007 and 2018 in two-dimensional plane, and it reflects results from first and second axis. To show the modalities with biggest differences in their locations in space of lifestyles and to examine the direction of change, we present figure  `r fignum <- fignum + 1 ; fignum`. In Appendix 3, all statistically significant (p < 0.01) changes of modalities in axis 1, axis 2, or in the plane composed of those axes are presented. 
 
 ```{r figure7, fig.cap="Items with highest difference in their location in space of lifestyles during 2007-2018 in Finland.", out.width="100%"}
 
@@ -824,7 +823,8 @@ In figure `r fignum`, some major changes in the space of lifestyles in Finland a
 Similar shift might be present when comparing clouds of individuals in 2018 and 2007. These clouds are presented in figure `r fignum <- fignum + 1 ; fignum`.
 
 ```{r figure8, fig.cap="Cloud of individuals of 2018 as supplementary individuals in cloud of active individuals of 2007", out.width="100%"}
-inds <- rbind(data.frame(dim1 = analyysi_molemmat$ind$coord[,1],
+inds <- rbind(
+      data.frame(dim1 = analyysi_molemmat$ind$coord[,1],
            dim2 = analyysi_molemmat$ind$coord[,2],
            year = rep("2007", nrow(analyysi_molemmat$ind$coord))),
       data.frame(dim1 = analyysi_molemmat$ind.sup$coord[,1],
@@ -988,7 +988,89 @@ knitr::kable(tb, caption = otsikko) %>%
 
 ```
 
-We can see from table `r tablenum` that two youngest cohorts occupy stable location in the space from 2007 to 2018. For the rest of the cohorts, all of them were more modern in 2018 than in 2007, which might be explained by stability of cultural practices in individuals. Despite of aging, lifestyle of the individual might remain more or less stable, which is indicated by the fact that location of cohorts (excluding two youngest ones) in 2018 reflects locations of the same cohorts in 2007, so, for example cohort of 55-64 year old in 2018 occupies the same location of 45-54 in 2007.
+We can see from table `r tablenum` that two youngest cohorts occupy stable location in the space from 2007 to 2018. For the rest of the cohorts, all of them were more modern in 2018 than in 2007, which might be explained by stability of cultural practices in individuals. Despite of aging, lifestyle of the individual might remain more or less stable, which is indicated by the fact that location of cohorts (excluding two youngest ones) in 2018 reflects locations of the same cohorts in 2007, so, for example cohort of 55-64 year old in 2018 occupies the same location of 45-54 in 2007. With homogeneity tests for principal plane, we find out that change in locations of the cohorts during eleven years was not significant, as presented in table `r tablenum <- tablenum + 1; tablenum`. (liitän nyt kuvankin tähän...)
+
+```{r}
+
+taustamuuttuja <- "ikä"
+
+coords_and_sup_vars <- data.frame(rbind(analyysi_molemmat$ind$coord[,1:2], analyysi_molemmat$ind.sup$coord[,1:2]),
+                                  rbind(analyysi_molemmat$call$X[,names(analyysi_molemmat$call$X) %in% sup.vars]),
+                                  aineisto = c(rep("2007", nrow(analyysi_molemmat$ind$coord)),
+                                               rep("2018", nrow(analyysi_molemmat$ind.sup$coord))))
+coords_and_sup_vars <-coords_and_sup_vars %>% 
+  group_by(.data[[taustamuuttuja]],aineisto) %>% 
+  summarise(Dim.1 = mean(Dim.1),
+            Dim.2 = mean(Dim.2)) %>% 
+  filter(str_detect(ikä, "NA", negate = TRUE))
+
+coords_and_sup_vars$pari <- (c(1, 7 , 2, 1 , 3, 2 , 4, 3 , 5, 4 , 8, 5 ))
+
+limx <- c(-0.4, 0.4)
+limy <- c(-0.4, 0.4)
+bre <- round(seq(-1.6, 2, 0.2),2)
+ggplot(coords_and_sup_vars, aes(x = Dim.1, y = Dim.2, label = interaction(.data[[taustamuuttuja]], aineisto),
+                                color = factor(pari))) +
+  geom_point(size = 1) + 
+  geom_text_repel(size = 2.7) +
+  geom_line(aes(group = pari),color = "black", size = 0.01, linetype = "dashed", alpha = 0.8) +
+  geom_hline(yintercept = 0, colour = "gray70") +
+  geom_vline(xintercept = 0, colour = "gray70") +
+  scale_x_continuous(breaks = bre, limits = limx) +
+  scale_y_continuous(breaks = bre, limits = limy) +
+  scale_color_discrete(name = "") +
+  ggtitle("") +
+  labs(x = "1. dimensio", y = "2. dimensio") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5), legend.position = "none")
+
+
+# testing -----------------------------------------------------------------
+
+
+homogenity_test_for_plane_sup_vars <- function(cohort1, cohort2){
+  
+    n_2007 <- nrow(analyysi_molemmat$ind$coord)
+    n_2018 <- nrow(analyysi_molemmat$ind.sup$coord)
+    
+    lambda_1 <- analyysi_molemmat$eig[1,1]
+    lambda_2 <- analyysi_molemmat$eig[2,1]
+    
+    d_hat_1 <- mean(coords_and_sup_vars[coords_and_sup_vars$aineisto_ikä == cohort1, "Dim.1"]) - mean(coords_and_sup_vars[coords_and_sup_vars$aineisto_ikä == cohort2, "Dim.1"])
+    d_hat_2 <- mean(coords_and_sup_vars[coords_and_sup_vars$aineisto_ikä == cohort1, "Dim.2"]) - mean(coords_and_sup_vars[coords_and_sup_vars$aineisto_ikä == cohort2, "Dim.2"])
+    
+    D_squared <- (d_hat_1^2 / lambda_1) + (d_hat_2^2 / lambda_2) 
+    
+    n_tilda <- 1/(
+      1 / length(coords_and_sup_vars[1:n_2007, "aineisto_ikä"] == cohort1) +
+        1 / length(coords_and_sup_vars[(n_2007+1) : n_2018, "aineisto_ikä"] == cohort2)    
+    )
+    
+    chi_squared <- n_tilda * ((n_2007 + n_2018 -1) / (n_2007 + n_2018)) * D_squared
+    p_chi <- dchisq(chi_squared, 2)
+    cbind(cohort_11 = cohort1, cohort_2 = cohort2, chisq = chi_squared, pval = p_chi)
+    #return(list(d_hat_1, d_hat_2, D_squared, n_tilda ))
+}
+
+coords_and_sup_vars <- data.frame(rbind(analyysi_molemmat$ind$coord[,1:2], analyysi_molemmat$ind.sup$coord[,1:2]),
+                                  rbind(analyysi_molemmat$call$X[,names(analyysi_molemmat$call$X) %in% sup.vars]),
+                                  aineisto = c(rep("2007", nrow(analyysi_molemmat$ind$coord)),
+                                               rep("2018", nrow(analyysi_molemmat$ind.sup$coord))))
+coords_and_sup_vars <- coords_and_sup_vars  %>% 
+  select(Dim.1, Dim.2, ikä, aineisto) %>% 
+  mutate(aineisto_ikä = interaction(ikä, aineisto)) 
+
+
+res <- rbind(
+  homogenity_test_for_plane_sup_vars(cohort1 = "18-24.2007", cohort2 = "25-34.2018"),
+  homogenity_test_for_plane_sup_vars(cohort1 = "25-34.2007", cohort2 = "35-44.2018"),
+  homogenity_test_for_plane_sup_vars(cohort1 = "35-44.2007", cohort2 = "45-54.2018"),
+  homogenity_test_for_plane_sup_vars(cohort1 = "45-54.2007", cohort2 = "55-64.2018"),
+  homogenity_test_for_plane_sup_vars(cohort1 = "55-64.2007", cohort2 = "65-74.2018")
+)
+res 
+```
+
 
 Next, we will try to find clusters from space of individuals and to identify most important cultural products for those clusters. We try to identify robust groups in space of lifestyles, and examine if there is change during eleven year period in these groups.
 
@@ -1002,6 +1084,10 @@ clust_vanha <- HCPC(analyysi_vanha, nb.clust = -1, graph = FALSE)
 clust_uusi <- HCPC(analyysi_uusi, nb.clust = -1, graph = FALSE)
 
 # create ggplot -----------------------------------------------------------
+
+limx <- c(-0.7, 1)
+limy <- c(-0.7, 1)
+
 plot_clusters <- function(clustdat){
   to_plot <- clustdat$call$X[,c("Dim 1","Dim 2","clust")]
   names(to_plot) <- c("dim1", "dim2", "group")
@@ -1243,6 +1329,6 @@ plot(p3)
 ```
 
 ```{r}
-new_whole <- find_most_important_categories_for_clusters(clust_2018_whole, n = 10, sign = "+", vuosi = "2007")
+new_whole <- find_most_important_categories_for_clusters(clust_2018_whole, n = 3, sign = "+", vuosi = "2007")
 new_whole
 ```

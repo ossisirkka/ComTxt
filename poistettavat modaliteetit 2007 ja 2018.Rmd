@@ -160,7 +160,13 @@ index_str <- c("Scifielokuvat", "TV_Pesäpallo", "Urheiluohjelmat", "Mäkelä", 
                
                "Uinti", "Kävely", "Pyöräily",
                
-               "Nettimusiikki", "Nettilehdet", "Nettichattaily", "Nettitaide", "Nettipelaaminen")
+               "Nettimusiikki", "Nettilehdet", "Nettichattaily", "Nettitaide", "Nettipelaaminen",
+               
+               
+               # 26.11.2020: remove these also
+               
+                "TV_Jalkapallo", "Salibandy", "Kreiksalaat", "Dekkarit", "Tietokirjat", "SuomenKuvalehti", "X7päivää", "Toimintaelokuvat", "Vanhat.kotim.elokuvat", "Kotikatu",
+  "tosi_tv", "Merkkitiet", "Netti")
 # modalitites of variables in index_str
 
 modalities_to_remove <- unname(unlist(sapply(index_str, function(x) levels(complete_vanha_aineisto$completeObs[,x]))))
