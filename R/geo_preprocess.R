@@ -226,5 +226,8 @@ geo_preprocess <- function(df, location_country,  multi_name){
     }
   }
 
+  for(i in 1:length(c(multi_name, location_country))){
+    df$city <- gsub(c(multi_name, location_country)[i], NA, df$city)}
+
   return(df)
 }
