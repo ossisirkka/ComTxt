@@ -16,7 +16,7 @@ twitter_preprocess <- function(df, ud_lang, stop_words){
   tmp$text <- gsub("\\\\s", "",tmp$text)
   tmp$text <- iconv(tmp$text, to = 'UTF-8')
 
-  tmp_1 <- udpipe(x = tmp, object = "spanish", trace = 10)
+  tmp_1 <- udpipe(x = tmp, object = ud_lang, trace = 10)
 
   tmp_1 <- tmp_1 %>%
       select(doc_id, lemma, upos)

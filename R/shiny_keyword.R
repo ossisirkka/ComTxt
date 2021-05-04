@@ -106,7 +106,7 @@ shiny_keyword <- function(df){
 
       output$keyword_hub <- renderPlot(
 
-        textplot_network(fcm_hub(), min_freq = 1, edge_color = "grey",vertex_color ="#538797"), height = 800, width = 1000 )
+        quanteda.textplots::textplot_network(fcm_hub(), min_freq = 1, edge_color = "grey",vertex_color ="#538797"), height = 800, width = 1000 )
 }
 
   )

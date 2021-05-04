@@ -127,7 +127,7 @@ shiny_mention <- function(df){
       })
 
       output$mention_network <- renderPlot(
-        textplot_network(topgat_fcm(), min_freq = 1, edge_color = "grey",vertex_color ="#538797"), height = 800, width = 1000 )
+        quanteda.textplots::textplot_network(topgat_fcm(), min_freq = 1, edge_color = "grey",vertex_color ="#538797"), height = 800, width = 1000 )
 
     }
   )
