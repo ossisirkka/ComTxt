@@ -9,112 +9,131 @@ output: html_document
 
 This package is for text analysis including preprocessing, topic modelling, semantic network, and sentiment analysis. The function includes both analysis and graphic visualization.  
 
-
-```{r}
+```{r  message=FALSE, warning=FALSE}
 library(devtools)
-install_github("BeaJJ/ComTxt",ref='trunk')
+install_github("BeaJJ/ComTxt")
 
 library(ComTxt)
-## preprocessing
-library(udpipe)
 library(dplyr)
-## topicmodelling
+library(quanteda)
+library(tidyr)
+library(scales)
+library(igraph)
+library(topicmodels)
+library(maps)
+library(purrr)
 library(mallet)
 library(stopwords)
-##visualizing topic
-library(RColorBrewer)
-library(wordcloud)
-library(rlist)
-library(kableExtra)
-library(igraph)
-##semantic network
-library(quanteda)
-##sentiment analysis
-library(tidytext) #Text mining
-library(tidyr) #Spread, separate, unite, text mining (also included in the tidyverse package)
-library(widyr) #Use for pairwise correlation
-library(textdata)
-library(readxl)
-##visualizing sentiment
-#Visualizations!
-library(ggplot2) #Visualizations (also included in the tidyverse package)
-library(ggrepel) #`geom_label_repel`
-library(gridExtra) #`grid.arrange()` for multi-graphs
-library(knitr) #Create nicely formatted output tables
-library(formattable) #For the color_tile function
-library(circlize) #Visualizations - chord diagram
-library(memery) #Memes - images with plots
-library(magick) #Memes - images with plots (image_read)
-library(yarrr)  #Pirate plot
-library(radarchart) #Visualizations
-library(igraph) #ngram network diagrams
-library(ggraph)
-
+library(ggplot2)
 ```
+
 
 ## Preprocessing 
 
-The preprocessing is based on UDpipe package. The function eliminate URLs, Emoticon, stopwords and finally return to lemma. 
+### 1. geo preprocessing with Premium account
 
+Instead of "exmple_df" place your Data name. Multi_names indicate other names that user might write. I found users wrote Croatia mainly but some people also wrote republic of croatia. You can check from the geo_preprocess function.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
+## put all different names of your country check the value of multi_name
+?geo_preprocess
+example_df <- geo_preprocess(example_df, location_country = "spain" , ##"finland" ##"croatia"
+                         multi_name = c("españa","spagna")) ##c("Suomi")  c("republic of croatia")
+
+```
+
+#### Geo information Description 
+
+```{r message=FALSE, warning=FALSE}
+geo_map(example_df, location_country = "Spain")
+geo_table(example_df)
+```
+
+### 3. text preprocessing
+
+Please check the function and ud_lang, stopwords you can choose according to your language. Select your own langauge for preprocessing 
+
+```{r message=FALSE, warning=FALSE}
+
+unique(example_df$lang) 
+example_lang.1 <- example_df[example_df$lang == "es", ] 
+example_lang.2 <- example_df[example_df$lang == "ca", ]
+
+?twitter_preprocess
 ## preprocess : lemmatization, stopwords, urls, emoticons
-df_pre <- twitter_preprocess(twitter_df, ud_lang = "spanish", stopwords_lang = "es")
+stop_words <- c(stopwords::stopwords("es", source = "stopwords-iso"))
+df_lang.1 <- twitter_preprocess(example_lang.1, ud_lang = "spanish", stop_words)
+
+## stopwords 
+stop_words <- c(stopwords::stopwords("ca", source = "stopwords-iso"))
+df_lang.2 <- twitter_preprocess(example_lang.2, ud_lang = "catalan", stop_words)
+
+df_pre <- rbind(df_lang.1, df_lang.2)
+```
+
+## Twitter Description 
+
+### 1. Key words Description 
+
+```{r message=FALSE, warning=FALSE}
+keyword_network(df_pre, keyword_remove = "cultura", top_n = 40)
+keyword_table(df_pre, keyword_remove= "cultura", top_n = 10)
+##select your keyword to zoom in
+keyword_network_hub(df_pre,hub="libro", top_n = 40 )
+shiny_keyword(df_pre)
+```
+
+### 2. Hashtags Description 
+
+```{r message=FALSE, warning=FALSE}
+hashtags_network(df_pre, hashtag_remove = "#cultura", top_n = 40)
+hashtags_table(df_pre, hashtag_remove = "#cultura", top_n = 10)
+##cine #historia #literatura #música
+##select your own key hashtags fromm  table
+hashtags_network_hub(df_pre, hub = "#arte", top_n = 10)
+```
+
+### 3. User Description 
+
+Top n users based on follower, friends, tweets number 
+
+```{r message=FALSE, warning=FALSE}
+user_table(df_pre, top_n = 10 )
+mention_table(df_pre, top_n = 10)
+mention_network(df_pre, top_n = 20)
+
+shiny_mention(df_pre)
 ```
 
 ## Mallet Topic Modeling  
 
-```{r}
+n_topic is the topic number K you select. 
+
+```{r message=FALSE, warning=FALSE}
 ## Topic modeling------------------------------------------------------
+?topic_number
+topic_number(df_pre)
 ### mallet topic modeling
-df_topics <- twitter_topic(df_pre, language = "es", n_topic = 7)
+?twitter_topic
+df_topics <- twitter_topic(df_pre, n_topic = 7)
 
 ### data frame words topic
-words <- topic_getwords(df_topics, n_topic = 7, n_words = 100)
-kable(words, "simple")
+?topic_getwords
+topic_getwords(df_topics, n_words = 100)
+
 ### draw wordscloud for each topics 3*3 = 9 spots (depending on your topic numbers)
-dev.off()
-topic_wordcloud(df_topics, par_row = 3, par_col = 3, n_topic = 7, maximum_n = 200, cloud_scale = 2.5)
+?topic_wordcloud
+topic_wordcloud(df_topics, maximum_n = 200, cloud_scale = 2.5)
 
-### draw topic semantic networks
-dev.off()
-topic_network(df_topics, n_nodes = 50, igraph_semantic_label= 0.007)
+### draw top n words in each topic 
+?topic_wordplot 
+topic_wordplot(df_topics,  num_words = 10)
 
-```
+### draw topic radar map based on year distribution 
+?topic_radarmap
+topic_radarmap(df_pre, df_topics)
 
-## Semantic network 
-
-```{r}
-## semantic network ----------------------------------------
-### semantic general
-semantic_network(df_pre, n_top = 40)
-
-### semantic hub network
-semantic_network_hub(df_pre, hub = "arte")
-
-```
-
-## Sentiment analysis 
-
-```{r}
-## Sentiment analysis ------------------------------
-### NRC sentiment analysis
-df_sent <- twitter_sentiment(df_pre, language = "es", undesirable_words = c("lol", "wtf"))
-
-### sentiment bar plot
-sentiment_bar(df_sent, by = "%m%Y")
-
-### sentiment wordsplot
-sentiment_wordsplot(df_sent)
-
-### sentiment circos plot
-sentiment_circos(df_sent)
-
-### sentiment radarmap
-sentiment_radarmap(df_sent)
-
-### sentiment semantic network
-sentiment_semantic(df_sent, select = "Anticipation", n_nodes = 200)
-
+?shiny_topic
+shiny_topic(df_topics, df_pre)
 ```
 
