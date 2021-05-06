@@ -107,16 +107,27 @@ shiny_mention(df_pre)
 
 ## Mallet Topic Modeling  
 
+### 1. Topic number K 
 n_topic is the topic number K you select. 
 
 ```{r message=FALSE, warning=FALSE}
 ## Topic modeling------------------------------------------------------
 ?topic_number
 topic_number(df_pre)
+
+```
+
+### 2. Topic modelling
+
+```{r}
 ### mallet topic modeling
 ?twitter_topic
 df_topics <- twitter_topic(df_pre, n_topic = 7)
+```
 
+### 3. Topic modelling visualization
+
+```{r}
 ### data frame words topic
 ?topic_getwords
 topic_getwords(df_topics, n_words = 100)
