@@ -18,9 +18,9 @@ This function display word term plot of topics.
 
 \examples{
 
-df_pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stopwords_lang = "es")
-df_topics <- twitter_topic(df_pre, language = "es", n_topic = 7)
-topic_radarmap(df_pre ,df_topics, n_topic =7)
+df_pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stop_words)
+df_topics <- twitter_topic(df_pre, n_topic = 7)
+topic_radarmap(df_pre ,df_topics)
 
 }
 \source{

@@ -16,9 +16,9 @@ This function retrive the matrix of words and its weight for topics.
 }
 
 \examples{
-df_ pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stopwords_lang = "es")
-df_topics <- twitter_topic(df_pre, language = "es", n_topic = 7)
-words <- topic_getwords(df_topics, n_topic = 7, n_words = 100)
+df_ pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stop_words)
+df_topics <- twitter_topic(df_pre, n_topic = 7)
+words <- topic_getwords(df_topics, n_words = 100)
 }
 \source{
 David Mimno (2013) mallet: A wrapper around the Java machine learning tool MALLET
