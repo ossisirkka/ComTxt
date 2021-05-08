@@ -6,6 +6,7 @@ library(maps)
 
 get_tweet_preprocess <- function(list, location_country = "spain"){
 
+  list <- Filter(function(k) length(k)> 1, list)
 
   tweets_list_clean <- lapply(list, function(x){
   ##from x$data
@@ -92,6 +93,7 @@ get_tweet_preprocess <- function(list, location_country = "spain"){
   tmp$account_created_at <-df$created_at.y
 
   tmp.5 <- list()
+  if(length(df$entities.y$url$urls) > 0){
   for (m in 1:length(df$entities.y$url$urls)){
     profile_url <- df$entities.y$url$urls[[m]][["url"]]
     if(length(profile_url)==0){
@@ -102,6 +104,9 @@ get_tweet_preprocess <- function(list, location_country = "spain"){
     tmp.5[[m]] <- data.frame(profile_url)
   }
   tmp.5 <- do.call(rbind.data.frame, tmp.5)
+  } else {
+    tmp.5 <- NA
+  }
   tmp$profile_url <- tmp.5
 
   names(x$includes$places)[names(x$includes$places) == "id"] <- "place_id"
@@ -115,6 +120,8 @@ get_tweet_preprocess <- function(list, location_country = "spain"){
   colnames(tmp)[colnames(tmp) == "name.y"] <- 'city'
   colnames(tmp)[colnames(tmp) == "name.x"] <- 'name'
 
+  col_name <- colnames(tmp)
+
   col_order <- c("user_id", "status_id", "created_at","screen_name", "text",
                  "source", "conversation_id", "in_reply_to_user_id",
                  "mentions_screen_name","retweet_count","reply_count", "like_count",
@@ -123,6 +130,14 @@ get_tweet_preprocess <- function(list, location_country = "spain"){
                  "followers_count","friends_count", "statuses_count",
                  "listed_count", "account_created_at","verified",
                  "profile_image_url", "profile_url")
+
+  if(length(which(!col_order %in% col_name)) > 0){
+    missing <- col_order[which(!col_order %in% col_name)]
+    tmp[, missing] <- NA
+  } else{
+    tmp
+  }
+
   tmp <- tmp[col_order]
 
   tmp <- tmp[, col_order]
@@ -131,18 +146,6 @@ get_tweet_preprocess <- function(list, location_country = "spain"){
 })
 
 df_tweets <- do.call(rbind.data.frame, tweets_list_clean)
-
-#geom <- list()
-#for(i in 1:nrow(df_tweets)){
-#  if(length(df_tweets$geo_coords[[i]]) < 1){
-#    df_tweets$geo_coords[[i]] <- c(NA, NA)
-#  }
-#  geom[[i]]<- c(df_tweets$geo_coords[[i]][[2]], df_tweets$geo_coords[[i]][[1]] )
-#}
-
-#df_tweets <-
-#  df_tweets %>%
-#  mutate(geo_coords = geom)
 
 ## now lets find the cities cities
 df_tweets$city <- iconv(df_tweets$city,from="UTF-8",to="ASCII//TRANSLIT")
