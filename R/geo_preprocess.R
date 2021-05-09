@@ -134,6 +134,7 @@ geo_preprocess <- function(df, location_country,  multi_name){
       country = ifelse(location_df$city %in% multi_name, location_country, location_df$country)
     )
 
+
   location_df <-
     location_df %>%
     mutate(
