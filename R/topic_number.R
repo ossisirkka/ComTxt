@@ -74,7 +74,7 @@ topic_number <- function(df){
 dtm <- DocumentTermMatrix(Corpus(VectorSource(df$text)))
 
 #Filtering empty rows of the matrix (DTM) - important for performance
-rowTotals <- apply(dtm, 1, sum)
+rowTotals <- slam::row_sums(dtm)#apply(dtm, 1, sum)
 dtm_filter <- dtm[rowTotals > 0,]
 
 #Model optimization - calculating perplexity for different values of k
