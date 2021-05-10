@@ -15,8 +15,11 @@ for(i in 1:length(tmp)){
   location_1[[i]] <- list(city = unlist(tmp[i])[1], country = unlist(tmp[i])[2])
 }
 
-location_1 <- reduce(location_1, bind_rows)
+#location_1 <- reduce(location_1, bind_rows)
 
+#library (plyr)
+#location_1 <- ldply(location_1, data.frame)
+location_1 <- dplyr::bind_rows(location_1)
 ## location_tmp: seperating cities and country ()
 tmp <- list()
 for(i in 1:nrow(location_1)){
@@ -28,7 +31,9 @@ for(i in 1:length(tmp)){
   location_tmp[[i]] <- list(city = unlist(tmp[i])[1], country = unlist(tmp[i])[2])
 }
 
-location_tmp <- reduce(location_tmp, bind_rows)
+
+location_tmp <- dplyr::bind_rows(location_tmp)
+#location_tmp <- reduce(location_tmp, bind_rows)
 
 ## location_ df: combining location_1 data and location_tmp data adjusting contry coulmn
 location_df <- cbind(location_tmp, location_1[,2])
@@ -52,8 +57,8 @@ for(i in 1:length(tmp)){
   location_tmp[[i]] <- list(city = unlist(tmp[i])[1], country = unlist(tmp[i])[2])
 }
 
-location_tmp <- reduce(location_tmp, bind_rows)
-
+#location_tmp <- reduce(location_tmp, bind_rows)
+location_tmp <- dplyr::bind_rows(location_tmp)
 ## location_df: combining loctaion_df and location tmp
 
 location_df <- cbind(location_tmp, location_df[,2])
@@ -77,7 +82,8 @@ for(i in 1:length(tmp)){
   location_tmp[[i]] <- list(city = unlist(tmp[i])[1], country = unlist(tmp[i])[2])
 }
 
-location_tmp <- reduce(location_tmp, bind_rows)
+#location_tmp <- reduce(location_tmp, bind_rows)
+location_tmp <- dplyr::bind_rows(location_tmp)
 
 ## location_df: combining loctaion_df and location tmp
 location_df <- cbind(location_tmp, location_df[,2])
@@ -102,7 +108,8 @@ for(i in 1:length(tmp)){
   location_tmp[[i]] <-list(city = unlist(tmp[i])[1], country = unlist(tmp[i])[2])
 }
 
-location_tmp <- reduce(location_tmp, bind_rows)
+#location_tmp <- reduce(location_tmp, bind_rows)
+location_tmp <- dplyr::bind_rows(location_tmp)
 
 ##location_df :combining loctaion_df and location tmp
 location_df <- cbind(location_tmp, location_df[,2])
@@ -125,12 +132,7 @@ location_df$country <- trimws(location_df$country)
 location_df[,2] <- tolower(location_df[,2])##lowercase
 location_df[,1] <- tolower(location_df[,1])
 
-location_df <-
-  location_df %>%
-  rename(
-    city.x =city,
-    country.x = country
-  )
+colnames(location_df)<- c("city.x", "country.x")
 
 location_df <-
   location_df %>%
@@ -173,12 +175,44 @@ location_df$city.x <- iconv(location_df$city.x ,from="UTF-8",to="ASCII//TRANSLIT
 df <- subset(df, select = -c(location))
 df <- data.frame(df, location_df)
 df$city <- tolower(df$city)
+df$city <-gsub('[[:punct:] ]+',' ',df$city)
+
+df$city.x <-gsub('[[:punct:] ]+',' ',df$city.x)
 
 df <-
   df %>%
   mutate(
     country.x = ifelse(str_detect(df$city.x, df$city) == TRUE, location_country, df$country.x)
   )
+
+df <-
+  df %>%
+  mutate(
+    country.x = ifelse(str_detect(df$city.x, location_country) == TRUE, location_country, df$country.x)
+  )
+
+df <-
+  df %>%
+  mutate(
+    city.x = ifelse(str_detect(df$city.x, df$city) == TRUE, df$city, df$city.x)
+  )
+
+df <-
+  df %>%
+  mutate(
+    for(i in 1:length(multi_name)){
+    country.x = ifelse(str_detect(df$city.x, multi_name[[i]]) == TRUE, location_country, df$country.x)
+    }
+  )
+
+df$country.x <- iconv(df$country.x ,from="UTF-8",to="ASCII//TRANSLIT")
+df$country.x <- iconv(df$country.x ,from="UTF-8",to="ASCII//TRANSLIT")
+df <-
+  df %>%
+  mutate(
+    country.x = ifelse(df$country.x %in% city_df$name, location_country, df$country.x)
+  )
+
 
 df <- df[which(df$country.x == location_country),]
 
