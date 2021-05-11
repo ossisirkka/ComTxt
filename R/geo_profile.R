@@ -2,7 +2,7 @@
 library(purrr)
 library(dplyr)
 library(maps)
-
+library(stringr)
 geo_profile <- function(df, location_country,  multi_name){
 ## Seperating city and country with
 tmp <- list()
@@ -171,13 +171,16 @@ location_df <-
 
 #location_df <- cbind(location_df, city = df$city, country = df$country)
 location_df$city.x <- iconv(location_df$city.x ,from="UTF-8",to="ASCII//TRANSLIT")
+location_df$city.x <-gsub('[[:punct:] ]+',' ',location_df$city.x)
+location_df$country.x <- iconv(location_df$country.x ,from="UTF-8",to="ASCII//TRANSLIT")
+location_df$country.x <-gsub('[[:punct:] ]+',' ',location_df$country.x)
 
 df <- subset(df, select = -c(location))
 df <- data.frame(df, location_df)
 df$city <- tolower(df$city)
 df$city <-gsub('[[:punct:] ]+',' ',df$city)
 
-df$city.x <-gsub('[[:punct:] ]+',' ',df$city.x)
+
 
 df <-
   df %>%
@@ -197,36 +200,47 @@ df <-
     city.x = ifelse(str_detect(df$city.x, df$city) == TRUE, df$city, df$city.x)
   )
 
+multi <- iconv(multi_name,from="Latin1",to="ASCII//TRANSLIT")
+for(i in 1:length(multi)){
 df <-
   df %>%
   mutate(
-    for(i in 1:length(multi_name)){
-    country.x = ifelse(str_detect(df$city.x, multi_name[[i]]) == TRUE, location_country, df$country.x)
-    }
+    country.x = ifelse(str_detect(df$city.x, multi[[i]]) == TRUE, location_country, df$country.x))
+}
+
+df <-
+  df %>%
+  mutate(
+    city.x = ifelse(str_detect(df$country.x, df$city) == TRUE, df$city, df$city.x),
+    country.x = ifelse(str_detect(df$country.x, df$city) == TRUE, location_country, df$country.x)
   )
 
-df$country.x <- iconv(df$country.x ,from="UTF-8",to="ASCII//TRANSLIT")
-df$country.x <- iconv(df$country.x ,from="UTF-8",to="ASCII//TRANSLIT")
 df <-
   df %>%
   mutate(
+    city.x = ifelse(df$country.x %in% city_df$name, df$country.x, df$city.x),
     country.x = ifelse(df$country.x %in% city_df$name, location_country, df$country.x)
   )
 
-
 df <- df[which(df$country.x == location_country),]
 
-
 for(i in 1:nrow(df)){
-  if(nrow(city_df[city_df$name == df$city.x[i],])==1){
-    df$lat[[i]] <- city_df[city_df$name == df$city.x[i],]$lat
-    df$lng[[i]] <- city_df[city_df$name == df$city.x[i],]$long
-  }
-  if(nrow(city_df[city_df$name == df$city.x[i],])==0) {
-    df$lat[[i]] <- NA
-    df$lng[[i]] <- NA
-  }
+  if(df$city.x[[i]] != df$city[[i]]){
+    if(nrow(city_df[city_df$name == df$city.x[i],])==1){
+    df$lat.x[[i]] <- city_df[city_df$name == df$city.x[i],]$lat
+    df$lng.x[[i]] <- city_df[city_df$name == df$city.x[i],]$long
+    }
+    if(nrow(city_df[city_df$name == df$city.x[i],])==0) {
+     df$lat.x[[i]] <- NA
+     df$lng.x[[i]] <- NA
+    }
+    }else{
+    df$lat.x[[i]] <-  df$lat[[i]]
+    df$lng.x[[i]] <-  df$lng[[i]]
+    }
 }
+
+
 
 
 ##delete country name in city column
@@ -241,5 +255,9 @@ names(df)[names(df) == 'country'] <- 'place_country'
 names(df)[names(df) == 'city.x'] <- 'city'
 names(df)[names(df) == 'country.x'] <- 'country'
 
+names(df)[names(df) == 'lat'] <- 'place_lat'
+names(df)[names(df) == 'lng'] <- 'place_lng'
+names(df)[names(df) == 'lat.x'] <- 'lat'
+names(df)[names(df) == 'lng.x'] <- 'lng'
 return(df)
 }

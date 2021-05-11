@@ -24,6 +24,6 @@ This function preprocess profile location data adds country and city data.
 }
 \examples{
 df_tweets <- get_tweet_preprocess(tweets_list, location_country = "spain")
-df_pre <- geo_profile(df_tweets, location_country = "spain",  multi_name = c("españa","spagna"))
+df_pre <- geo_profile(df_tweets, location_country = "spain",  multi_name = c("españa","spagna","spanje"))
 }
 
