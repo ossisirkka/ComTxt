@@ -26,7 +26,10 @@ user_table <- function(df, top_n){
     arrange(desc(statuses_count)) %>%
     head(top_n)
 
-  tmp <- cbind(tmp_1, tmp_2, tmp_3)
-  print(kable(tmp, "simple", caption = paste("Top", top_n, "Users in follower, following, tweets number")))
+  tmp_4 <- as.data.frame(sort(table(df$screen_name), decreasing=TRUE))
+  colnames(tmp_4 ) <- "N.tweet_culture"
+
+  tmp <- cbind(tmp_1, tmp_2, tmp_3, tmp_4)
+  print(kable(tmp, "simple", caption = paste("Top", top_n, "Users in follower, following, tweets number, N tweets about culture")))
 
 }
