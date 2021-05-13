@@ -21,7 +21,8 @@ hashtag_stat <- function(df) {
   unique_hashtags<- length(unique(dddd))
 
   check <- data.frame(total_hashtags = total_hashtags, unique_hashtags = unique_hashtags, hashtags_percentage = hashtags_percentage, max_n_hashtags = max_n_hashtags, mean_n_hashtags= mean_n_hashtags)
-  return(check)
+  rownames(check) <- NULL
+  print(kable(check, "simple", caption = "hashtags statistics"))
 }
 
 

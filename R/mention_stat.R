@@ -15,6 +15,5 @@ mention_stat <- function(df){
   mean_n_mention <-round(mean(cal_max), digits = 1)
 
   check <- data.frame(mention_percentage = mention_percentage, mean_n_mention= mean_n_mention)
-
-  return(check)
+  print(kable(check, "simple", caption = "mention statistics"))
 }
