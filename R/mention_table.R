@@ -22,5 +22,6 @@ mention_table <- function(df, top_n = 10){
 
   toptag <- topfeatures(hash_dfm, top_n)
 
-  print(kable(as.table(toptag), "simple", caption = paste("Top", top_n, "mention_id")))
+  #print(kable(as.table(toptag), "simple", caption = paste("Top", top_n, "mention_id")))
+  return(toptag)
 }

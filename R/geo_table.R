@@ -7,6 +7,8 @@ geo_table <- function(df){
   colnames(tmp) <- c("city", "freq")
   rownames(tmp) <- NULL
   tmp <- tmp[order(-tmp$freq),]
-  print(kable(head(tmp, 10), "simple", caption = "Top 10 locations"))
+  #print(kable(head(tmp, 10), "simple", caption = "Top 10 locations"))
+  tmp <- head(tmp, 10)
+  return(tmp)
 }
 

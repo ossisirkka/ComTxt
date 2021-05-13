@@ -11,5 +11,6 @@ keyword_table <- function(df, keyword_remove, top_n = 10){
   toptag <- data.frame(toptag)
   toptag <- tibble::rownames_to_column(toptag, "keyword")
   colnames(toptag) <- c("keyword", "freq")
-  print(kable(toptag, "simple", caption = paste("Top", top_n, "keyword")))
+  #print(kable(toptag, "simple", caption = paste("Top", top_n, "keyword")))
+  return(toptag)
 }
