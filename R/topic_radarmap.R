@@ -6,13 +6,13 @@ library(scales)
 library(mallet)
 library(radarchart)
 #create function that accepts the lda model and num word to display
-topic_radarmap <- function(df ,mallet_df, n_topic = mallet_df$model$numTopics) {
+topic_radarmap <- function(mallet_df, df, col = "royalblue") {
 
   doc.topics.m <- mallet.doc.topics(mallet_df, smoothed=T,
                                     normalized=T)
 
 
-  tmp_df <- df[rep(seq_len(nrow(df)), each = n_topic), ]
+  tmp_df <- df[rep(seq_len(nrow(df)), each = mallet_df$model$numTopics), ]
   #tmp_df$topic <- paste("Topic", rep(1:n_topic,  nrow(df)))
 
   tt <- list()
@@ -21,12 +21,12 @@ topic_radarmap <- function(df ,mallet_df, n_topic = mallet_df$model$numTopics) {
   }
 
   tmp_df$prob <- unlist(tt)
-  tmp_df$topic <- paste("Topic", rep(1:n_topic,  nrow(df)))
-  tmp_df$created_at <- format(as.Date(tmp_df$created_at), "%Y")
-
+  tmp_df$topic <- paste("Topic", rep(1:mallet_df$model$numTopics,  nrow(df)))
+  #tmp_df$created_at <- format(as.Date(tmp_df$created_at), "%Y")
+  tmp_df$created_at <- min(format(as.Date(tmp_df$created_at), "%Y"))
   year_prob <- aggregate(x = tmp_df$prob,                # Specify data column
-                                      by = list(tmp_df$topic, tmp_df$created_at),              # Specify group indicator
-                                      FUN = sum)
+                         by = list(tmp_df$topic, tmp_df$created_at),              # Specify group indicator
+                         FUN = sum)
 
   year_topic <- tmp_df  %>%
     group_by(created_at, topic) %>%
@@ -37,13 +37,14 @@ topic_radarmap <- function(df ,mallet_df, n_topic = mallet_df$model$numTopics) {
 
   year_topic$percent <- year_topic$prob / year_topic$year_topic_n *100
 
-  col <- col2rgb(c("peachpuff", "royalblue", "tomato", "#B4CF68", "green", "purple", "orange","grey","red","#8DD3C7" , "pink", "blue","gold"))
+  #col <- col2rgb(c("royalblue", "tomato", "#B4CF68", "green", "purple", "orange","grey","red","#8DD3C7" , "pink", "blue","gold"))
   #Join the two and create a percent field
   year_radar_chart <- year_topic %>%
     select(-year_topic_n, -prob) %>%
     spread(created_at, percent) %>%
     chartJSRadar(showToolTipLabel = TRUE,
-                 main = "Topic Radar", colMatrix =col)
+                 main = "Topic Radar", colMatrix =col2rgb(col))
   print(year_radar_chart)
 
 }
+

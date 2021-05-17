@@ -131,8 +131,8 @@ shiny_topic <- function(mallet_df, df){
 
       tmp_df$prob <- unlist(tt)
       tmp_df$topic <- paste("Topic", rep(1:mallet_df$model$numTopics,  nrow(df)))
-      tmp_df$created_at <- format(as.Date(tmp_df$created_at), "%Y")
-
+      #tmp_df$created_at <- format(as.Date(tmp_df$created_at), "%Y")
+      tmp_df$created_at <- min(format(as.Date(tmp_df$created_at), "%Y"))
       year_prob <- aggregate(x = tmp_df$prob,                # Specify data column
                              by = list(tmp_df$topic, tmp_df$created_at),              # Specify group indicator
                              FUN = sum)
@@ -150,7 +150,7 @@ shiny_topic <- function(mallet_df, df){
 
 
      col <- reactive({
-       col2rgb(c("peachpuff", "royalblue", "tomato", "#B4CF68", "green", "purple", "orange","grey","red","#8DD3C7" , "pink", "blue","gold"))
+       col2rgb(c("royalblue", "tomato", "#B4CF68", "green", "purple", "orange","grey","red","#8DD3C7" , "pink", "blue","gold"))
      })
        #Join the two and create a percent field
        year_radar_chart <- reactive({
