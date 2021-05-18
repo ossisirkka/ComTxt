@@ -1,8 +1,8 @@
-\name{topic_radarmap}
-\alias{topic_radarmap}
-\title{Topic distribution by year}
+\name{topic_radarmap_1}
+\alias{topic_radarmap_1}
+\title{Topic distribution with topic names}
 \usage{
-topic_radarmap(mallet_df,df , col = "royalblue")
+topic_radarmap_1(mallet_df, df, col = "royalblue")
 }
 \description{
 This function display word term plot of topics.
@@ -12,6 +12,8 @@ This function display word term plot of topics.
 
   \item{df}{preprocessed twitter data}
 
+  \item{topic_name}{topic names}
+
   \item{col}{"royalblue", "tomato", "#B4CF68", "green", "purple", "orange","grey","red","#8DD3C7" , "pink", "blue","gold"}
 }
 
@@ -19,6 +21,7 @@ This function display word term plot of topics.
 
 df_pre <- twitter_preprocess(df_tweets, ud_lang = "spanish", stop_words)
 df_topics <- twitter_topic(df_pre, n_topic = 7)
-topic_radarmap(df_topics, df_pre , col = "royalblue")
+topic_name <- c("social division", "spain", "visual art")
+topic_radarmap_1(df_topics, df_pre ,topic_name, col = "royalblue")
 
 }
