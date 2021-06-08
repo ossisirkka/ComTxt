@@ -1,5 +1,5 @@
 ##### Packages you need to install/load ####
-library(ComTxt)
+
 library(ggplot2)
 library(mallet)
 library(RColorBrewer)
