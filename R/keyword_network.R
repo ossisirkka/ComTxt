@@ -29,8 +29,8 @@ keyword_network <- function(df, keyword_remove, top_n = 40){
 
 
 
-
-
+#size = 0.15
+#, vertex_labelsize = rowSums(fcm_1)*size
 
 
 

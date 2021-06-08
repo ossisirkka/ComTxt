@@ -38,7 +38,7 @@ topic_radarmap_1 <- function(mallet_df, df, topic_name, col = "royalblue") {
     select(created_at, topic, year_topic_n = n)
 
   year_topic$prob <- year_prob$x
-
+  year_topic$prob <- round(year_topic$prob, digits = 2)
   year_topic$percent <- year_topic$prob / year_topic$year_topic_n *100
   year_topic$topic <- as.numeric(year_topic$topic)
 
@@ -52,8 +52,8 @@ topic_radarmap_1 <- function(mallet_df, df, topic_name, col = "royalblue") {
   year_radar_chart <- year_topic %>%
     select(-year_topic_n, -prob) %>%
     spread(created_at, percent) %>%
-    chartJSRadar(showToolTipLabel = TRUE,
-                 main = "Topic Radar", colMatrix =col2rgb(col))
+    chartJSRadar(#showToolTipLabel = TRUE,
+                 main = "Topic Radar", colMatrix =col2rgb(col), scaleStartValue = 8)
   print(year_radar_chart)
 
 }

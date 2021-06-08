@@ -3,7 +3,7 @@ library(quanteda.textplots)## Semantic network
 library(quanteda)
 library(RColorBrewer)
 library(dplyr)
-
+library(stringr)
 
 hashtags_network <- function(df, hashtag_remove = "#cultura", top_n = 40){
 
@@ -12,6 +12,7 @@ hashtags_network <- function(df, hashtag_remove = "#cultura", top_n = 40){
   }
   df$hashtags <- gsub("#na", NA, df$hashtags)
   df$hashtags <- iconv(df$hashtags,from="UTF-8",to="ASCII//TRANSLIT")
+  df$hashtags <- stringr::str_remove_all(df$hashtag, "[\\p{P}\\p{S}&&[^#]]")
   df <- df[!is.na(df$hashtags),]
   hash_dfm <- dfm(df$hashtags)
   hash_dfm <- dfm_remove(hash_dfm, hashtag_remove)# Document-feature matrix
@@ -24,10 +25,8 @@ hashtags_network <- function(df, hashtag_remove = "#cultura", top_n = 40){
 }
 
 
-
-
-
-
+#size =0.015
+#, vertex_labelsize = rowSums(topgat_fcm)*size
 
 
 

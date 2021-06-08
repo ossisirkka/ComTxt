@@ -36,7 +36,7 @@ topic_preprocess <- function(df, ud_lang, stop_words){
   }
   preprocess_tmp <- as.data.frame(do.call(rbind, preprocess))
 
-  tmp.2 <- df[df$status_id %in% preprocess_tmp$V1, ]
+  tmp.2 <- df[df$status_id%in% preprocess_tmp$V1, ]
   tmp.2$text <- preprocess_tmp$V2
 
   return(tmp.2)
