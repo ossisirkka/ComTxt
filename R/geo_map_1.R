@@ -6,7 +6,6 @@ library(ggmap)
 library(ggplot2)
 library(dplyr)
 library(RColorBrewer)
-library(ComTxt)
 library(stringr)
 
 ##### Parameters of the function tweets_map(country, df_2019, df_2020)
